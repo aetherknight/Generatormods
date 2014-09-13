@@ -1,12 +1,10 @@
 /*
 
 !build.gradle
-!/assets/
+!/src
+!/src/*
 !/gradle/
-!assets/*
 !gradle/*
-!mcmod.info
-!pack.mcmeta
 !license.md
 !update.xml
 !changelog.md
