@@ -1,10 +1,13 @@
-/*
-
-!build.gradle
-!/src
-!/src/*
-!/gradle/
-!gradle/*
-!license.md
-!update.xml
-!changelog.md
+# Gradle/Forge:
+.gradle
+bin
+build
+eclipse
+# Eclipse:
+.classpath
+.project
+.settings
+# IDEA:
+*.iml
+*.ipr
+*.iws
