@@ -1,14 +1,24 @@
+/* Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
+ * Copyright (C) 2011 by formivore
+ * Copyright (C) 2013-2014 by GotoLink
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package assets.generator;
 
-/*
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+import java.io.*;
+import java.util.*;
 
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.command.CommandBase;
@@ -17,9 +27,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Scan command for players to get templates from structures built in game in the specified location

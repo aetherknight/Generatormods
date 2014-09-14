@@ -1,20 +1,22 @@
+/* Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
+ * Copyright (C) 2011 by formivore
+ * Copyright (C) 2013-2014 by GotoLink
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package assets.generator;
 
-/*
- *  Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
- *  Copyright (C) 2011 by formivore
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-/*
- * TemplateTML reads in a .tml file and defines a template.
- */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -26,6 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+/*
+ * TemplateTML reads in a .tml file and defines a template.
+ */
 public class TemplateTML {
 	public final static String NO_WATER_CHECK_STR = "NO_WATER_CHECK";
 	public final static int NO_WATER_CHECK = -666;

@@ -46,7 +46,7 @@ processResources {
 
     // copy licensing, documentation from the project base directory
     from(project.projectDir.getPath()) {
-        include "*.md"
+        include "*.md", "*.txt"
     }
 
 }

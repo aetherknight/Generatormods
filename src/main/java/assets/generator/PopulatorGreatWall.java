@@ -1,21 +1,22 @@
+/* Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
+ * Copyright (C) 2011 by formivore
+ * Copyright (C) 2013-2014 by GotoLink
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package assets.generator;
 
-/*
- *  Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
- *  Copyright (C) 2011 by formivore
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-/*
- * PopulatorGreatWall is the main class that hooks into ModLoader for the Great Wall Mod.
- * It reads the globalSettings file and runs WorldGenWalledCities.
- */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,10 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
+/*
+ * PopulatorGreatWall is the main class that hooks into ModLoader for the Great Wall Mod.
+ * It reads the globalSettings file and runs WorldGenWalledCities.
+ */
 @Mod(modid = "GreatWallMod", name = "Great Wall Mod", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Instance("GreatWallMod")

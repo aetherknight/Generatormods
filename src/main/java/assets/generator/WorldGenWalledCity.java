@@ -1,22 +1,22 @@
+/* Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
+ * Copyright (C) 2011 by formivore
+ * Copyright (C) 2013-2014 by GotoLink
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package assets.generator;
 
-/*
- *  Source code for the The Great Wall Mod and Walled City Generator Mods for the game Minecraft
- *  Copyright (C) 2011 by formivore
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-/*
- * WorldGenWalledCity generates walled cities in the Minecraft world.
- * Walled cities are composed of 4 wall template BuildingWalls in a rough rectangle,
- *  filled with many street template BuildingDoubleWalls.
- */
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,6 +28,11 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
+/*
+ * WorldGenWalledCity generates walled cities in the Minecraft world.
+ * Walled cities are composed of 4 wall template BuildingWalls in a rough rectangle,
+ *  filled with many street template BuildingDoubleWalls.
+ */
 public class WorldGenWalledCity extends WorldGeneratorThread {
 	private final static int GATE_HEIGHT = 6;
 	private final static int JMEAN_DEVIATION_SLOPE = 10;
