@@ -15,18 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package assets.generator;
+package generatormods;
 
 import net.minecraft.block.Block;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class PlacedBlock extends BlockAndMeta{
-    public final int x, y, z;
-    public PlacedBlock(Block block, int[] data) {
-        super(block, data[3]);
-        this.x = data[0];
-        this.y = data[1];
-        this.z = data[2];
+public class BlockExtended extends BlockAndMeta{
+    public final String info;
+    public BlockExtended(Block block, int meta, String extra) {
+        super(block, meta);
+        info = extra;
     }
 
     @Override
@@ -39,14 +37,14 @@ public class PlacedBlock extends BlockAndMeta{
         }
         if(!super.equals(obj)){
             return false;
-        }else if(obj instanceof PlacedBlock){
-            return this.x == ((PlacedBlock) obj).x && this.y == ((PlacedBlock) obj).y && this.z == ((PlacedBlock) obj).z;
+        }else if(obj instanceof BlockExtended){
+            return this.info.equals(((BlockExtended) obj).info);
         }
         return false;
     }
 
     @Override
     public int hashCode(){
-        return new HashCodeBuilder().append(getMeta()).append(get()).append(x).append(y).append(z).toHashCode();
+        return new HashCodeBuilder().append(getMeta()).append(get()).append(info).toHashCode();
     }
 }
