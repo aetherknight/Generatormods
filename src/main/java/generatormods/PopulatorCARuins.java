@@ -17,24 +17,29 @@
  */
 package generatormods;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Random;
+import generatormods.config.CARuinsConfig;
+import generatormods.config.ChestContentsConfig;
+import generatormods.config.ChestItemSpec;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ModContainer;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 @Mod(modid = "CARuins", name = "Cellular Automata Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorCARuins extends BuildingExplorationHandler {
@@ -149,30 +154,51 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Override
 	public void loadGlobalOptions(BufferedReader br) {
 		ArrayList<Integer> caRuleWeights = new ArrayList<Integer>();
-		try {
+
+        GlobalFrequency = CARuinsConfig.globalFrequency;
+        TriesPerChunk = CARuinsConfig.triesPerChunk;
+        // AllowedDimensions is a List<Integer> instead of a point to an int[].
+        for( int currInt : CARuinsConfig.allowedDimensions) {
+            AllowedDimensions.add(new Integer(currInt));
+        }
+        logActivated = CARuinsConfig.logActivated;
+
+        // CARuins-specific
+        MinHeight = CARuinsConfig.minHeight;
+        MaxHeight = CARuinsConfig.maxHeight;
+        MinHeightBeforeOscillation = CARuinsConfig.minHeightBeforeOscillation;
+        SmoothWithStairs = CARuinsConfig.smoothWithStairs;
+        MakeFloors = CARuinsConfig.makeFloors;
+        ContainerWidth = CARuinsConfig.containerWidth;
+        ContainerLength = CARuinsConfig.containerLength;
+
+        // Support the existing old chest format (array of values)
+        for(Map.Entry<String, ChestContentsConfig> entry : CARuinsConfig.chestConfigs.entrySet()) {
+            String chestType = entry.getKey();
+            ChestContentsConfig chestSpec = entry.getValue();
+            List<ChestItemSpec> chestItemList = chestSpec.getChestItems();
+            Object[][] chestSpecOld = new Object[6][chestItemList.size()];
+            for(int n = 0; n < chestItemList.size(); n++) {
+                ChestItemSpec itemSpec = chestItemList.get(n);
+                chestSpecOld[0][n] = n; // index
+                chestSpecOld[1][n] = itemSpec.getBlockOrItem();
+                chestSpecOld[2][n] = itemSpec.getMetadata();
+                chestSpecOld[3][n] = itemSpec.getSelectionWeight();
+                chestSpecOld[4][n] = itemSpec.getMinStackSize();
+                chestSpecOld[5][n] = itemSpec.getMaxStackSize();
+            }
+            chestItems.put(chestType, chestSpecOld);
+        }
+
+        SymmetricSeedDensity = CARuinsConfig.symmetricSeedDensity;
+        // Trusting that the indices here matches the constants.
+        seedTypeWeights[0] = CARuinsConfig.symmetricSeedWeight;
+        seedTypeWeights[1] = CARuinsConfig.linearSeedWeight;
+        seedTypeWeights[2] = CARuinsConfig.circularSeedWeight;
+        seedTypeWeights[3] = CARuinsConfig.cruciformSeedWeight;
+
+        try {
 			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				readGlobalOptions(lw, read);
-				if (read.startsWith("MinHeight"))
-					MinHeight = readIntParam(lw, MinHeight, ":", read);
-				if (read.startsWith("MaxHeight"))
-					MaxHeight = readIntParam(lw, MaxHeight, ":", read);
-				if (read.startsWith("MinHeightBeforeOscillation"))
-					MinHeightBeforeOscillation = readIntParam(lw, MinHeightBeforeOscillation, ":", read);
-				if (read.startsWith("SmoothWithStairs"))
-					SmoothWithStairs = readBooleanParam(lw, SmoothWithStairs, ":", read);
-				if (read.startsWith("MakeFloors"))
-					MakeFloors = readBooleanParam(lw, MakeFloors, ":", read);
-				if (read.startsWith("ContainerWidth"))
-					ContainerWidth = readIntParam(lw, ContainerWidth, ":", read);
-				if (read.startsWith("ContainerLength"))
-					ContainerLength = readIntParam(lw, ContainerLength, ":", read);
-				readChestItemsList(lw, read, br);
-				if (read.startsWith("SymmetricSeedDensity"))
-					SymmetricSeedDensity = readFloatParam(lw, SymmetricSeedDensity, ":", read);
-				for (int m = 0; m < SEED_TYPE_STRINGS.length; m++) {
-					if (read.startsWith(SEED_TYPE_STRINGS[m]))
-						seedTypeWeights[m] = readIntParam(lw, seedTypeWeights[m], ":", read);
-				}
 				for (int m = 0; m < spawnerRules.length; m++) {
 					if (read.startsWith(SPAWNER_RULE_NAMES[m])) {
 						try {
@@ -204,8 +230,8 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 					break;
 				}
 			}
-			if (TriesPerChunk > MAX_TRIES_PER_CHUNK)
-				TriesPerChunk = MAX_TRIES_PER_CHUNK;
+//			if (TriesPerChunk > MAX_TRIES_PER_CHUNK)
+//				TriesPerChunk = MAX_TRIES_PER_CHUNK;
 		} catch (IOException e) {
 			lw.println(e.getMessage());
 		} finally {
@@ -229,28 +255,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Override
 	public void writeGlobalOptions(PrintWriter pw) {
 		ArrayList<Integer> caRuleWeights = new ArrayList<Integer>();
-		printGlobalOptions(pw, true);
-		pw.println();
-		pw.println("<-MinHeight and MaxHeight are the minimum and maximum allowed height of the structures->");
-		pw.println("<-MinHeightBeforeOscillation - Any structures that form oscillators before MaxOscillatorCullStep will be culled.->");
-		pw.println("<-Smooth with stairs - If set to true, will smooth out ruins by placing extra stair blocks.->");
-		pw.println("<-ContainerWidth and ContainerLength are the dimensions of the bounding rectangle.->");
-		pw.println("MinHeight:" + MinHeight);
-		pw.println("MaxHeight:" + MaxHeight);
-		pw.println("MinHeightBeforeOscillation:" + MinHeightBeforeOscillation);
-		pw.println("SmoothWithStairs:" + SmoothWithStairs);
-		pw.println("MakeFloors:" + MakeFloors);
-		pw.println("ContainerWidth:" + ContainerWidth);
-		pw.println("ContainerLength:" + ContainerLength);
-		pw.println();
-		printDefaultChestItems(pw);
-		pw.println();
-		pw.println("<-Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.->");
-		pw.println("<-SymmetricSeedDensity is the density (out of 1.0) of live blocks in the symmetric seed.->");
-		pw.println("SymmetricSeedDensity:" + SymmetricSeedDensity);
-		for (int m = 0; m < SEED_TYPE_STRINGS.length; m++) {
-			pw.println(SEED_TYPE_STRINGS[m] + ":" + seedTypeWeights[m]);
-		}
+		pw.println("Settings are now starting to be in CARuins.cfg");
 		pw.println();
 		pw.println("<-These spawner rule variables control what spawners will be used depending on the light level and floor width.->");
 		for (int m = 0; m < spawnerRules.length; m++) {

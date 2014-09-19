@@ -17,6 +17,9 @@
  */
 package generatormods;
 
+import generatormods.config.CARuinsConfig;
+import generatormods.config.ChestItemSpec;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,8 +28,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.IWorldGenerator;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderEnd;
@@ -34,10 +44,6 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.ISaveHandler;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.IWorldGenerator;
-import cpw.mods.fml.common.Loader;
 import org.apache.logging.log4j.Level;
 
 /*
@@ -58,7 +64,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	protected HashMap<String, Object[][]> chestItems = new HashMap<String, Object[][]>();
 	protected boolean errFlag = false, dataFilesLoaded = false;
 	protected boolean logActivated = false;
-	private List<Integer> AllowedDimensions = new ArrayList<Integer>();
+	protected List<Integer> AllowedDimensions = new ArrayList<Integer>();
 	private List<World> currentWorld = new ArrayList<World>();
 	public static String[] BIOME_NAMES = new String[BiomeGenBase.getBiomeGenArray().length + 1];
 	static {
@@ -193,6 +199,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	//****************************  FUNCTION - getGlobalOptions *************************************************************************************//
 	protected final void getGlobalOptions() {
+                CARuinsConfig.initialize(CONFIG_DIRECTORY);
 		File settingsFile = new File(CONFIG_DIRECTORY, settingsFileName);
 		if (settingsFile.exists()) {
 			lw.println("Getting global options for " + this.toString() + " ...");
@@ -255,17 +262,13 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 			pw.println("Tries:" + Building.DEFAULT_CHEST_TRIES[l]);
 			for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[l].length; m++) {
                 try{
-                    String txt = GameData.itemRegistry.getNameForObject(Building.DEFAULT_CHEST_ITEMS[l][m][1]);
-                    if(txt==null){
-                        txt = GameData.blockRegistry.getNameForObject(Building.DEFAULT_CHEST_ITEMS[l][m][1]);
-                    }
-                    if(txt!=null){
-                        pw.print(txt);
-                        pw.print("-" + Building.DEFAULT_CHEST_ITEMS[l][m][2]);
-                        pw.print("," + Building.DEFAULT_CHEST_ITEMS[l][m][3]);
-                        pw.print("," + Building.DEFAULT_CHEST_ITEMS[l][m][4]);
-                        pw.println("," + Building.DEFAULT_CHEST_ITEMS[l][m][5]);
-                    }
+                    ChestItemSpec currspec =
+                            new ChestItemSpec(Building.DEFAULT_CHEST_ITEMS[l][m][1],
+                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][2]),
+                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][3]),
+                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][4]),
+                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][5]));
+                    pw.println(currspec.toSpecString());
                 }catch(Exception e){
                     e.printStackTrace();
                 }
