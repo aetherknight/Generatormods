@@ -74,7 +74,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	}
 	//WARNING! Make sure the first DEFAULT_BLOCK_RULES.length biome Strings in Building are the ones we want here.
 	private static String[] BLOCK_RULE_NAMES = new String[DEFAULT_BLOCK_RULES.length];
-	private final static String[] SPAWNER_RULE_NAMES = new String[] { "MediumLightNarrowFloorSpawnerRule", "MediumLightWideFloorSpawnerRule", "LowLightSpawnerRule" };
 	public final static String[][] DEFAULT_CA_RULES = new String[][] {
 			//3-rule
 			{ "B3/S23", "5", "Life - good for weird temples" }, { "B36/S013468", "3", "pillars and hands" }, { "B367/S02347", "2", "towers with interiors and chasms" },
@@ -197,18 +196,12 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         seedTypeWeights[2] = CARuinsConfig.circularSeedWeight;
         seedTypeWeights[3] = CARuinsConfig.cruciformSeedWeight;
 
+        spawnerRules[0] = CARuinsConfig.mediumLightNarrowFloorSpawnerRule;
+        spawnerRules[1] = CARuinsConfig.mediumLightWideFloorSpawnerRule;
+        spawnerRules[2] = CARuinsConfig.lowLightSpawnerRule;
+
         try {
 			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				for (int m = 0; m < spawnerRules.length; m++) {
-					if (read.startsWith(SPAWNER_RULE_NAMES[m])) {
-						try {
-							spawnerRules[m] = readRuleIdOrRule(":", read, null);
-						} catch (Exception e) {
-							spawnerRules[m] = BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE;
-							lw.println(e.getMessage());
-						}
-					}
-				}
 				for (int m = 0; m < DEFAULT_BLOCK_RULES.length; m++) {
 					if (BIOME_NAMES[m] != null && read.startsWith(BLOCK_RULE_NAMES[m])) {
 						try {
@@ -255,13 +248,10 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Override
 	public void writeGlobalOptions(PrintWriter pw) {
 		ArrayList<Integer> caRuleWeights = new ArrayList<Integer>();
+
 		pw.println("Settings are now starting to be in CARuins.cfg");
 		pw.println();
-		pw.println("<-These spawner rule variables control what spawners will be used depending on the light level and floor width.->");
-		for (int m = 0; m < spawnerRules.length; m++) {
-			pw.println(SPAWNER_RULE_NAMES[m] + ":" + spawnerRules[m]);
-		}
-		pw.println();
+
 		pw.println("<-BlockRule is the template rule that controls what blocks the structure will be made out of.->");
 		pw.println("<-Default is BiomeNameBlockRule:" + DEFAULT_TEMPLATE.toString() + "->");
 		pw.println("<-Which translates into: (special condition) then,(100%=complete)ruin in either normal(1 out of 3 chance) or mossy cobblestone(2 out of 3) in said biome->");

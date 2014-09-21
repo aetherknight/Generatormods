@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 import net.minecraftforge.common.config.Configuration;
 
-import generatormods.*;
+import generatormods.TemplateRule;
+import generatormods.Building;
+import generatormods.BuildingCellularAutomaton;
 
 public class CARuinsConfig {
     private static final int[] DEFAULT_DIM_LIST = {-1, 0};
@@ -51,6 +53,10 @@ public class CARuinsConfig {
     public static int linearSeedWeight;
     public static int circularSeedWeight;
     public static int cruciformSeedWeight;
+
+    public static TemplateRule mediumLightWideFloorSpawnerRule;
+    public static TemplateRule mediumLightNarrowFloorSpawnerRule;
+    public static TemplateRule lowLightSpawnerRule;
 
     public CARuinsConfig() {}
 
@@ -182,6 +188,22 @@ public class CARuinsConfig {
                         "Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.",
                         0, 4096).getInt();
 
+
+        section = "CARuins.SpawnerRules";
+        config.setCategoryComment(
+                section,
+                "These spawner rule variables control what spawners will be used depending on the light level and floor width.");
+
+        mediumLightNarrowFloorSpawnerRule =
+                getSpawnerRule(config, section, "MediumLightNarrowFloorSpawnerRule",
+                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE);
+        mediumLightWideFloorSpawnerRule =
+                getSpawnerRule(config, section, "MediumLightWideFloorSpawnerRule",
+                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE);
+        lowLightSpawnerRule =
+                getSpawnerRule(config, section, "LowLightSpawnerRule",
+                        BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE);
+
         if (config.hasChanged())
             config.save();
     }
@@ -197,5 +219,21 @@ public class CARuinsConfig {
                             .toSpecString();
         }
         return chestItems;
+    }
+
+    /**
+     * Attempts to get and parse a given spawner rule.
+     *
+     * If it fails to parse, it reverts to the default rule.
+     */
+    private static TemplateRule getSpawnerRule(Configuration config, String section,
+            String ruleName, TemplateRule defaultRule) {
+        String rawRule = config.get(section, ruleName, defaultRule.toString()).getString();
+        try {
+            return new TemplateRule(rawRule, false);
+        } catch (Exception e) {
+            // TODO: log the error
+            return defaultRule;
+        }
     }
 }
