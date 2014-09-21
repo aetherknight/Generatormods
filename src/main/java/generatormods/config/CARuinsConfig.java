@@ -25,13 +25,67 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.init.Blocks;
+import net.minecraft.block.Block;
 
 import generatormods.TemplateRule;
 import generatormods.Building;
 import generatormods.BuildingCellularAutomaton;
 
 public class CARuinsConfig {
+    // Defaults to the Nether and the Overworld
     private static final int[] DEFAULT_DIM_LIST = {-1, 0};
+    // Default CARuins template is 1/3 cobblestone, 2/3 mossy cobblestone.
+    private final static TemplateRule DEFAULT_TEMPLATE = new TemplateRule(new Block[] {
+            Blocks.cobblestone, Blocks.mossy_cobblestone, Blocks.mossy_cobblestone}, new int[] {0,
+            0, 0}, 100);
+    // Customize the default templates per-biome. We track it here by biome ID.
+    private static TemplateRule[] DEFAULT_BLOCK_RULES = new TemplateRule[BiomeGenBase
+            .getBiomeGenArray().length];
+    static {
+        DEFAULT_BLOCK_RULES[0] = DEFAULT_TEMPLATE; // Underground, unused
+        DEFAULT_BLOCK_RULES[1] = DEFAULT_TEMPLATE; // Ocean
+        DEFAULT_BLOCK_RULES[2] =
+                new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick},
+                        new int[] {0, 1, 2}, 100); // Plains
+        DEFAULT_BLOCK_RULES[3] = new TemplateRule(Blocks.sandstone, 0, 100); // Desert
+        DEFAULT_BLOCK_RULES[4] =
+                new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick},
+                        new int[] {0, 0, 2}, 100); // Hills
+        DEFAULT_BLOCK_RULES[5] = DEFAULT_TEMPLATE; // Forest
+        DEFAULT_BLOCK_RULES[6] = DEFAULT_TEMPLATE; // Taiga
+        DEFAULT_BLOCK_RULES[7] = DEFAULT_TEMPLATE; // Swampland
+        DEFAULT_BLOCK_RULES[8] = DEFAULT_TEMPLATE; // River
+        DEFAULT_BLOCK_RULES[9] = new TemplateRule(Blocks.nether_brick, 0, 100);// Nether
+        DEFAULT_BLOCK_RULES[10] = new TemplateRule(Blocks.end_stone, 0, 100); // Sky
+        DEFAULT_BLOCK_RULES[11] =
+                new TemplateRule(new Block[] {Blocks.ice, Blocks.snow, Blocks.stonebrick},
+                        new int[] {0, 0, 2}, 100); // FrozenOcean
+        DEFAULT_BLOCK_RULES[12] =
+                new TemplateRule(new Block[] {Blocks.ice, Blocks.snow, Blocks.stonebrick},
+                        new int[] {0, 0, 2}, 100); // FrozenRiver
+        DEFAULT_BLOCK_RULES[13] =
+                new TemplateRule(new Block[] {Blocks.snow, Blocks.stonebrick, Blocks.stonebrick},
+                        new int[] {0, 2, 2}, 100); // IcePlains
+        DEFAULT_BLOCK_RULES[14] =
+                new TemplateRule(new Block[] {Blocks.snow, Blocks.stonebrick, Blocks.stonebrick},
+                        new int[] {0, 2, 2}, 100); // IceMountains
+        DEFAULT_BLOCK_RULES[15] = DEFAULT_TEMPLATE; // MushroomIsland
+        DEFAULT_BLOCK_RULES[16] = DEFAULT_TEMPLATE; // Shore
+        DEFAULT_BLOCK_RULES[17] = DEFAULT_TEMPLATE; // Beach
+        DEFAULT_BLOCK_RULES[18] = new TemplateRule(Blocks.sandstone, 0, 100); // DesertHills
+        DEFAULT_BLOCK_RULES[19] = DEFAULT_TEMPLATE; // ForestHills
+        DEFAULT_BLOCK_RULES[20] = DEFAULT_TEMPLATE; // TaigaHills
+        DEFAULT_BLOCK_RULES[21] =
+                new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick},
+                        new int[] {0, 0, 2}, 100);// ExtremeHillsEdge
+        for (int i = 22; i < BiomeGenBase.getBiomeGenArray().length; i++) {
+            if(DEFAULT_BLOCK_RULES[i] == null) {
+                DEFAULT_BLOCK_RULES[i] = DEFAULT_TEMPLATE;
+            }
+        }
+    }
 
     public static float globalFrequency;
     public static int triesPerChunk;
@@ -58,6 +112,8 @@ public class CARuinsConfig {
     public static TemplateRule mediumLightNarrowFloorSpawnerRule;
     public static TemplateRule lowLightSpawnerRule;
 
+    public static TemplateRule[] blockRules;
+
     public CARuinsConfig() {}
 
     /**
@@ -74,6 +130,7 @@ public class CARuinsConfig {
         initChestConfigs(config, section);
         initSeedWeights(config, section);
         initSpawnerRules(config, section);
+        initBlockRules(config, section);
 
         if (config.hasChanged())
             config.save();
@@ -252,5 +309,35 @@ public class CARuinsConfig {
         lowLightSpawnerRule =
                 getSpawnerRule(config, section, "LowLightSpawnerRule",
                         BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE);
+    }
+
+    /**
+     * Load a BlockRule or generate a default BlockRule for all biomes.
+     */
+    private static void initBlockRules(Configuration config, String baseSection) {
+        String section = baseSection + ".BlockRules";
+        blockRules = new TemplateRule[DEFAULT_BLOCK_RULES.length];
+
+        config.setCategoryComment(
+                section,
+                "BlockRule is the template rule that controls what blocks the structure will be made out of.\nDefault is:\n   BiomeNameBlockRule:0,100,minecraft:cobblestone-0,minecraft:mossy_cobblestone-0,minecraft:mossy_cobblestone-0\n\nWhich translates into: (special condition) then,(100%=complete) ruin in either normal(1 out of 3 chance) or mossy cobblestone(2 out of 3) in said biome. Metadatas are supported, use blockname-blockmetadata syntax.");
+
+        // We only care about biomes that exist, and at worst we use the
+        // default template for a biome. If a given biome ID does not
+        // correspond to a biome, then it is ignored.
+        for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
+            BiomeGenBase currBiome = BiomeGenBase.getBiomeGenArray()[i];
+            if (currBiome != null) {
+                String rawBlockRule =
+                        config.get(section, currBiome.biomeName, DEFAULT_BLOCK_RULES[i].toString(),
+                                "" + currBiome.biomeID + " -- " + currBiome.biomeName).getString();
+                try {
+                    blockRules[i] = new TemplateRule(rawBlockRule, false);
+                } catch (Exception e) {
+                    // TODO: log the error
+                    blockRules[i] = DEFAULT_BLOCK_RULES[i];
+                }
+            }
+        }
     }
 }

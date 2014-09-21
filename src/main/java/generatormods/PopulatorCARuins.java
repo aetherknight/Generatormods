@@ -46,34 +46,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Instance("CARuins")
 	public static PopulatorCARuins instance;
 	private final static String AUTOMATA_RULES_STRING = "AUTOMATA RULES";
-	private final static TemplateRule DEFAULT_TEMPLATE = new TemplateRule(new Block[] {Blocks.cobblestone, Blocks.mossy_cobblestone, Blocks.mossy_cobblestone}, new int[] { 0, 0, 0 }, 100);
-	private static TemplateRule[] DEFAULT_BLOCK_RULES = new TemplateRule[BIOME_NAMES.length];
-	static {
-		DEFAULT_BLOCK_RULES[0] = DEFAULT_TEMPLATE; //Underground, unused
-		DEFAULT_BLOCK_RULES[1] = DEFAULT_TEMPLATE; //Ocean
-		DEFAULT_BLOCK_RULES[2] = new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick}, new int[] { 0, 1, 2 }, 100); //Plains
-		DEFAULT_BLOCK_RULES[3] = new TemplateRule(Blocks.sandstone, 0, 100); //Desert
-		DEFAULT_BLOCK_RULES[4] = new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick}, new int[] { 0, 0, 2 }, 100); //Hills
-		DEFAULT_BLOCK_RULES[5] = DEFAULT_TEMPLATE; //Forest            
-		DEFAULT_BLOCK_RULES[6] = DEFAULT_TEMPLATE; //Taiga             
-		DEFAULT_BLOCK_RULES[7] = DEFAULT_TEMPLATE; //Swampland         
-		DEFAULT_BLOCK_RULES[8] = DEFAULT_TEMPLATE; //River             
-		DEFAULT_BLOCK_RULES[9] = new TemplateRule(Blocks.nether_brick, 0, 100);//Nether
-		DEFAULT_BLOCK_RULES[10] = new TemplateRule(Blocks.end_stone, 0, 100); //Sky
-		DEFAULT_BLOCK_RULES[11] = new TemplateRule(new Block[] {Blocks.ice, Blocks.snow, Blocks.stonebrick}, new int[] { 0, 0, 2 }, 100); //FrozenOcean
-		DEFAULT_BLOCK_RULES[12] = new TemplateRule(new Block[] {Blocks.ice, Blocks.snow, Blocks.stonebrick}, new int[] { 0, 0, 2 }, 100); //FrozenRiver
-		DEFAULT_BLOCK_RULES[13] = new TemplateRule(new Block[] {Blocks.snow, Blocks.stonebrick, Blocks.stonebrick}, new int[] { 0, 2, 2 }, 100); //IcePlains
-		DEFAULT_BLOCK_RULES[14] = new TemplateRule(new Block[] {Blocks.snow, Blocks.stonebrick, Blocks.stonebrick}, new int[] { 0, 2, 2 }, 100); //IceMountains
-		DEFAULT_BLOCK_RULES[15] = DEFAULT_TEMPLATE; //MushroomIsland    
-		DEFAULT_BLOCK_RULES[16] = DEFAULT_TEMPLATE; //Shore
-		DEFAULT_BLOCK_RULES[17] = DEFAULT_TEMPLATE; //Beach
-		DEFAULT_BLOCK_RULES[18] = new TemplateRule(Blocks.sandstone, 0, 100); //DesertHills
-		DEFAULT_BLOCK_RULES[19] = DEFAULT_TEMPLATE; //ForestHills
-		DEFAULT_BLOCK_RULES[20] = DEFAULT_TEMPLATE; //TaigaHills
-		DEFAULT_BLOCK_RULES[21] = new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick }, new int[] { 0, 0, 2 }, 100);//ExtremeHillsEdge
-	}
-	//WARNING! Make sure the first DEFAULT_BLOCK_RULES.length biome Strings in Building are the ones we want here.
-	private static String[] BLOCK_RULE_NAMES = new String[DEFAULT_BLOCK_RULES.length];
 	public final static String[][] DEFAULT_CA_RULES = new String[][] {
 			//3-rule
 			{ "B3/S23", "5", "Life - good for weird temples" }, { "B36/S013468", "3", "pillars and hands" }, { "B367/S02347", "2", "towers with interiors and chasms" },
@@ -91,7 +63,9 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	public int ContainerWidth = 40, ContainerLength = 40;
 	public int MinHeightBeforeOscillation = 12;
 	public boolean SmoothWithStairs = true, MakeFloors = true;
-	public TemplateRule[] blockRules = new TemplateRule[DEFAULT_BLOCK_RULES.length];
+
+    // blockRules index = biomeId +1
+	public TemplateRule[] blockRules;// = new TemplateRule[DEFAULT_BLOCK_RULES.length];
 	public TemplateRule[] spawnerRules = new TemplateRule[] { BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE, BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE,
 			BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE };
 	ArrayList<byte[][]> caRules = null;
@@ -124,13 +98,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
 			initializeLogging("Loading options for the Cellular Automata Generator.");
-			for (int i = 0; i < BIOME_NAMES.length; i++) {
-				if (BIOME_NAMES[i] != null) {
-					if (i > 21)
-						DEFAULT_BLOCK_RULES[i] = DEFAULT_TEMPLATE;
-					BLOCK_RULE_NAMES[i] = BIOME_NAMES[i].replaceAll("\\s", "") + "BlockRule";
-				}
-			}
 			//read and check values from file
 			caRules = new ArrayList<byte[][]>();
 			getGlobalOptions();
@@ -200,18 +167,10 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         spawnerRules[1] = CARuinsConfig.mediumLightWideFloorSpawnerRule;
         spawnerRules[2] = CARuinsConfig.lowLightSpawnerRule;
 
+        blockRules = CARuinsConfig.blockRules;
+
         try {
 			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				for (int m = 0; m < DEFAULT_BLOCK_RULES.length; m++) {
-					if (BIOME_NAMES[m] != null && read.startsWith(BLOCK_RULE_NAMES[m])) {
-						try {
-							blockRules[m] = readRuleIdOrRule(":", read, null);
-						} catch (Exception e) {
-							blockRules[m] = DEFAULT_BLOCK_RULES[m];
-							lw.println(e.getMessage());
-						}
-					}
-				}
 				if (read.startsWith(AUTOMATA_RULES_STRING)) {
 					for (read = br.readLine(); read != null; read = br.readLine()) {
 						if (read.startsWith("B") || read.startsWith("b")) {
@@ -252,15 +211,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 		pw.println("Settings are now starting to be in CARuins.cfg");
 		pw.println();
 
-		pw.println("<-BlockRule is the template rule that controls what blocks the structure will be made out of.->");
-		pw.println("<-Default is BiomeNameBlockRule:" + DEFAULT_TEMPLATE.toString() + "->");
-		pw.println("<-Which translates into: (special condition) then,(100%=complete)ruin in either normal(1 out of 3 chance) or mossy cobblestone(2 out of 3) in said biome->");
-		pw.println("<-Metadatas are supported, use blockname-blockmetadata syntax->");
-		for (int m = 0; m < DEFAULT_BLOCK_RULES.length; m++) {
-			if (BLOCK_RULE_NAMES[m] != null)
-				pw.println(BLOCK_RULE_NAMES[m] + ":" + DEFAULT_BLOCK_RULES[m]);
-		}
-		pw.println();
 		pw.println("<-An automata rule should be in the form B<neighbor digits>/S<neighbor digits>, where B stands for \"birth\" and S stands->");
 		pw.println("<-   for \"survive\". <neighbor digits> are the subset the digits from 0 to 8 on which the rule will birth or survive.->");
 		pw.println("<-   For example, the Game of Life has the rule code B3/S23.->");
