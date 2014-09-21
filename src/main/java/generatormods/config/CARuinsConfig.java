@@ -69,6 +69,17 @@ public class CARuinsConfig {
 
         String section = "CARuins";
 
+        initCommonConfig(config, section);
+        initCARuinsConfig(config, section);
+        initChestConfigs(config, section);
+        initSeedWeights(config, section);
+        initSpawnerRules(config, section);
+
+        if (config.hasChanged())
+            config.save();
+    }
+
+    private static void initCommonConfig(Configuration config, String section) {
         // TODO: turn this into an integer n where 1/n is the odds that a given chunk will attempt
         // to generate a structure.
         globalFrequency =
@@ -99,7 +110,9 @@ public class CARuinsConfig {
                         true,
                         "Controls information stored into forge logs. Set to true if you want to report an issue with complete forge logs.")
                         .getBoolean();
+    }
 
+    private static void initCARuinsConfig(Configuration config, String section) {
         minHeight =
                 config.get(section, "Min Height", 20,
                         "The minimum allowed height of the structures", 0, 255).getInt();
@@ -124,12 +137,27 @@ public class CARuinsConfig {
         containerLength =
                 config.get(section, "Container Length", 40,
                         "The length of the bounding rectangle.", 0, 4096).getInt();
+    }
 
+    private static String[] defaultChestItems(int chestTypeIndex) {
+        // Build an array of the chest item strings
+        String[] chestItems = new String[Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length];
+        for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length; m++) {
+            Object[] chestItem = Building.DEFAULT_CHEST_ITEMS[chestTypeIndex][m];
+            chestItems[m] =
+                    (new ChestItemSpec(chestItem[1], (Integer) chestItem[2],
+                            (Integer) chestItem[3], (Integer) chestItem[4], (Integer) chestItem[5]))
+                            .toSpecString();
+        }
+        return chestItems;
+    }
+
+    private static void initChestConfigs(Configuration config, String baseSection) {
         // Chest contents. Grouped by chest type.
         chestConfigs = new HashMap<String, ChestContentsConfig>();
         for (int l = 0; l < Building.CHEST_TYPE_LABELS.length; l++) {
             String chestType = Building.CHEST_TYPE_LABELS[l];
-            section = "CARuins.CHEST_" + chestType;
+            String section = baseSection + ".CHEST_" + chestType;
 
             int chestTries =
                     config.get(section, "Tries", Building.DEFAULT_CHEST_TRIES[l],
@@ -153,8 +181,11 @@ public class CARuinsConfig {
                     new ChestContentsConfig(chestType, chestTries, chestItemList);
             chestConfigs.put(chestType, chestConfig);
         }
+    }
 
-        section = "CARuins.SeedWeights";
+    private static void initSeedWeights(Configuration config, String baseSection) {
+        String section = baseSection + ".SeedWeights";
+
         symmetricSeedDensity =
                 (float) config.get(section, "Symmetric Seed Density", 0.5,
                         "The density (out of 1.0) of live blocks in the symmetric seed.", 0.0, 1.0)
@@ -187,38 +218,6 @@ public class CARuinsConfig {
                         1,
                         "Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.",
                         0, 4096).getInt();
-
-
-        section = "CARuins.SpawnerRules";
-        config.setCategoryComment(
-                section,
-                "These spawner rule variables control what spawners will be used depending on the light level and floor width.");
-
-        mediumLightNarrowFloorSpawnerRule =
-                getSpawnerRule(config, section, "MediumLightNarrowFloorSpawnerRule",
-                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE);
-        mediumLightWideFloorSpawnerRule =
-                getSpawnerRule(config, section, "MediumLightWideFloorSpawnerRule",
-                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE);
-        lowLightSpawnerRule =
-                getSpawnerRule(config, section, "LowLightSpawnerRule",
-                        BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE);
-
-        if (config.hasChanged())
-            config.save();
-    }
-
-    private static String[] defaultChestItems(int chestTypeIndex) {
-        // Build an array of the chest item strings
-        String[] chestItems = new String[Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length];
-        for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length; m++) {
-            Object[] chestItem = Building.DEFAULT_CHEST_ITEMS[chestTypeIndex][m];
-            chestItems[m] =
-                    (new ChestItemSpec(chestItem[1], (Integer) chestItem[2],
-                            (Integer) chestItem[3], (Integer) chestItem[4], (Integer) chestItem[5]))
-                            .toSpecString();
-        }
-        return chestItems;
     }
 
     /**
@@ -235,5 +234,23 @@ public class CARuinsConfig {
             // TODO: log the error
             return defaultRule;
         }
+    }
+
+    private static void initSpawnerRules(Configuration config, String baseSection) {
+        String section = baseSection + ".SpawnerRules";
+
+        config.setCategoryComment(
+                section,
+                "These spawner rule variables control what spawners will be used depending on the light level and floor width.");
+
+        mediumLightNarrowFloorSpawnerRule =
+                getSpawnerRule(config, section, "MediumLightNarrowFloorSpawnerRule",
+                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE);
+        mediumLightWideFloorSpawnerRule =
+                getSpawnerRule(config, section, "MediumLightWideFloorSpawnerRule",
+                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE);
+        lowLightSpawnerRule =
+                getSpawnerRule(config, section, "LowLightSpawnerRule",
+                        BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE);
     }
 }
