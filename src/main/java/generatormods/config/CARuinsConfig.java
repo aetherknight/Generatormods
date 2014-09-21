@@ -18,20 +18,20 @@
  */
 package generatormods.config;
 
+import generatormods.Building;
+import generatormods.BuildingCellularAutomaton;
+import generatormods.TemplateRule;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.Block;
-
-import generatormods.TemplateRule;
-import generatormods.Building;
-import generatormods.BuildingCellularAutomaton;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.config.Configuration;
 
 public class CARuinsConfig {
     // Defaults to the Nether and the Overworld
@@ -81,7 +81,7 @@ public class CARuinsConfig {
                 new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick},
                         new int[] {0, 0, 2}, 100);// ExtremeHillsEdge
         for (int i = 22; i < BiomeGenBase.getBiomeGenArray().length; i++) {
-            if(DEFAULT_BLOCK_RULES[i] == null) {
+            if (DEFAULT_BLOCK_RULES[i] == null) {
                 DEFAULT_BLOCK_RULES[i] = DEFAULT_TEMPLATE;
             }
         }
@@ -114,6 +114,8 @@ public class CARuinsConfig {
 
     public static TemplateRule[] blockRules;
 
+    public static List<CARule> caRules;
+
     public CARuinsConfig() {}
 
     /**
@@ -131,6 +133,7 @@ public class CARuinsConfig {
         initSeedWeights(config, section);
         initSpawnerRules(config, section);
         initBlockRules(config, section);
+        initCARules(config, section);
 
         if (config.hasChanged())
             config.save();
@@ -337,6 +340,31 @@ public class CARuinsConfig {
                     // TODO: log the error
                     blockRules[i] = DEFAULT_BLOCK_RULES[i];
                 }
+            }
+        }
+    }
+
+    private static void initCARules(Configuration config, String section) {
+        String[] defaultCARules = new String[CARule.DEFAULT_CA_RULES.size()];
+        for (int i = 0; i < defaultCARules.length; i++) {
+            defaultCARules[i] = CARule.DEFAULT_CA_RULES.get(i).toString();
+        }
+
+        String[] caRuleStrings =
+                config.get(
+                        section,
+                        "CARules",
+                        defaultCARules,
+                        "Cellular Automata rules and weights. Each rule is a comma-separated list in the\nfollowing format:\n\n    B3/S23, 5, Life - good for weird temples\n\nThe first value is the Cellular Automata rule, with Birth and survival rule\nnumbers. The second value is the random weight of the rule. The third value is\nan optional comment, which main contain commas.")
+                        .getStringList();
+        caRules = new ArrayList<CARule>();
+        for (String caRuleString : caRuleStrings) {
+            try {
+                caRules.add(CARule.fromString(caRuleString));
+            } catch (ParseError e) {
+                // TODO: use logger or handle error more catastrophically
+                System.out.println("Error parsing CA rule: \"" + caRuleString + "\": "
+                        + e.getMessage());
             }
         }
     }

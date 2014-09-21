@@ -199,7 +199,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	//****************************  FUNCTION - getGlobalOptions *************************************************************************************//
 	protected final void getGlobalOptions() {
-                CARuinsConfig.initialize(CONFIG_DIRECTORY);
 		File settingsFile = new File(CONFIG_DIRECTORY, settingsFileName);
 		if (settingsFile.exists()) {
 			lw.println("Getting global options for " + this.toString() + " ...");

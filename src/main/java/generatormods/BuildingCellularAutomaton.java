@@ -32,7 +32,7 @@ import net.minecraft.world.EnumSkyBlock;
  * BuildingCellularAutomaton creates double-ended walls
  */
 public class BuildingCellularAutomaton extends Building {
-	private final static byte DEAD = 0, ALIVE = 1;
+	public final static byte DEAD = 0, ALIVE = 1;
 	private final float MEAN_SIDE_LENGTH_PER_POPULATE = 15.0f;
 	private final static int HOLE_FLOOR_BUFFER = 2, UNREACHED = -1;
 	private final static int SYMMETRIC_SEED_MIN_WIDTH = 4, CIRCULAR_SEED_MIN_WIDTH = 4;

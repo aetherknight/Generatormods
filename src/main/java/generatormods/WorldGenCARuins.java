@@ -17,8 +17,8 @@
  */
 package generatormods;
 
+import java.util.List;
 import java.util.Random;
-
 import net.minecraft.world.World;
 
 public class WorldGenCARuins extends WorldGeneratorThread {
@@ -32,10 +32,12 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 	private final int MinHeightBeforeOscillation;
 	private final boolean SmoothWithStairs, MakeFloors;
 	private TemplateRule[] blockRules;
+        private final List<byte[][]> caRules;
 
 	//****************************************  CONSTRUCTOR - WorldGenCARuins  *************************************************************************************//
 	public WorldGenCARuins(PopulatorCARuins ca, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(ca, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
+        caRules = ca.caRules;
 		caRulesWeightsAndIndex = ca.caRulesWeightsAndIndex;
 		MinHeight = ca.MinHeight;
 		MaxHeight = ca.MaxHeight;
@@ -55,7 +57,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 	public boolean generate(int i0, int j0, int k0) {
 		int th = MinHeight + random.nextInt(MaxHeight - MinHeight + 1);
 		if (caRule == null) //if we haven't picked in an earlier generate call 
-			caRule = ((PopulatorCARuins) master).caRules.get(Building.pickWeightedOption(world.rand, caRulesWeightsAndIndex[0], caRulesWeightsAndIndex[1]));
+            caRule = caRules.get(Building.pickWeightedOption(world.rand, caRulesWeightsAndIndex[0], caRulesWeightsAndIndex[1]));
 		if (caRule == null)
 			return false;
 		int seedCode = Building.pickWeightedOption(world.rand, seedTypeWeights, SEED_TYPE_CODES);
