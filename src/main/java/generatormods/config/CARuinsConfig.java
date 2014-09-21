@@ -42,7 +42,7 @@ public class CARuinsConfig {
             0, 0}, 100);
     // Customize the default templates per-biome. We track it here by biome ID.
     private static TemplateRule[] DEFAULT_BLOCK_RULES = new TemplateRule[BiomeGenBase
-            .getBiomeGenArray().length];
+            .getBiomeGenArray().length+1];
     static {
         DEFAULT_BLOCK_RULES[0] = DEFAULT_TEMPLATE; // Underground, unused
         DEFAULT_BLOCK_RULES[1] = DEFAULT_TEMPLATE; // Ocean
@@ -80,7 +80,7 @@ public class CARuinsConfig {
         DEFAULT_BLOCK_RULES[21] =
                 new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick},
                         new int[] {0, 0, 2}, 100);// ExtremeHillsEdge
-        for (int i = 22; i < BiomeGenBase.getBiomeGenArray().length; i++) {
+        for (int i = 22; i < BiomeGenBase.getBiomeGenArray().length+1; i++) {
             if (DEFAULT_BLOCK_RULES[i] == null) {
                 DEFAULT_BLOCK_RULES[i] = DEFAULT_TEMPLATE;
             }
@@ -112,6 +112,12 @@ public class CARuinsConfig {
     public static TemplateRule mediumLightNarrowFloorSpawnerRule;
     public static TemplateRule lowLightSpawnerRule;
 
+    /**
+     * Contains the template rule for a CA Ruin that is generated in a given
+     * biome. The indices of this list are 1 greater than the corresponding
+     * biomeID. Index 0 is reserved the the generator mods' special
+     * "Underground" pseudo-biome.
+     */
     public static TemplateRule[] blockRules;
 
     public static List<CARule> caRules;
@@ -147,28 +153,28 @@ public class CARuinsConfig {
                         .get(section,
                                 "Global Frequency",
                                 0.025,
-                                "Controls how likely structures are to appear --- it is the probability for trying to make a structure in a given chunk. Should be between 0.0 and 1.0. Smaller values make structures less common.",
+                                "Controls how likely structures are to appear --- it is the probability for\ntrying to make a structure in a given chunk. Should be between 0.0 and 1.0.\nSmaller values make structures less common.",
                                 0.0, 1.0).getDouble();
         triesPerChunk =
                 config.get(
                         section,
                         "Tries Per Chunk",
                         1,
-                        "Allows multiple attempts to build a structure per chunk. If a chunk is selected for a structure, but that structure is rejected for some reason, then a value greater than 1 will attempt to create another structure. Only set it to larger than 1 if you want very dense generation!",
+                        "Allows multiple attempts to build a structure per chunk. If a chunk is selected\nfor a structure, but that structure is rejected for some reason, then a value\ngreater than 1 will attempt to create another structure. Only set it to larger\nthan 1 if you want very dense generation!",
                         0, 100).getInt();
         allowedDimensions =
                 config.get(
                         section,
                         "Allowed Dimensions",
                         DEFAULT_DIM_LIST,
-                        "Whitelist of dimension IDs where structures may be gnerated. Default is Nether (-1) and Overworld (0).")
+                        "Whitelist of dimension IDs where structures may be gnerated. Default is Nether\n(-1) and Overworld (0).")
                         .getIntList();
         logActivated =
                 config.get(
                         section,
                         "Log Activated",
                         true,
-                        "Controls information stored into forge logs. Set to true if you want to report an issue with complete forge logs.")
+                        "Controls information stored into forge logs. Set to true if you want to report\nan issue with complete forge logs.")
                         .getBoolean();
     }
 
@@ -184,7 +190,7 @@ public class CARuinsConfig {
                         section,
                         "Min Height Before Oscillation",
                         12,
-                        "Any structures that form oscillators before MaxOscillatorCullStep will be culled.",
+                        "Any structures that form oscillators before MaxOscillatorCullStep will be\nculled.",
                         0, 255).getInt();
         smoothWithStairs =
                 config.get(section, "Smooth With Stairs", true,
@@ -228,7 +234,7 @@ public class CARuinsConfig {
                             section,
                             "Chest Contents",
                             defaultChestItems(l),
-                            "Format for each item is: <item name>-<metadata>,<selection weight>,<min stack size>,<max stack size>. E.g. minecraft:arrow-0,2,1,12 means a stack of between 1 and 12 arrows, with a selection weight of 2.")
+                            "Format for each item is:\n\n    <item name>-<metadata>,<selection weight>,<min stack size>,<max stack size>\n\nE.g.:\n\n    minecraft:arrow-0,2,1,12\n\nMeans a stack of between 1 and 12 arrows, with a selection weight of 2.")
                             .getStringList();
 
             // Create a list of ChestItemSpecs from the config
@@ -255,28 +261,28 @@ public class CARuinsConfig {
                         section,
                         "Symmetric Seed Weight",
                         8,
-                        "Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.",
+                        "Seed type weights are the relative likelihood weights that different seeds will\nbe used. Weights are nonnegative integers.",
                         0, 4096).getInt();
         linearSeedWeight =
                 config.get(
                         section,
                         "Linear Seed Weight",
                         2,
-                        "Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.",
+                        "Seed type weights are the relative likelihood weights that different seeds will\nbe used. Weights are nonnegative integers.",
                         0, 4096).getInt();
         circularSeedWeight =
                 config.get(
                         section,
                         "Circular Seed Weight",
                         2,
-                        "Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.",
+                        "Seed type weights are the relative likelihood weights that different seeds will\nbe used. Weights are nonnegative integers.",
                         0, 4096).getInt();
         cruciformSeedWeight =
                 config.get(
                         section,
                         "Cruciform Seed Weight",
                         1,
-                        "Seed type weights are the relative likelihood weights that different seeds will be used. Weights are nonnegative integers.",
+                        "Seed type weights are the relative likelihood weights that different seeds will\nbe used. Weights are nonnegative integers.",
                         0, 4096).getInt();
     }
 
@@ -301,7 +307,7 @@ public class CARuinsConfig {
 
         config.setCategoryComment(
                 section,
-                "These spawner rule variables control what spawners will be used depending on the light level and floor width.");
+                "These spawner rule variables control what spawners will be used depending on\nthe light level and floor width.");
 
         mediumLightNarrowFloorSpawnerRule =
                 getSpawnerRule(config, section, "MediumLightNarrowFloorSpawnerRule",
@@ -323,22 +329,30 @@ public class CARuinsConfig {
 
         config.setCategoryComment(
                 section,
-                "BlockRule is the template rule that controls what blocks the structure will be made out of.\nDefault is:\n   BiomeNameBlockRule:0,100,minecraft:cobblestone-0,minecraft:mossy_cobblestone-0,minecraft:mossy_cobblestone-0\n\nWhich translates into: (special condition) then,(100%=complete) ruin in either normal(1 out of 3 chance) or mossy cobblestone(2 out of 3) in said biome. Metadatas are supported, use blockname-blockmetadata syntax.");
+                "BlockRule is the template rule that controls what blocks the structure will be\nmade out of. Default is:\n\n    S:BiomeName=0,100,minecraft:cobblestone-0,minecraft:mossy_cobblestone-0,minecraft:mossy_cobblestone-0\n\nWhich translates into: (special condition) then,(100%=complete) ruin in either\nnormal(1 out of 3 chance) or mossy cobblestone(2 out of 3) in said biome.\nMetadatas are supported, use blockname-blockmetadata syntax.");
 
         // We only care about biomes that exist, and at worst we use the
         // default template for a biome. If a given biome ID does not
         // correspond to a biome, then it is ignored.
+        //
+        // The index into blockRules and into DEFAULT_BLOCK_RULES should be 1
+        // greater than the biomeID.
         for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
             BiomeGenBase currBiome = BiomeGenBase.getBiomeGenArray()[i];
             if (currBiome != null) {
                 String rawBlockRule =
-                        config.get(section, currBiome.biomeName, DEFAULT_BLOCK_RULES[i].toString(),
+                        config.get(section, currBiome.biomeName,
+                                DEFAULT_BLOCK_RULES[i + 1].toString(),
                                 "" + currBiome.biomeID + " -- " + currBiome.biomeName).getString();
                 try {
-                    blockRules[i] = new TemplateRule(rawBlockRule, false);
+                    blockRules[i + 1] = new TemplateRule(rawBlockRule, false);
                 } catch (Exception e) {
-                    // TODO: log the error
-                    blockRules[i] = DEFAULT_BLOCK_RULES[i];
+                    // TODO: log the error using a proper logger
+                    System.out
+                            .println("Error parsing the CARuins block rule for "
+                                    + currBiome.biomeName + ": \"" + rawBlockRule + "\": "
+                                    + e.getMessage());
+                    blockRules[i + 1] = DEFAULT_BLOCK_RULES[i + 1];
                 }
             }
         }
