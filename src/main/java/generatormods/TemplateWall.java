@@ -65,7 +65,7 @@ public class TemplateWall extends TemplateTML {
 	public int CARuinContainerWidth = 15;
 	public int CARuinMinHeight = 20;
 	public int CARuinMaxHeight = 35;
-	ArrayList<byte[][]> CARuinAutomataRules = null;
+	List<byte[][]> CARuinAutomataRules = null;
 
 	//****************************************  CONSTRUCTOR - WallStyle*************************************************************************************//
 	public TemplateWall(File wallFile, HashMap<String, TemplateTML> buildingTemplateMap, BuildingExplorationHandler beh) throws Exception {

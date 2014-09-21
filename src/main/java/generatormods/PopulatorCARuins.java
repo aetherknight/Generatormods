@@ -18,9 +18,9 @@
 package generatormods;
 
 import generatormods.config.CARuinsConfig;
-import generatormods.config.CARule;
 import generatormods.config.ChestContentsConfig;
 import generatormods.config.ChestItemSpec;
+import generatormods.config.WeightedCARule;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -32,14 +32,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
 @Mod(modid = "CARuins", name = "Cellular Automata Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
@@ -159,9 +156,9 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
         caRules = new ArrayList<byte[][]>();
         List<Integer> caRuleWeights = new ArrayList<Integer>();
-        for(CARule caRule : CARuinsConfig.caRules) {
-            caRules.add(caRule.toBytes());
-            caRuleWeights.add(caRule.getWeight());
+        for(WeightedCARule weightedRule : CARuinsConfig.caRules) {
+            caRules.add(weightedRule.getRule().toBytes());
+            caRuleWeights.add(weightedRule.getWeight());
         }
         setRulesWeightAndIndex(caRuleWeights);
     }

@@ -17,8 +17,9 @@
  */
 package generatormods;
 
-import generatormods.config.CARuinsConfig;
+import generatormods.config.CARule;
 import generatormods.config.ChestItemSpec;
+import generatormods.config.ParseError;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -303,13 +304,16 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 			logActivated = readBooleanParam(lw, logActivated, ":", read);
 	}
 
-	public static ArrayList<byte[][]> readAutomataList(PrintWriter lw, String splitString, String read) {
-		ArrayList<byte[][]> rules = new ArrayList<byte[][]>();
+	public static List<byte[][]> readAutomataList(PrintWriter lw, String splitString, String read) {
+		List<byte[][]> rules = new ArrayList<byte[][]>();
 		String[] ruleStrs = (read.split(splitString)[1]).split(",");
 		for (String ruleStr : ruleStrs) {
-			byte[][] rule = BuildingCellularAutomaton.parseCARule(ruleStr.trim(), lw);
-			if (rule != null)
+            try {
+                byte[][] rule = (new CARule(ruleStr.trim())).toBytes();
 				rules.add(rule);
+            } catch (ParseError e) {
+                lw.println("Error parsing automaton rule " + ruleStr + ": " + e.getMessage());
+            }
 		}
 		if (rules.size() == 0)
 			return null;

@@ -551,27 +551,6 @@ public class BuildingCellularAutomaton extends Building {
 		return seed;
 	}
 
-	public static byte[][] parseCARule(String str, PrintWriter lw) {
-		try {
-			byte[][] rule = new byte[][] { { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-			String birthStr = str.split("/")[0].trim();
-			String surviveStr = str.split("/")[1].trim();
-			for (int n = 1; n < birthStr.length(); n++) {
-				int digit = Integer.parseInt(birthStr.substring(n, n + 1));
-				rule[0][digit] = ALIVE;
-			}
-			for (int n = 1; n < surviveStr.length(); n++) {
-				int digit = Integer.parseInt(surviveStr.substring(n, n + 1));
-				rule[1][digit] = ALIVE;
-			}
-			return rule;
-		} catch (Exception e) {
-			if (lw != null)
-				lw.println("Error parsing automaton rule " + str + ": " + e.getMessage());
-			return null;
-		}
-	}
-
 	public static String ruleToString(byte[][] rule) {
 		StringBuilder sb = new StringBuilder(30);
 		sb.append("B");

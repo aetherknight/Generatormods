@@ -120,7 +120,7 @@ public class CARuinsConfig {
      */
     public static TemplateRule[] blockRules;
 
-    public static List<CARule> caRules;
+    public static List<WeightedCARule> caRules;
 
     public CARuinsConfig() {}
 
@@ -297,7 +297,9 @@ public class CARuinsConfig {
         try {
             return new TemplateRule(rawRule, false);
         } catch (Exception e) {
-            // TODO: log the error
+            // TODO: log the error to a logger
+            System.out.println("Error parsing the CARuins spawner rule for " + ruleName
+                    + ": \"" + rawRule + "\": " + e.getMessage());
             return defaultRule;
         }
     }
@@ -359,9 +361,9 @@ public class CARuinsConfig {
     }
 
     private static void initCARules(Configuration config, String section) {
-        String[] defaultCARules = new String[CARule.DEFAULT_CA_RULES.size()];
+        String[] defaultCARules = new String[WeightedCARule.DEFAULT_CA_RULES.size()];
         for (int i = 0; i < defaultCARules.length; i++) {
-            defaultCARules[i] = CARule.DEFAULT_CA_RULES.get(i).toString();
+            defaultCARules[i] = WeightedCARule.DEFAULT_CA_RULES.get(i).toString();
         }
 
         String[] caRuleStrings =
@@ -371,10 +373,10 @@ public class CARuinsConfig {
                         defaultCARules,
                         "Cellular Automata rules and weights. Each rule is a comma-separated list in the\nfollowing format:\n\n    B3/S23, 5, Life - good for weird temples\n\nThe first value is the Cellular Automata rule, with Birth and survival rule\nnumbers. The second value is the random weight of the rule. The third value is\nan optional comment, which main contain commas.")
                         .getStringList();
-        caRules = new ArrayList<CARule>();
+        caRules = new ArrayList<WeightedCARule>();
         for (String caRuleString : caRuleStrings) {
             try {
-                caRules.add(CARule.fromString(caRuleString));
+                caRules.add(WeightedCARule.fromString(caRuleString));
             } catch (ParseError e) {
                 // TODO: use logger or handle error more catastrophically
                 System.out.println("Error parsing CA rule: \"" + caRuleString + "\": "
