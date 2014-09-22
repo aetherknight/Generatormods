@@ -17,7 +17,12 @@
  */
 package generatormods;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import net.minecraft.block.*;
 import net.minecraft.entity.item.EntityPainting;

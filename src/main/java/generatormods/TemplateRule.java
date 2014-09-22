@@ -17,9 +17,10 @@
  */
 package generatormods;
 
+import cpw.mods.fml.common.registry.GameData;
+
 import java.util.Random;
 
-import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockChest;

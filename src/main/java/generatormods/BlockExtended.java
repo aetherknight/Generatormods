@@ -18,6 +18,7 @@
 package generatormods;
 
 import net.minecraft.block.Block;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class BlockExtended extends BlockAndMeta{

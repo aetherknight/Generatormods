@@ -20,6 +20,7 @@ package generatormods;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Tuple;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class BlockAndMeta extends Tuple {
