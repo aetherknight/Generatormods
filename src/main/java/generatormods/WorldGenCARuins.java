@@ -17,67 +17,73 @@
  */
 package generatormods;
 
-import java.util.List;
+import generatormods.config.CARuinsConfig;
+import generatormods.config.CARule;
+import generatormods.config.SeedType;
+import generatormods.config.WeightedCARule;
+
 import java.util.Random;
+
 import net.minecraft.world.World;
+import net.minecraft.util.WeightedRandom;
 
 public class WorldGenCARuins extends WorldGeneratorThread {
-	private byte[][] caRule = null;
-	private int[][] caRulesWeightsAndIndex;
-	private final int MinHeight, MaxHeight;
-	private final float GlobalFrequency, SymmetricSeedDensity;
-	private final int ContainerWidth, ContainerLength;
-	private int[] seedTypeWeights;
-	private final static int[] SEED_TYPE_CODES = new int[] { 0, 1, 2, 3 };
-	private final int MinHeightBeforeOscillation;
-	private final boolean SmoothWithStairs, MakeFloors;
-	private TemplateRule[] blockRules;
-        private final List<byte[][]> caRules;
+	private CARule caRule = null;
 
-	//****************************************  CONSTRUCTOR - WorldGenCARuins  *************************************************************************************//
+    private final CARuinsConfig config;
+
 	public WorldGenCARuins(PopulatorCARuins ca, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(ca, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
-        caRules = ca.caRules;
-		caRulesWeightsAndIndex = ca.caRulesWeightsAndIndex;
-		MinHeight = ca.MinHeight;
-		MaxHeight = ca.MaxHeight;
-		GlobalFrequency = ca.GlobalFrequency;
-		SymmetricSeedDensity = ca.SymmetricSeedDensity;
-		ContainerWidth = ca.ContainerWidth;
-		ContainerLength = ca.ContainerLength;
-		seedTypeWeights = ca.seedTypeWeights;
-		MinHeightBeforeOscillation = ca.MinHeightBeforeOscillation;
-		SmoothWithStairs = ca.SmoothWithStairs;
-		MakeFloors = ca.MakeFloors;
-		blockRules = ca.blockRules;
+        config = ca.config;
 	}
 
-	//****************************************  FUNCTION - generate  *************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
-		int th = MinHeight + random.nextInt(MaxHeight - MinHeight + 1);
-		if (caRule == null) //if we haven't picked in an earlier generate call 
-            caRule = caRules.get(Building.pickWeightedOption(world.rand, caRulesWeightsAndIndex[0], caRulesWeightsAndIndex[1]));
-		if (caRule == null)
-			return false;
-		int seedCode = Building.pickWeightedOption(world.rand, seedTypeWeights, SEED_TYPE_CODES);
-		byte[][] seed = seedCode == 0 || (caRule[0][0] == 0 && caRule[0][1] == 0 && caRule[0][2] == 0 && caRule[0][3] == 0) //only use symmetric for 4-rules
-		? BuildingCellularAutomaton.makeSymmetricSeed(Math.min(ContainerWidth, ContainerLength), SymmetricSeedDensity, world.rand) : seedCode == 1 ? BuildingCellularAutomaton.makeLinearSeed(
-				ContainerWidth, world.rand) : seedCode == 2 ? BuildingCellularAutomaton.makeCircularSeed(Math.min(ContainerWidth, ContainerLength), world.rand) : BuildingCellularAutomaton
-				.makeCruciformSeed(Math.min(ContainerWidth, ContainerLength), world.rand);
-		TemplateRule blockRule = blockRules[world.getBiomeGenForCoordsBody(i0, k0).biomeID + 1];
-		//can use this to test out new Building classes
-		/*
-		 * BuildingSpiralStaircase bss=new
-		 * BuildingSpiralStaircase(this,blockRule
-		 * ,random.nextInt(4),2*random.nextInt
-		 * (2)-1,false,-(random.nextInt(10)+1),new int[]{i0,j0,k0});
-		 * bss.build(0,0); bss.bottomIsFloor(); return true;
-		 */
-		BuildingCellularAutomaton bca = new BuildingCellularAutomaton(this, blockRule, random.nextInt(4), 1, false, ContainerWidth, th, ContainerLength, seed, caRule, null, new int[] { i0, j0, k0 });
-		if (bca.plan(true, MinHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
-			bca.build(SmoothWithStairs, MakeFloors);
-			if (GlobalFrequency < 0.05 && random.nextInt(2) != 0) {
+        int ContainerWidth = config.containerWidth;
+        int ContainerLength = config.containerLength;
+
+		int th = config.minHeight + random.nextInt(config.maxHeight - config.minHeight + 1);
+        if (caRule == null) //if we haven't picked in an earlier generate call
+            caRule = ((WeightedCARule)WeightedRandom.getRandomItem(world.rand, config.caRules)).getRule();
+        if (caRule == null)
+            return false;
+        SeedType seedCode =
+                ((SeedType.Weighted) WeightedRandom.getRandomItem(world.rand, config.weightedSeeds))
+                        .getSeedType();
+        if (caRule.isFourRule()) // only use symmetric for 4-rules
+            seedCode = SeedType.SYMMETRIC_SEED;
+        byte[][] seed;
+        switch (seedCode) {
+            case SYMMETRIC_SEED:
+                seed =
+                        BuildingCellularAutomaton.makeSymmetricSeed(
+                                Math.min(ContainerWidth, ContainerLength),
+                                config.symmetricSeedDensity, world.rand);
+                break;
+            case LINEAR_SEED:
+                seed = BuildingCellularAutomaton.makeLinearSeed(ContainerWidth, world.rand);
+                break;
+            case CIRCULAR_SEED:
+                seed =
+                        BuildingCellularAutomaton.makeCircularSeed(
+                                Math.min(ContainerWidth, ContainerLength), world.rand);
+                break;
+            default:
+                seed =
+                        BuildingCellularAutomaton.makeCruciformSeed(
+                                Math.min(ContainerWidth, ContainerLength), world.rand);
+        }
+        TemplateRule blockRule =
+                config.blockRules[world.getBiomeGenForCoordsBody(i0, k0).biomeID + 1];
+        //can use this to test out new Building classes
+        //BuildingSpiralStaircase bss=new BuildingSpiralStaircase(this,blockRule,random.nextInt(4),2*random.nextInt(2)-1,false,-(random.nextInt(10)+1),new int[]{i0,j0,k0});
+        //bss.build(0,0);
+        //bss.bottomIsFloor();
+        //return true;
+		BuildingCellularAutomaton bca = new BuildingCellularAutomaton(this, blockRule, random.nextInt(4), 1, false, ContainerWidth, th, ContainerLength, seed, caRule.toBytes(), null, new int[] { i0, j0, k0 });
+		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
+			bca.build(config.smoothWithStairs, config.makeFloors);
+			if (config.globalFrequency < 0.05 && random.nextInt(2) != 0) {
 				for (int tries = 0; tries < 10; tries++) {
 					int[] pt = new int[] { i0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)), 0,
 							k0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)) };

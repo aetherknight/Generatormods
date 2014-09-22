@@ -54,25 +54,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Instance("CARuins")
 	public static PopulatorCARuins instance;
 
-    // Ordering means:
-    // [0]: SymmetricSeedWeight
-    // [1]: LinearSeedWeight
-    // [2]: CircularSeedWeight
-    // [3]: CruciformSeedWeight
-	public int[] seedTypeWeights = new int[] { 8, 2, 2, 1 };
-	public float SymmetricSeedDensity = 0.5F;
-	public int MinHeight = 20, MaxHeight = 70;
-	public int ContainerWidth = 40, ContainerLength = 40;
-	public int MinHeightBeforeOscillation = 12;
-	public boolean SmoothWithStairs = true, MakeFloors = true;
-
-    // blockRules index = biomeId +1
-	public TemplateRule[] blockRules;// = new TemplateRule[DEFAULT_BLOCK_RULES.length];
-	public TemplateRule[] spawnerRules = new TemplateRule[] { BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE, BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE,
-			BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE };
-	ArrayList<byte[][]> caRules = null;
-	int[][] caRulesWeightsAndIndex = null;
-
     public CARuinsConfig config;
 
 	@EventHandler
@@ -112,29 +93,17 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 			if (lw != null)
 				lw.close();
 		}
-		if (GlobalFrequency < 0.000001 || caRules == null || caRules.size() == 0)
+		if (config.globalFrequency < 0.000001 || config.caRules == null || config.caRules.size() == 0)
 			errFlag = true;
 		dataFilesLoaded = true;
 	}
 
-	@Override
-	public void loadGlobalOptions(BufferedReader br) {
+    @Override
+    public void loadGlobalOptions(BufferedReader br) {
         GlobalFrequency = config.globalFrequency;
         TriesPerChunk = config.triesPerChunk;
-        // AllowedDimensions is a List<Integer> instead of a point to an int[].
-        for( int currInt : config.allowedDimensions) {
-            AllowedDimensions.add(new Integer(currInt));
-        }
+        AllowedDimensions = config.allowedDimensions;
         logActivated = config.logActivated;
-
-        // CARuins-specific
-        MinHeight = config.minHeight;
-        MaxHeight = config.maxHeight;
-        MinHeightBeforeOscillation = config.minHeightBeforeOscillation;
-        SmoothWithStairs = config.smoothWithStairs;
-        MakeFloors = config.makeFloors;
-        ContainerWidth = config.containerWidth;
-        ContainerLength = config.containerLength;
 
         // Support the existing old chest format (array of values)
         for(Map.Entry<String, ChestContentsConfig> entry : config.chestConfigs.entrySet()) {
@@ -152,31 +121,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
                 chestSpecOld[5][n] = itemSpec.getMaxStackSize();
             }
             chestItems.put(chestType, chestSpecOld);
-        }
-
-        SymmetricSeedDensity = config.symmetricSeedDensity;
-        // Trusting that the indices here matches the constants.
-        seedTypeWeights[0] = config.symmetricSeedWeight;
-        seedTypeWeights[1] = config.linearSeedWeight;
-        seedTypeWeights[2] = config.circularSeedWeight;
-        seedTypeWeights[3] = config.cruciformSeedWeight;
-
-        spawnerRules[0] = config.mediumLightNarrowFloorSpawnerRule;
-        spawnerRules[1] = config.mediumLightWideFloorSpawnerRule;
-        spawnerRules[2] = config.lowLightSpawnerRule;
-
-        blockRules = config.blockRules;
-
-        caRules = new ArrayList<byte[][]>();
-        List<Integer> caRuleWeights = new ArrayList<Integer>();
-        for(WeightedCARule weightedRule : config.caRules) {
-            caRules.add(weightedRule.getRule().toBytes());
-            caRuleWeights.add(weightedRule.getWeight());
-        }
-        caRulesWeightsAndIndex = new int[2][caRuleWeights.size()];
-        for (int m = 0; m < caRuleWeights.size(); m++) {
-            caRulesWeightsAndIndex[0][m] = caRuleWeights.get(m);
-            caRulesWeightsAndIndex[1][m] = m;
         }
     }
 

@@ -23,7 +23,10 @@ import generatormods.BuildingCellularAutomaton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WeightedCARule {
+import net.minecraft.util.WeightedRandom;
+import net.minecraft.util.WeightedRandom.Item;
+
+public class WeightedCARule extends WeightedRandom.Item {
     public final static List<WeightedCARule> DEFAULT_CA_RULES;
     static {
         try {
@@ -92,6 +95,7 @@ public class WeightedCARule {
     }
 
     public WeightedCARule(CARule rule, int weight, String comment) {
+        super(weight);
         this.rule = rule;
         this.weight = weight;
         this.comment = comment;

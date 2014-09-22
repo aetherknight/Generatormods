@@ -94,7 +94,7 @@ public class CARuinsConfig {
 
     public float globalFrequency;
     public int triesPerChunk;
-    public int[] allowedDimensions;
+    public List<Integer> allowedDimensions;
     public boolean logActivated;
 
     public int minHeight;
@@ -112,6 +112,8 @@ public class CARuinsConfig {
     public int linearSeedWeight;
     public int circularSeedWeight;
     public int cruciformSeedWeight;
+
+    public List<SeedType.Weighted> weightedSeeds;
 
     public TemplateRule mediumLightWideFloorSpawnerRule;
     public TemplateRule mediumLightNarrowFloorSpawnerRule;
@@ -171,13 +173,18 @@ public class CARuinsConfig {
                         1,
                         "Allows multiple attempts to build a structure per chunk. If a chunk is selected\nfor a structure, but that structure is rejected for some reason, then a value\ngreater than 1 will attempt to create another structure. Only set it to larger\nthan 1 if you want very dense generation!",
                         0, 100).getInt();
-        allowedDimensions =
+        int[] rawAllowedDimensions =
                 config.get(
                         section,
                         "Allowed Dimensions",
                         DEFAULT_DIM_LIST,
                         "Whitelist of dimension IDs where structures may be gnerated. Default is Nether\n(-1) and Overworld (0).")
                         .getIntList();
+        allowedDimensions = new ArrayList<Integer>();
+        for(int dimensionInt : rawAllowedDimensions) {
+            allowedDimensions.add(dimensionInt);
+        }
+
         logActivated =
                 config.get(
                         section,
@@ -293,6 +300,12 @@ public class CARuinsConfig {
                         1,
                         "Seed type weights are the relative likelihood weights that different seeds will\nbe used. Weights are nonnegative integers.",
                         0, 4096).getInt();
+
+        weightedSeeds = new ArrayList<SeedType.Weighted>();
+        weightedSeeds.add(new SeedType.Weighted(SeedType.SYMMETRIC_SEED, symmetricSeedWeight));
+        weightedSeeds.add(new SeedType.Weighted(SeedType.LINEAR_SEED, linearSeedWeight));
+        weightedSeeds.add(new SeedType.Weighted(SeedType.CIRCULAR_SEED, circularSeedWeight));
+        weightedSeeds.add(new SeedType.Weighted(SeedType.CRUCIFORM_SEED, cruciformSeedWeight));
     }
 
     /**

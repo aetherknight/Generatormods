@@ -71,4 +71,8 @@ public class CARule {
     public byte[][] toBytes() {
         return rule;
     }
+
+    public boolean isFourRule() {
+        return rule[0][0] == 0 && rule[0][1] == 0 && rule[0][2] == 0 && rule[0][3] == 0;
+    }
 }
