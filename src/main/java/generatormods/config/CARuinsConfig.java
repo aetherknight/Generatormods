@@ -36,6 +36,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 import net.minecraftforge.common.config.Configuration;
 
+import org.apache.logging.log4j.Logger;
+
 public class CARuinsConfig {
     // Defaults to the Nether and the Overworld
     private static final int[] DEFAULT_DIM_LIST = {-1, 0};
@@ -45,7 +47,7 @@ public class CARuinsConfig {
             0, 0}, 100);
     // Customize the default templates per-biome. We track it here by biome ID.
     private static TemplateRule[] DEFAULT_BLOCK_RULES = new TemplateRule[BiomeGenBase
-            .getBiomeGenArray().length+1];
+            .getBiomeGenArray().length + 1];
     static {
         DEFAULT_BLOCK_RULES[0] = DEFAULT_TEMPLATE; // Underground, unused
         DEFAULT_BLOCK_RULES[1] = DEFAULT_TEMPLATE; // Ocean
@@ -83,56 +85,60 @@ public class CARuinsConfig {
         DEFAULT_BLOCK_RULES[21] =
                 new TemplateRule(new Block[] {Blocks.stone, Blocks.stonebrick, Blocks.stonebrick},
                         new int[] {0, 0, 2}, 100);// ExtremeHillsEdge
-        for (int i = 22; i < BiomeGenBase.getBiomeGenArray().length+1; i++) {
+        for (int i = 22; i < BiomeGenBase.getBiomeGenArray().length + 1; i++) {
             if (DEFAULT_BLOCK_RULES[i] == null) {
                 DEFAULT_BLOCK_RULES[i] = DEFAULT_TEMPLATE;
             }
         }
     }
 
-    public static float globalFrequency;
-    public static int triesPerChunk;
-    public static int[] allowedDimensions;
-    public static boolean logActivated;
+    public float globalFrequency;
+    public int triesPerChunk;
+    public int[] allowedDimensions;
+    public boolean logActivated;
 
-    public static int minHeight;
-    public static int maxHeight;
-    public static int minHeightBeforeOscillation;
-    public static boolean smoothWithStairs;
-    public static boolean makeFloors;
-    public static int containerWidth;
-    public static int containerLength;
+    public int minHeight;
+    public int maxHeight;
+    public int minHeightBeforeOscillation;
+    public boolean smoothWithStairs;
+    public boolean makeFloors;
+    public int containerWidth;
+    public int containerLength;
 
-    public static Map<String, ChestContentsConfig> chestConfigs;
+    public Map<String, ChestContentsConfig> chestConfigs;
 
-    public static float symmetricSeedDensity;
-    public static int symmetricSeedWeight;
-    public static int linearSeedWeight;
-    public static int circularSeedWeight;
-    public static int cruciformSeedWeight;
+    public float symmetricSeedDensity;
+    public int symmetricSeedWeight;
+    public int linearSeedWeight;
+    public int circularSeedWeight;
+    public int cruciformSeedWeight;
 
-    public static TemplateRule mediumLightWideFloorSpawnerRule;
-    public static TemplateRule mediumLightNarrowFloorSpawnerRule;
-    public static TemplateRule lowLightSpawnerRule;
+    public TemplateRule mediumLightWideFloorSpawnerRule;
+    public TemplateRule mediumLightNarrowFloorSpawnerRule;
+    public TemplateRule lowLightSpawnerRule;
 
     /**
-     * Contains the template rule for a CA Ruin that is generated in a given
-     * biome. The indices of this list are 1 greater than the corresponding
-     * biomeID. Index 0 is reserved the the generator mods' special
-     * "Underground" pseudo-biome.
+     * Contains the template rule for a CA Ruin that is generated in a given biome. The indices of
+     * this list are 1 greater than the corresponding biomeID. Index 0 is reserved the the generator
+     * mods' special "Underground" pseudo-biome.
      */
-    public static TemplateRule[] blockRules;
+    public TemplateRule[] blockRules;
 
-    public static List<WeightedCARule> caRules;
+    public List<WeightedCARule> caRules;
 
-    public CARuinsConfig() {}
+    private File configFile;
+    private Logger logger;
+
+    public CARuinsConfig(File configDir, Logger logger) {
+        configFile = new File(configDir + "/CARuins.cfg");
+        this.logger = logger;
+    }
 
     /**
      * Create or read a Forge-style config file.
      */
-    public static void initialize(File configDir) {
-        File forgeStyleConfigFile = new File(configDir + "/CARuins.cfg");
-        Configuration config = new Configuration(forgeStyleConfigFile);
+    public void initialize() {
+        Configuration config = new Configuration(configFile);
 
         String section = "CARuins";
 
@@ -148,7 +154,7 @@ public class CARuinsConfig {
             config.save();
     }
 
-    private static void initCommonConfig(Configuration config, String section) {
+    private void initCommonConfig(Configuration config, String section) {
         // TODO: turn this into an integer n where 1/n is the odds that a given chunk will attempt
         // to generate a structure.
         globalFrequency =
@@ -181,7 +187,7 @@ public class CARuinsConfig {
                         .getBoolean();
     }
 
-    private static void initCARuinsConfig(Configuration config, String section) {
+    private void initCARuinsConfig(Configuration config, String section) {
         minHeight =
                 config.get(section, "Min Height", 20,
                         "The minimum allowed height of the structures", 0, 255).getInt();
@@ -208,7 +214,7 @@ public class CARuinsConfig {
                         "The length of the bounding rectangle.", 0, 4096).getInt();
     }
 
-    private static String[] defaultChestItems(int chestTypeIndex) {
+    private String[] defaultChestItems(int chestTypeIndex) {
         // Build an array of the chest item strings
         String[] chestItems = new String[Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length];
         for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length; m++) {
@@ -221,7 +227,7 @@ public class CARuinsConfig {
         return chestItems;
     }
 
-    private static void initChestConfigs(Configuration config, String baseSection) {
+    private void initChestConfigs(Configuration config, String baseSection) {
         // Chest contents. Grouped by chest type.
         chestConfigs = new HashMap<String, ChestContentsConfig>();
         for (int l = 0; l < Building.CHEST_TYPE_LABELS.length; l++) {
@@ -252,7 +258,7 @@ public class CARuinsConfig {
         }
     }
 
-    private static void initSeedWeights(Configuration config, String baseSection) {
+    private void initSeedWeights(Configuration config, String baseSection) {
         String section = baseSection + ".SeedWeights";
 
         symmetricSeedDensity =
@@ -294,20 +300,19 @@ public class CARuinsConfig {
      *
      * If it fails to parse, it reverts to the default rule.
      */
-    private static TemplateRule getSpawnerRule(Configuration config, String section,
-            String ruleName, TemplateRule defaultRule) {
+    private TemplateRule getSpawnerRule(Configuration config, String section, String ruleName,
+            TemplateRule defaultRule) {
         String rawRule = config.get(section, ruleName, defaultRule.toString()).getString();
         try {
             return new TemplateRule(rawRule, false);
         } catch (Exception e) {
-            // TODO: log the error to a logger
-            System.out.println("Error parsing the CARuins spawner rule for " + ruleName
-                    + ": \"" + rawRule + "\": " + e.getMessage());
+            logger.error("Error parsing the CARuins spawner rule for " + ruleName + ": \""
+                    + rawRule + "\". Using defaults instead.", e);
             return defaultRule;
         }
     }
 
-    private static void initSpawnerRules(Configuration config, String baseSection) {
+    private void initSpawnerRules(Configuration config, String baseSection) {
         String section = baseSection + ".SpawnerRules";
 
         config.setCategoryComment(
@@ -328,7 +333,7 @@ public class CARuinsConfig {
     /**
      * Load a BlockRule or generate a default BlockRule for all biomes.
      */
-    private static void initBlockRules(Configuration config, String baseSection) {
+    private void initBlockRules(Configuration config, String baseSection) {
         String section = baseSection + ".BlockRules";
         blockRules = new TemplateRule[DEFAULT_BLOCK_RULES.length];
 
@@ -352,18 +357,15 @@ public class CARuinsConfig {
                 try {
                     blockRules[i + 1] = new TemplateRule(rawBlockRule, false);
                 } catch (Exception e) {
-                    // TODO: log the error using a proper logger
-                    System.out
-                            .println("Error parsing the CARuins block rule for "
-                                    + currBiome.biomeName + ": \"" + rawBlockRule + "\": "
-                                    + e.getMessage());
+                    logger.error("Error parsing the CARuins block rule for " + currBiome.biomeName
+                            + ": \"" + rawBlockRule + "\". Using defaults instead.", e);
                     blockRules[i + 1] = DEFAULT_BLOCK_RULES[i + 1];
                 }
             }
         }
     }
 
-    private static void initCARules(Configuration config, String section) {
+    private void initCARules(Configuration config, String section) {
         String[] defaultCARules = new String[WeightedCARule.DEFAULT_CA_RULES.size()];
         for (int i = 0; i < defaultCARules.length; i++) {
             defaultCARules[i] = WeightedCARule.DEFAULT_CA_RULES.get(i).toString();
@@ -381,9 +383,7 @@ public class CARuinsConfig {
             try {
                 caRules.add(WeightedCARule.fromString(caRuleString));
             } catch (ParseError e) {
-                // TODO: use logger or handle error more catastrophically
-                System.out.println("Error parsing CA rule: \"" + caRuleString + "\": "
-                        + e.getMessage());
+                logger.error("Error parsing CA rule: \"" + caRuleString + "\". Ignoring.", e);
             }
         }
     }

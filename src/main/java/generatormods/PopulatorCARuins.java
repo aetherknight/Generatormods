@@ -73,6 +73,8 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	ArrayList<byte[][]> caRules = null;
 	int[][] caRulesWeightsAndIndex = null;
 
+    public CARuinsConfig config;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
@@ -99,7 +101,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
 			initializeLogging("Loading options for the Cellular Automata Generator.");
-            CARuinsConfig.initialize(CONFIG_DIRECTORY);
 			getGlobalOptions();
 			finalizeLoading(false, "ruin");
 		} catch (Exception e) {
@@ -118,25 +119,25 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
 	@Override
 	public void loadGlobalOptions(BufferedReader br) {
-        GlobalFrequency = CARuinsConfig.globalFrequency;
-        TriesPerChunk = CARuinsConfig.triesPerChunk;
+        GlobalFrequency = config.globalFrequency;
+        TriesPerChunk = config.triesPerChunk;
         // AllowedDimensions is a List<Integer> instead of a point to an int[].
-        for( int currInt : CARuinsConfig.allowedDimensions) {
+        for( int currInt : config.allowedDimensions) {
             AllowedDimensions.add(new Integer(currInt));
         }
-        logActivated = CARuinsConfig.logActivated;
+        logActivated = config.logActivated;
 
         // CARuins-specific
-        MinHeight = CARuinsConfig.minHeight;
-        MaxHeight = CARuinsConfig.maxHeight;
-        MinHeightBeforeOscillation = CARuinsConfig.minHeightBeforeOscillation;
-        SmoothWithStairs = CARuinsConfig.smoothWithStairs;
-        MakeFloors = CARuinsConfig.makeFloors;
-        ContainerWidth = CARuinsConfig.containerWidth;
-        ContainerLength = CARuinsConfig.containerLength;
+        MinHeight = config.minHeight;
+        MaxHeight = config.maxHeight;
+        MinHeightBeforeOscillation = config.minHeightBeforeOscillation;
+        SmoothWithStairs = config.smoothWithStairs;
+        MakeFloors = config.makeFloors;
+        ContainerWidth = config.containerWidth;
+        ContainerLength = config.containerLength;
 
         // Support the existing old chest format (array of values)
-        for(Map.Entry<String, ChestContentsConfig> entry : CARuinsConfig.chestConfigs.entrySet()) {
+        for(Map.Entry<String, ChestContentsConfig> entry : config.chestConfigs.entrySet()) {
             String chestType = entry.getKey();
             ChestContentsConfig chestSpec = entry.getValue();
             List<ChestItemSpec> chestItemList = chestSpec.getChestItems();
@@ -153,22 +154,22 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
             chestItems.put(chestType, chestSpecOld);
         }
 
-        SymmetricSeedDensity = CARuinsConfig.symmetricSeedDensity;
+        SymmetricSeedDensity = config.symmetricSeedDensity;
         // Trusting that the indices here matches the constants.
-        seedTypeWeights[0] = CARuinsConfig.symmetricSeedWeight;
-        seedTypeWeights[1] = CARuinsConfig.linearSeedWeight;
-        seedTypeWeights[2] = CARuinsConfig.circularSeedWeight;
-        seedTypeWeights[3] = CARuinsConfig.cruciformSeedWeight;
+        seedTypeWeights[0] = config.symmetricSeedWeight;
+        seedTypeWeights[1] = config.linearSeedWeight;
+        seedTypeWeights[2] = config.circularSeedWeight;
+        seedTypeWeights[3] = config.cruciformSeedWeight;
 
-        spawnerRules[0] = CARuinsConfig.mediumLightNarrowFloorSpawnerRule;
-        spawnerRules[1] = CARuinsConfig.mediumLightWideFloorSpawnerRule;
-        spawnerRules[2] = CARuinsConfig.lowLightSpawnerRule;
+        spawnerRules[0] = config.mediumLightNarrowFloorSpawnerRule;
+        spawnerRules[1] = config.mediumLightWideFloorSpawnerRule;
+        spawnerRules[2] = config.lowLightSpawnerRule;
 
-        blockRules = CARuinsConfig.blockRules;
+        blockRules = config.blockRules;
 
         caRules = new ArrayList<byte[][]>();
         List<Integer> caRuleWeights = new ArrayList<Integer>();
-        for(WeightedCARule weightedRule : CARuinsConfig.caRules) {
+        for(WeightedCARule weightedRule : config.caRules) {
             caRules.add(weightedRule.getRule().toBytes());
             caRuleWeights.add(weightedRule.getWeight());
         }
@@ -195,6 +196,9 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
+        config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
+        config.initialize();
+
 		if (!dataFilesLoaded)
 			loadDataFiles();
 		if (!errFlag) {

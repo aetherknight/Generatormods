@@ -50,6 +50,7 @@ import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.ISaveHandler;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 /*
  * BuildingExplorationHandler is an abstract superclass for PopulatorWalledCity
@@ -62,7 +63,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
 	protected final static File LOG = new File(new File(getMinecraftBaseDir(), "logs"), "generatormods_log.txt");
 	protected String settingsFileName, templateFolderName;
-	public org.apache.logging.log4j.Logger logger;
+	public Logger logger;
 	public PrintWriter lw = null;
 	public float GlobalFrequency = 0.025F;
 	public int TriesPerChunk = 1;
