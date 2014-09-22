@@ -20,6 +20,9 @@ package generatormods;
 import net.minecraft.block.Block;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Sub-type of BlockAndMeta that represents a block placed in the world.
+ */
 public class PlacedBlock extends BlockAndMeta{
     public final int x, y, z;
     public PlacedBlock(Block block, int[] data) {

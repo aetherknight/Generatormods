@@ -22,9 +22,9 @@ import java.util.Random;
 import net.minecraft.world.World;
 
 /*
- * WorldGenGreatWall creates a great wall in Minecraft.
- * This class is chiefly a WorldGeneratorThread wrapper for a BuildingDoubleWall.
- * It also checks curviness and length.
+ * WorldGenGreatWall creates a great wall in Minecraft. This class is chiefly a
+ * WorldGeneratorThread wrapper for a BuildingDoubleWall. It also checks
+ * curviness and length.
  */
 public class WorldGenGreatWall extends WorldGeneratorThread {
 	//private final static boolean DEBUG=false;

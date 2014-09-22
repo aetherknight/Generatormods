@@ -20,8 +20,12 @@ package generatormods;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Tuple;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Stores a block type, plus a metadata value for that block.
+ */
 public class BlockAndMeta extends Tuple {
     public BlockAndMeta(Block block, int meta){
         super(block,meta);

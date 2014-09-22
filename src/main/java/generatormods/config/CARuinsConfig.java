@@ -23,14 +23,17 @@ import generatormods.BuildingCellularAutomaton;
 import generatormods.TemplateRule;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
+
 import net.minecraftforge.common.config.Configuration;
 
 public class CARuinsConfig {

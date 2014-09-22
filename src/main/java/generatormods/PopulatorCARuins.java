@@ -31,14 +31,24 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
+/**
+ * Main class that hooks into Forge for CARuins. It loads configuration and
+ * sets up the world generation it adds.
+ */
 @Mod(modid = "CARuins", name = "Cellular Automata Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Instance("CARuins")

@@ -17,26 +17,28 @@
  */
 package generatormods;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Random;
-
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ModContainer;
-import net.minecraft.world.World;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import net.minecraft.world.World;
+
 /*
- * PopulatorGreatWall is the main class that hooks into ModLoader for the Great Wall Mod.
- * It reads the globalSettings file and runs WorldGenWalledCities.
+ * PopulatorGreatWall is the main class that hooks into ModLoader for the Great
+ * Wall Mod. It reads the globalSettings file and runs WorldGenWalledCities.
  */
 @Mod(modid = "GreatWallMod", name = "Great Wall Mod", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorGreatWall extends BuildingExplorationHandler {
