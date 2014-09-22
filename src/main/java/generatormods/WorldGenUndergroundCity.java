@@ -27,9 +27,9 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 /*
- * WorldGenUndergroundCity generates a city in a large underground cavern.
- * The cavern is made from many recursively created spherical voids.
- * These are filled with street template BuildingDoubleWalls to create the city.
+ * WorldGenUndergroundCity generates a city in a large underground cavern. The
+ * cavern is made from many recursively created spherical voids. These are
+ * filled with street template BuildingDoubleWalls to create the city.
  */
 public class WorldGenUndergroundCity extends WorldGeneratorThread {
 	private final static float P_CHILDREN = 0.80F;

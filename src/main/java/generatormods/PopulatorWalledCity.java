@@ -49,8 +49,9 @@ import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
 
 /*
- * PopulatorWalledCity is the main class that hooks into ModLoader for the Walled City Mod.
- * It reads the globalSettings file, keeps track of city locations, and runs WorldGenWalledCitys and WorldGenUndergroundCities.
+ * PopulatorWalledCity is the main class that hooks into ModLoader for the
+ * Walled City Mod. It reads the globalSettings file, keeps track of city
+ * locations, and runs WorldGenWalledCitys and WorldGenUndergroundCities.
  */
 @Mod(modid = "WalledCityMod", name = "Walled City Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorWalledCity extends BuildingExplorationHandler {

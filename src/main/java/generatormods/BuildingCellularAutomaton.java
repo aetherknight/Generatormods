@@ -30,7 +30,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 
 /*
- * BuildingCellularAutomaton creates double-ended walls
+ * BuildingCellularAutomaton creates Cellular Automata-derived towers.
  */
 public class BuildingCellularAutomaton extends Building {
 	private final static byte DEAD = 0, ALIVE = 1;

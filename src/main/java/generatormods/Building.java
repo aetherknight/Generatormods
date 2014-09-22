@@ -37,7 +37,8 @@ import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
 
 /*
- *      Building is a general class for buildings. Classes can inherit from Building to build from a local frame of reference.
+ * Building is a general class for buildings. Classes can inherit from Building
+ * to build from a local frame of reference.
  * 
  *  Local frame of reference variables:
  *     i,j,k are coordinate inputs for global frame of reference functions.

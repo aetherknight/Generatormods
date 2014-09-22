@@ -29,9 +29,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
 /*
- * WorldGenWalledCity generates walled cities in the Minecraft world.
- * Walled cities are composed of 4 wall template BuildingWalls in a rough rectangle,
- *  filled with many street template BuildingDoubleWalls.
+ * WorldGenWalledCity generates walled cities in the Minecraft world. Walled
+ * cities are composed of 4 wall template BuildingWalls in a rough rectangle,
+ * filled with many street template BuildingDoubleWalls.
  */
 public class WorldGenWalledCity extends WorldGeneratorThread {
 	private final static int GATE_HEIGHT = 6;
