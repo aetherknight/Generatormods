@@ -44,7 +44,11 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Instance("CARuins")
 	public static PopulatorCARuins instance;
 
-	public final static String[] SEED_TYPE_STRINGS = new String[] { "SymmetricSeedWeight", "LinearSeedWeight", "CircularSeedWeight", "CruciformSeedWeight" };
+    // Ordering means:
+    // [0]: SymmetricSeedWeight
+    // [1]: LinearSeedWeight
+    // [2]: CircularSeedWeight
+    // [3]: CruciformSeedWeight
 	public int[] seedTypeWeights = new int[] { 8, 2, 2, 1 };
 	public float SymmetricSeedDensity = 0.5F;
 	public int MinHeight = 20, MaxHeight = 70;
@@ -81,7 +85,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         event.registerServerCommand(new CommandScan());
 	}
 
-	//****************************  FUNCTION - loadDataFiles *************************************************************************************//
 	@Override
 	public final void loadDataFiles() {
 		try {
@@ -103,7 +106,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 		dataFilesLoaded = true;
 	}
 
-	//****************************  FUNCTION - getGlobalOptions *************************************************************************************//
 	@Override
 	public void loadGlobalOptions(BufferedReader br) {
         GlobalFrequency = CARuinsConfig.globalFrequency;
@@ -160,23 +162,16 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
             caRules.add(weightedRule.getRule().toBytes());
             caRuleWeights.add(weightedRule.getWeight());
         }
-        setRulesWeightAndIndex(caRuleWeights);
+        caRulesWeightsAndIndex = new int[2][caRuleWeights.size()];
+        for (int m = 0; m < caRuleWeights.size(); m++) {
+            caRulesWeightsAndIndex[0][m] = caRuleWeights.get(m);
+            caRulesWeightsAndIndex[1][m] = m;
+        }
     }
 
-	private void setRulesWeightAndIndex(List<Integer> caRuleWeights) {
-		caRulesWeightsAndIndex = new int[2][caRuleWeights.size()];
-		for (int m = 0; m < caRuleWeights.size(); m++) {
-			caRulesWeightsAndIndex[0][m] = caRuleWeights.get(m);
-			caRulesWeightsAndIndex[1][m] = m;
-		}
-	}
+    @Override
+    public void writeGlobalOptions(PrintWriter pw) {}
 
-	@Override
-	public void writeGlobalOptions(PrintWriter pw) {
-		pw.println("Settings are now in CARuins.cfg");
-	}
-
-	//****************************  FUNCTION - generate *************************************************************************************//
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
 		if (random.nextFloat() < GlobalFrequency)
