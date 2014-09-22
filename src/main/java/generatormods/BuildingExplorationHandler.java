@@ -48,8 +48,9 @@ import net.minecraft.world.storage.ISaveHandler;
 import org.apache.logging.log4j.Level;
 
 /*
- * BuildingExplorationHandler is a abstract superclass for PopulatorWalledCity and PopulatorGreatWall.
- * It loads settings files and runs WorldGeneratorThreads.
+ * BuildingExplorationHandler is an abstract superclass for PopulatorWalledCity
+ * and PopulatorGreatWall. It loads settings files and runs
+ * WorldGeneratorThreads.
  */
 public abstract class BuildingExplorationHandler implements IWorldGenerator {
     protected final static String VERSION = "0.1.6";

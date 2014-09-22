@@ -21,6 +21,10 @@ import net.minecraft.block.Block;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Extends BlockAndMeta further to represent a block with metadata, and an
+ * internal store associating a given block to its BlockProperties.
+ */
 public class BlockExtended extends BlockAndMeta{
     public final String info;
     public BlockExtended(Block block, int meta, String extra) {

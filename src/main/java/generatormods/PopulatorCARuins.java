@@ -38,6 +38,10 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
+/**
+ * Main class that hooks into Forge for CARuins. It loads configuration and
+ * sets up the world generation it adds.
+ */
 @Mod(modid = "CARuins", name = "Cellular Automata Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Instance("CARuins")

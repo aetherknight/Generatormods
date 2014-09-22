@@ -24,8 +24,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 /*
- * WorldGeneratorThread is a thread that generates structures in the Minecraft world.
- * It is intended to serially hand back and forth control with a BuildingExplorationHandler (not to run parallel).
+ * WorldGeneratorThread is a thread that generates structures in the Minecraft
+ * world. It is intended to serially hand back and forth control with a
+ * BuildingExplorationHandler (not to run parallel).
  */
 public abstract class WorldGeneratorThread {
 	public final static int LAYOUT_CODE_NOCODE = -1;
