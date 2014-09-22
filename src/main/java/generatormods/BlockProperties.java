@@ -17,14 +17,15 @@
  */
 package generatormods;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
+
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.IShearable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class BlockProperties {
     private final static Map<Block,BlockProperties> props = new HashMap<Block, BlockProperties>();
