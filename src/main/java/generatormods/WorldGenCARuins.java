@@ -17,6 +17,12 @@
  */
 package generatormods;
 
+import generatormods.caruins.seeds.CircularSeed;
+import generatormods.caruins.seeds.CruciformSeed;
+import generatormods.caruins.seeds.ISeed;
+import generatormods.caruins.seeds.LinearSeed;
+import generatormods.caruins.seeds.SymmetricSeed;
+
 import generatormods.config.CARuinsConfig;
 import generatormods.config.CARule;
 import generatormods.config.SeedType;
@@ -47,32 +53,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
             caRule = ((WeightedCARule)WeightedRandom.getRandomItem(world.rand, config.caRules)).getRule();
         if (caRule == null)
             return false;
-        SeedType seedCode =
-                ((SeedType.Weighted) WeightedRandom.getRandomItem(world.rand, config.weightedSeeds))
-                        .getSeedType();
-        if (caRule.isFourRule()) // only use symmetric for 4-rules
-            seedCode = SeedType.SYMMETRIC_SEED;
-        byte[][] seed;
-        switch (seedCode) {
-            case SYMMETRIC_SEED:
-                seed =
-                        BuildingCellularAutomaton.makeSymmetricSeed(
-                                Math.min(ContainerWidth, ContainerLength),
-                                config.symmetricSeedDensity, world.rand);
-                break;
-            case LINEAR_SEED:
-                seed = BuildingCellularAutomaton.makeLinearSeed(ContainerWidth, world.rand);
-                break;
-            case CIRCULAR_SEED:
-                seed =
-                        BuildingCellularAutomaton.makeCircularSeed(
-                                Math.min(ContainerWidth, ContainerLength), world.rand);
-                break;
-            default:
-                seed =
-                        BuildingCellularAutomaton.makeCruciformSeed(
-                                Math.min(ContainerWidth, ContainerLength), world.rand);
-        }
+        ISeed seed = pickSeed();
         TemplateRule blockRule =
                 config.blockRules[world.getBiomeGenForCoordsBody(i0, k0).biomeID + 1];
         //can use this to test out new Building classes
@@ -80,7 +61,10 @@ public class WorldGenCARuins extends WorldGeneratorThread {
         //bss.build(0,0);
         //bss.bottomIsFloor();
         //return true;
-		BuildingCellularAutomaton bca = new BuildingCellularAutomaton(this, blockRule, random.nextInt(4), 1, false, ContainerWidth, th, ContainerLength, seed, caRule.toBytes(), null, new int[] { i0, j0, k0 });
+        BuildingCellularAutomaton bca =
+                new BuildingCellularAutomaton(this, blockRule, random.nextInt(4), 1, false,
+                        ContainerWidth, th, ContainerLength, seed.makeSeed(world.rand),
+                        caRule.toBytes(), null, new int[] {i0, j0, k0});
 		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
 			bca.build(config.smoothWithStairs, config.makeFloors);
 			if (config.globalFrequency < 0.05 && random.nextInt(2) != 0) {
@@ -97,4 +81,23 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 		}
 		return false;
 	}
+
+    private ISeed pickSeed() {
+        SeedType seedCode =
+                ((SeedType.Weighted) WeightedRandom.getRandomItem(world.rand, config.weightedSeeds))
+                        .getSeedType();
+        if (caRule.isFourRule()) // only use symmetric for 4-rules
+            seedCode = SeedType.SYMMETRIC_SEED;
+        switch (seedCode) {
+            case SYMMETRIC_SEED:
+                return new SymmetricSeed(Math.min(config.containerWidth, config.containerLength),
+                        config.symmetricSeedDensity);
+            case LINEAR_SEED:
+                return new LinearSeed(config.containerWidth);
+            case CIRCULAR_SEED:
+                return new CircularSeed(Math.min(config.containerWidth, config.containerLength));
+            default:
+                return new CruciformSeed(Math.min(config.containerWidth, config.containerLength));
+        }
+    }
 }

@@ -17,6 +17,9 @@
  */
 package generatormods;
 
+import generatormods.caruins.seeds.ISeed;
+import generatormods.caruins.seeds.SymmetricSeed;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -717,9 +720,13 @@ public class BuildingWall extends Building {
 		} else if (template == ws.makeCARuin) {
 			byte[][] caRule = ws.CARuinAutomataRules.get(random.nextInt(ws.CARuinAutomataRules.size()));
 			for (int tries = 0; tries < 10; tries++) {
-				byte[][] seed = BuildingCellularAutomaton.makeSymmetricSeed(ws.CARuinContainerWidth, 0.5F, world.rand);
-				BuildingCellularAutomaton bca = new BuildingCellularAutomaton(wgt, ws.CARuinRule, dir, 1, true, ws.CARuinContainerWidth, ws.CARuinMinHeight
-						+ random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight + 1), ws.CARuinContainerWidth, seed, caRule, null, pt);
+                ISeed seed = new SymmetricSeed(ws.CARuinContainerWidth, 0.5F);
+                BuildingCellularAutomaton bca =
+                        new BuildingCellularAutomaton(wgt, ws.CARuinRule, dir, 1, true,
+                                ws.CARuinContainerWidth, ws.CARuinMinHeight
+                                        + random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight
+                                                + 1), ws.CARuinContainerWidth,
+                                seed.makeSeed(world.rand), caRule, null, pt);
 				if (bca.plan(false, 12) && bca.queryCanBuild(ybuffer, ws.CARuinContainerWidth <= 15)) {
 					bca.build(true, true);
 					return true;

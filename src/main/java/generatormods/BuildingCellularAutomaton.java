@@ -17,12 +17,9 @@
  */
 package generatormods;
 
-import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -36,7 +33,6 @@ public class BuildingCellularAutomaton extends Building {
 	public final static byte DEAD = 0, ALIVE = 1;
 	private final float MEAN_SIDE_LENGTH_PER_POPULATE = 15.0f;
 	private final static int HOLE_FLOOR_BUFFER = 2, UNREACHED = -1;
-	private final static int SYMMETRIC_SEED_MIN_WIDTH = 4, CIRCULAR_SEED_MIN_WIDTH = 4;
 	public final static TemplateRule DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
             new int[]{0, 0, 0, 0, 0, 0}, new String[] { "Blaze", "Blaze", "Blaze", "Silverfish", "Silverfish", "LavaSlime" }, 100);
     public final static TemplateRule DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
@@ -501,55 +497,6 @@ public class BuildingCellularAutomaton extends Building {
 				return;
 			}
 		}
-	}
-
-	public static byte[][] makeCircularSeed(int maxWidth, Random random) {
-		int diam = Math.min(random.nextInt(random.nextInt(random.nextInt(Math.max(1, maxWidth - CIRCULAR_SEED_MIN_WIDTH)) + 1) + 1) + CIRCULAR_SEED_MIN_WIDTH, MAX_SPHERE_DIAM);
-		byte[][] seed = new byte[diam][diam];
-		for (int x = 0; x < diam; x++)
-			for (int y = 0; y < diam; y++)
-				seed[x][y] = CIRCLE_SHAPE[diam][x][y] == 1 ? ALIVE : DEAD;
-		return seed;
-	}
-
-	public static byte[][] makeCruciformSeed(int maxWidth, Random random) {
-		if (maxWidth <= 1)
-			return new byte[][] { { ALIVE } }; //degenerate case
-		int width = 2 * (random.nextInt(random.nextInt(maxWidth / 2) + 1) + 1) + 1, //width and length are always odd
-				length = 2 * (random.nextInt(random.nextInt(maxWidth / 2) + 1) + 1) + 1;
-		byte[][] seed = new byte[width][length];
-		for (int x = 0; x < width; x++)
-			for (int y = 0; y < length; y++)
-				seed[x][y] = (x == width / 2 || y == length / 2) ? ALIVE : DEAD;
-		return seed;
-	}
-
-	public static byte[][] makeLinearSeed(int maxWidth, Random random) {
-		if (maxWidth <= 1)
-			return new byte[][] { { ALIVE } }; //degenerate case
-		int width = random.nextInt(random.nextInt(maxWidth - 1) + 1) + 2; //random number in (2,maxWidth) inclusive, concentrated towards low end
-		byte[][] seed = new byte[width][1];
-		for (int x = 0; x < width; x++)
-			seed[x][0] = ALIVE;
-		return seed;
-	}
-
-	public static byte[][] makeSymmetricSeed(int maxWidth, float seedDensity, Random random) {
-		maxWidth = random.nextInt(random.nextInt(Math.max(1, maxWidth - SYMMETRIC_SEED_MIN_WIDTH)) + 1) + 1;
-		int width = random.nextInt(random.nextInt(maxWidth) + 1) + SYMMETRIC_SEED_MIN_WIDTH, length = random.nextInt(random.nextInt(maxWidth) + 1) + SYMMETRIC_SEED_MIN_WIDTH;
-		byte[][] seed = new byte[width][length];
-		int diam = Math.min(Math.max(width, length), MAX_SPHERE_DIAM);
-		for (int x = 0; x < (width + 1) / 2; x++) {
-			for (int y = 0; y < (length + 1) / 2; y++) {
-				seed[x][y] = (Building.CIRCLE_SHAPE[diam][x][y] >= 0 && random.nextFloat() < seedDensity) //use a circular mask to avoid ugly corners
-						? ALIVE
-								: DEAD;
-				seed[width - x - 1][y] = seed[x][y];
-				seed[x][length - y - 1] = seed[x][y];
-				seed[width - x - 1][length - y - 1] = seed[x][y];
-			}
-		}
-		return seed;
 	}
 
 	public static String ruleToString(byte[][] rule) {
