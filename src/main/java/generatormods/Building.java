@@ -124,8 +124,6 @@ public class Building {
 		for (int m = 0; m < randLightingHash.length; m++)
 			randLightingHash[m] = rand.nextInt(LIGHTING_INVERSE_DENSITY) == 0;
 	}
-	public final static String[] CHEST_TYPE_LABELS = new String[] { "EASY", "MEDIUM", "HARD", "TOWER" };
-	public final static int[] DEFAULT_CHEST_TRIES = new int[] { 4, 6, 6, 6 };
 	// chest items[n] format is array of 6 arrays
 	// 0array - idx
 	// 1array - blockId
@@ -672,7 +670,7 @@ public class Building {
 		if (chestType.equals(TOWER_CHEST) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
 			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
 		}
-		Object[][] itempool = wgt.chestItems.get(chestType);
+		Object[][] itempool = wgt.chestItems.get(chestType).getChestItemsObjectArray();
 		int idx = pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
         Object obj = itempool[1][idx];
         if(obj == null){
@@ -1108,8 +1106,8 @@ public class Building {
 	private void setLootChest(int[] pt, Block chestBlock, int meta, String chestType) {
 		if (world.setBlock(pt[0], pt[1], pt[2], chestBlock, meta, 2)) {
 			TileEntityChest chest = (TileEntityChest) world.getTileEntity(pt[0], pt[1], pt[2]);
-			if (wgt.chestTries != null && wgt.chestTries.containsKey(chestType)) {
-				for (int m = 0; m < wgt.chestTries.get(chestType); m++) {
+			if (wgt.chestItems != null && wgt.chestItems.containsKey(chestType)) {
+				for (int m = 0; m < wgt.chestItems.get(chestType).getTries(); m++) {
 					if (random.nextBoolean()) {
 						ItemStack itemstack = getChestItemstack(chestType);
 						if (itemstack != null && chest != null)

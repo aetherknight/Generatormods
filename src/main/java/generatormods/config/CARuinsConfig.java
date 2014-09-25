@@ -105,7 +105,7 @@ public class CARuinsConfig {
     public int containerWidth;
     public int containerLength;
 
-    public Map<String, ChestContentsConfig> chestConfigs;
+    public Map<ChestType, ChestContentsConfig> chestConfigs;
 
     public float symmetricSeedDensity;
     public int symmetricSeedWeight;
@@ -221,35 +221,26 @@ public class CARuinsConfig {
                         "The length of the bounding rectangle.", 0, 4096).getInt();
     }
 
-    private String[] defaultChestItems(int chestTypeIndex) {
-        // Build an array of the chest item strings
-        String[] chestItems = new String[Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length];
-        for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[chestTypeIndex].length; m++) {
-            Object[] chestItem = Building.DEFAULT_CHEST_ITEMS[chestTypeIndex][m];
-            chestItems[m] =
-                    (new ChestItemSpec(chestItem[1], (Integer) chestItem[2],
-                            (Integer) chestItem[3], (Integer) chestItem[4], (Integer) chestItem[5]))
-                            .toSpecString();
-        }
-        return chestItems;
-    }
-
     private void initChestConfigs(Configuration config, String baseSection) {
         // Chest contents. Grouped by chest type.
-        chestConfigs = new HashMap<String, ChestContentsConfig>();
-        for (int l = 0; l < Building.CHEST_TYPE_LABELS.length; l++) {
-            String chestType = Building.CHEST_TYPE_LABELS[l];
-            String section = baseSection + ".CHEST_" + chestType;
+        chestConfigs = new HashMap<ChestType, ChestContentsConfig>();
+        for (ChestType chestType : ChestType.values()) {
+            String section = baseSection + ".ChestContents." + chestType;
+
+            String[] defaultChestItems = new String[chestType.getDefaultChestItems().size()];
+            for(int i=0; i < defaultChestItems.length; i++) {
+                defaultChestItems[i] = chestType.getDefaultChestItems().get(i).toSpecString();
+            }
 
             int chestTries =
-                    config.get(section, "Tries", Building.DEFAULT_CHEST_TRIES[l],
+                    config.get(section, "Tries", chestType.getDefaultChestTries(),
                             "The number of selections that will be made for this chest type.")
                             .getInt();
             String[] rawChestItemArray =
                     config.get(
                             section,
                             "Chest Contents",
-                            defaultChestItems(l),
+                            defaultChestItems,
                             "Format for each item is:\n\n    <item name>-<metadata>,<selection weight>,<min stack size>,<max stack size>\n\nE.g.:\n\n    minecraft:arrow-0,2,1,12\n\nMeans a stack of between 1 and 12 arrows, with a selection weight of 2.")
                             .getStringList();
 

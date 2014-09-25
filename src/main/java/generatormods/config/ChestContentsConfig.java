@@ -21,17 +21,17 @@ package generatormods.config;
 import java.util.List;
 
 public class ChestContentsConfig {
-    private String chestType;
+    private ChestType chestType;
     private int tries;
     private List<ChestItemSpec> chestItems;
 
-    public ChestContentsConfig(String type, int tries, List<ChestItemSpec> chestItems) {
+    public ChestContentsConfig(ChestType type, int tries, List<ChestItemSpec> chestItems) {
         this.chestType = type;
         this.tries = tries;
         this.chestItems = chestItems;
     }
 
-    public String getChestType() {
+    public ChestType getChestType() {
         return chestType;
     }
 
@@ -42,4 +42,14 @@ public class ChestContentsConfig {
     public List<ChestItemSpec> getChestItems() {
         return chestItems;
     }
+
+    public Object[][] getChestItemsObjectArray() {
+        Object[][] chestItemArray = new Object[chestItems.size()][];
+        for(int i=0; i < chestItems.size() ; i++) {
+            chestItemArray[i] = chestItems.get(i).toObjectArray();
+            chestItemArray[i][0] = i;
+        }
+        return chestItemArray;
+    }
+
 }

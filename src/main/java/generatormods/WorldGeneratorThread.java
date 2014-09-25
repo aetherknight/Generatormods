@@ -17,7 +17,10 @@
  */
 package generatormods;
 
-import java.util.HashMap;
+import generatormods.config.ChestType;
+import generatormods.config.ChestContentsConfig;
+
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.world.World;
@@ -46,8 +49,7 @@ public abstract class WorldGeneratorThread {
 	public final double chunkTryProb;
 	private int min_spawn_height = 0, max_spawn_height = 127;
 	public boolean spawn_surface = true;
-	HashMap<String, Integer> chestTries = null;
-	HashMap<String, Object[][]> chestItems = null;
+	Map<ChestType, ChestContentsConfig> chestItems = null;
 	//public int ConcaveSmoothingScale=10, ConvexSmoothingScale=20, 
 	//All WorldGeneratorThreads will have these, even if not used.
 	public int backtrackLength = 9;
@@ -55,7 +57,6 @@ public abstract class WorldGeneratorThread {
 	//****************************  CONSTRUCTOR - WorldGeneratorThread *************************************************************************************//
 	public WorldGeneratorThread(BuildingExplorationHandler master, World world, Random random, int chunkI, int chunkK, int TriesPerChunk, double ChunkTryProb) {
 		this.master = master;
-		this.chestTries = master.chestTries;
 		this.chestItems = master.chestItems;
 		this.world = world;
 		this.random = random;

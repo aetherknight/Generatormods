@@ -18,7 +18,9 @@
 package generatormods;
 
 import generatormods.config.CARule;
+import generatormods.config.ChestContentsConfig;
 import generatormods.config.ChestItemSpec;
+import generatormods.config.ChestType;
 import generatormods.config.ParseError;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -40,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.world.World;
@@ -67,8 +70,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	public PrintWriter lw = null;
 	public float GlobalFrequency = 0.025F;
 	public int TriesPerChunk = 1;
-	protected HashMap<String, Integer> chestTries = new HashMap<String, Integer>();
-	protected HashMap<String, Object[][]> chestItems = new HashMap<String, Object[][]>();
+	protected Map<ChestType, ChestContentsConfig> chestItems = new HashMap<ChestType, ChestContentsConfig>();
 	protected boolean errFlag = false, dataFilesLoaded = false;
 	protected boolean logActivated = false;
 	protected List<Integer> AllowedDimensions = new ArrayList<Integer>();
@@ -111,8 +113,8 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	//****************************  FUNCTION - chestContentsList *************************************************************************************//
 	public void readChestItemsList(PrintWriter lw, String line, BufferedReader br) throws IOException {
         if(line.startsWith("CHEST_")){
-            String chestType = line.substring(6);
-			chestTries.put(chestType, readIntParam(lw, 1, ":", br.readLine()));
+            ChestType chestType = ChestType.valueOf(line.substring(6));
+			int tries =  readIntParam(lw, 1, ":", br.readLine());
 			ArrayList<String> lines = new ArrayList<String>();
 			for (line = br.readLine(); !(line == null || line.length() == 0); line = br.readLine())
 				lines.add(line);
@@ -125,14 +127,14 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
                     Object temp;
                     try{
                         int i = Integer.parseInt(idAndMeta[0]);
-                        temp = GameData.itemRegistry.getObjectById(i);
+                        temp = GameData.getItemRegistry().getObjectById(i);
                         if(temp==null){
-                            temp = GameData.blockRegistry.getObjectById(i);
+                            temp = GameData.getBlockRegistry().getObjectById(i);
                         }
                     }catch (Exception e){
-                        temp = GameData.itemRegistry.getObject(idAndMeta[0]);
+                        temp = GameData.getItemRegistry().getObject(idAndMeta[0]);
                         if(temp==null){
-                            temp = GameData.blockRegistry.getObject(idAndMeta[0]);
+                            temp = GameData.getBlockRegistry().getObject(idAndMeta[0]);
                         }
                     }
                     if(temp!=null){
@@ -153,7 +155,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 					lw.println("Line:" + lines.get(n));
 				}
 			}
-            chestItems.put(chestType, tempArray);
+            chestItems.put(chestType, new ChestContentsConfig(chestType, tries, ChestType.makeChestItemsFromArray(tempArray)));
 		}
 	}
 
@@ -181,20 +183,10 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	abstract public void writeGlobalOptions(PrintWriter pw);
 
 	protected void copyDefaultChestItems() {
-        for(int i = 0; i < Building.CHEST_TYPE_LABELS.length; i++){
-            chestTries.put(Building.CHEST_TYPE_LABELS[i], Building.DEFAULT_CHEST_TRIES[i]);
+        this.chestItems = new HashMap<ChestType, ChestContentsConfig>();
+        for(ChestType chestType : ChestType.values()) {
+            this.chestItems.put(chestType, chestType.getDefaultChestContentsConfig());
         }
-		Object[][][] chestItems = new Object[Building.DEFAULT_CHEST_ITEMS.length][][];
-		//careful, we have to flip the order of the 2nd and 3rd dimension here
-		for (int l = 0; l < Building.DEFAULT_CHEST_ITEMS.length; l++) {
-			chestItems[l] = new Object[6][Building.DEFAULT_CHEST_ITEMS[l].length];
-			for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[l].length; m++) {
-				for (int n = 0; n < 6; n++) {
-					chestItems[l][n][m] = Building.DEFAULT_CHEST_ITEMS[l][m][n];
-				}
-			}
-            this.chestItems.put(Building.CHEST_TYPE_LABELS[l], chestItems[l]);
-		}
 	}
 
 	protected void finalizeLoading(boolean hasTemplate, String structure) {
@@ -263,18 +255,12 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		pw.println("<-Tries is the number of selections that will be made for this chest type.->");
 		pw.println("<-Format for items is <item name>,<selection weight>,<min stack size>,<max stack size> ->");
 		pw.println("<-So e.g. minecraft:arrow,2,1,12 means a stack of between 1 and 12 arrows, with a selection weight of 2.->");
-		for (int l = 0; l < Building.CHEST_TYPE_LABELS.length; l++) {
-			pw.println("CHEST_" + Building.CHEST_TYPE_LABELS[l]);
-			pw.println("Tries:" + Building.DEFAULT_CHEST_TRIES[l]);
-			for (int m = 0; m < Building.DEFAULT_CHEST_ITEMS[l].length; m++) {
+        for (ChestType chestType : ChestType.values()) {
+			pw.println("CHEST_" + chestType.toString());
+			pw.println("Tries:" + chestType.getDefaultChestTries());
+			for (ChestItemSpec chestItem : chestType.getDefaultChestItems()) {
                 try{
-                    ChestItemSpec currspec =
-                            new ChestItemSpec(Building.DEFAULT_CHEST_ITEMS[l][m][1],
-                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][2]),
-                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][3]),
-                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][4]),
-                                    Integer.class.cast(Building.DEFAULT_CHEST_ITEMS[l][m][5]));
-                    pw.println(currspec.toSpecString());
+                    pw.println(chestItem.toSpecString());
                 }catch(Exception e){
                     e.printStackTrace();
                 }

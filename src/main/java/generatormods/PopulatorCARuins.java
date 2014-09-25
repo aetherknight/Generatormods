@@ -18,9 +18,6 @@
 package generatormods;
 
 import generatormods.config.CARuinsConfig;
-import generatormods.config.ChestContentsConfig;
-import generatormods.config.ChestItemSpec;
-import generatormods.config.WeightedCARule;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -33,16 +30,10 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
 /**
@@ -106,22 +97,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         logActivated = config.logActivated;
 
         // Support the existing old chest format (array of values)
-        for(Map.Entry<String, ChestContentsConfig> entry : config.chestConfigs.entrySet()) {
-            String chestType = entry.getKey();
-            ChestContentsConfig chestSpec = entry.getValue();
-            List<ChestItemSpec> chestItemList = chestSpec.getChestItems();
-            Object[][] chestSpecOld = new Object[6][chestItemList.size()];
-            for(int n = 0; n < chestItemList.size(); n++) {
-                ChestItemSpec itemSpec = chestItemList.get(n);
-                chestSpecOld[0][n] = n; // index
-                chestSpecOld[1][n] = itemSpec.getBlockOrItem();
-                chestSpecOld[2][n] = itemSpec.getMetadata();
-                chestSpecOld[3][n] = itemSpec.getSelectionWeight();
-                chestSpecOld[4][n] = itemSpec.getMinStackSize();
-                chestSpecOld[5][n] = itemSpec.getMaxStackSize();
-            }
-            chestItems.put(chestType, chestSpecOld);
-        }
+        chestItems = config.chestConfigs;
     }
 
     @Override
