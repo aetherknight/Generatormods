@@ -22,7 +22,6 @@ import generatormods.config.ChestContentsConfig;
 import generatormods.config.ChestItemSpec;
 import generatormods.config.ChestType;
 import generatormods.config.ParseError;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IWorldGenerator;
@@ -37,7 +36,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -115,47 +113,13 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
         if(line.startsWith("CHEST_")){
             ChestType chestType = ChestType.valueOf(line.substring(6));
 			int tries =  readIntParam(lw, 1, ":", br.readLine());
-			ArrayList<String> lines = new ArrayList<String>();
-			for (line = br.readLine(); !(line == null || line.length() == 0); line = br.readLine())
-				lines.add(line);
-			Object[][] tempArray = new Object[6][lines.size()];
-			for (int n = 0; n < lines.size(); n++) {
-				String[] intStrs = lines.get(n).trim().split(",");
-				try {
-                    tempArray[0][n] = n;
-					String[] idAndMeta = intStrs[0].split("-");
-                    Object temp;
-                    try{
-                        int i = Integer.parseInt(idAndMeta[0]);
-                        temp = GameData.getItemRegistry().getObjectById(i);
-                        if(temp==null){
-                            temp = GameData.getBlockRegistry().getObjectById(i);
-                        }
-                    }catch (Exception e){
-                        temp = GameData.getItemRegistry().getObject(idAndMeta[0]);
-                        if(temp==null){
-                            temp = GameData.getBlockRegistry().getObject(idAndMeta[0]);
-                        }
-                    }
-                    if(temp!=null){
-                        tempArray[1][n] = temp;
-                        tempArray[2][n] = idAndMeta.length > 1 ? Integer.parseInt(idAndMeta[1]) : 0;
-                        for (int m = 1; m < 4; m++)
-                            tempArray[m + 2][n] = Integer.parseInt(intStrs[m]);
-                        //input checking
-                        if (Integer.class.cast(tempArray[4][n]) < 0)
-                            tempArray[4][n] = 0;
-                        if (Integer.class.cast(tempArray[5][n]) < Integer.class.cast(tempArray[4][n]))
-                            tempArray[5][n] = tempArray[4][n];
-                        if (Integer.class.cast(tempArray[5][n]) > 64)
-                            tempArray[5][n] = 64;
-                    }
-				} catch (Exception e) {
-					lw.println("Error parsing Settings file: " + e.toString());
-					lw.println("Line:" + lines.get(n));
-				}
+            List<ChestItemSpec> chestItemList = new ArrayList<ChestItemSpec>();
+			for (line = br.readLine(); !(line == null || line.length() == 0); line = br.readLine()) {
+                ChestItemSpec chestItemSpec = new ChestItemSpec(line.trim());
+                chestItemList.add(chestItemSpec);
 			}
-            chestItems.put(chestType, new ChestContentsConfig(chestType, tries, ChestType.makeChestItemsFromArray(tempArray)));
+            ChestContentsConfig chestContents = new ChestContentsConfig(chestType, tries, chestItemList);
+            chestItems.put(chestType, chestContents);
 		}
 	}
 

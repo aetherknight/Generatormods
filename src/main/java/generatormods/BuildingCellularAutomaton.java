@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.config.ChestType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -395,11 +397,11 @@ public class BuildingCellularAutomaton extends Building {
 			makeFloorAt(x, z, y + 1, layout);
 	}
 
-	private String pickCAChestType(int z) {
+	private ChestType pickCAChestType(int z) {
 		if (Math.abs(zGround - z) > random.nextInt(1 + z > zGround ? (bHeight - zGround) : zGround) && (z > zGround ? (bHeight - zGround) : zGround) > 20)
-			return random.nextBoolean() ? MEDIUM_CHEST : HARD_CHEST;
+			return random.nextBoolean() ? ChestType.MEDIUM : ChestType.HARD;
 		else
-			return random.nextBoolean() ? EASY_CHEST : MEDIUM_CHEST;
+			return random.nextBoolean() ? ChestType.EASY : ChestType.MEDIUM;
 	}
 
 	private void populateFloor(int z, int floorBlocks) {
@@ -431,7 +433,7 @@ public class BuildingCellularAutomaton extends Building {
 			for (int tries = 0; tries < 8; tries++) {
 				int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
 				if (isFloor(x, z, y)) {
-					setBlockLocal(x, z - 1, y, new BlockExtended(Blocks.chest, 0, pickCAChestType(z)));
+					setBlockLocal(x, z - 1, y, new BlockExtended(Blocks.chest, 0, pickCAChestType(z).toString()));
 					setBlockLocal(x, z - 2, y, bRule);
 					if (random.nextBoolean()) {
 						break; //chance of > 1 chest. Expected # of chests is one.

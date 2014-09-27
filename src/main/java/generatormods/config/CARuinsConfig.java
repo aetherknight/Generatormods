@@ -18,14 +18,11 @@
  */
 package generatormods.config;
 
-import generatormods.Building;
 import generatormods.BuildingCellularAutomaton;
 import generatormods.TemplateRule;
 
 import java.io.File;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +30,6 @@ import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeGenBase;
-
 import net.minecraftforge.common.config.Configuration;
 
 import org.apache.logging.log4j.Logger;
@@ -181,7 +177,7 @@ public class CARuinsConfig {
                         "Whitelist of dimension IDs where structures may be gnerated. Default is Nether\n(-1) and Overworld (0).")
                         .getIntList();
         allowedDimensions = new ArrayList<Integer>();
-        for(int dimensionInt : rawAllowedDimensions) {
+        for (int dimensionInt : rawAllowedDimensions) {
             allowedDimensions.add(dimensionInt);
         }
 
@@ -228,7 +224,7 @@ public class CARuinsConfig {
             String section = baseSection + ".ChestContents." + chestType;
 
             String[] defaultChestItems = new String[chestType.getDefaultChestItems().size()];
-            for(int i=0; i < defaultChestItems.length; i++) {
+            for (int i = 0; i < defaultChestItems.length; i++) {
                 defaultChestItems[i] = chestType.getDefaultChestItems().get(i).toSpecString();
             }
 
@@ -245,13 +241,8 @@ public class CARuinsConfig {
                             .getStringList();
 
             // Create a list of ChestItemSpecs from the config
-            List<String> rawChestItemList = Arrays.asList(rawChestItemArray);
-            List<ChestItemSpec> chestItemList = new ArrayList<ChestItemSpec>();
-            for (String chestItemSpecString : rawChestItemList) {
-                chestItemList.add(new ChestItemSpec(chestItemSpecString));
-            }
             ChestContentsConfig chestConfig =
-                    new ChestContentsConfig(chestType, chestTries, chestItemList);
+                    new ChestContentsConfig(chestType, chestTries, rawChestItemArray);
             chestConfigs.put(chestType, chestConfig);
         }
     }

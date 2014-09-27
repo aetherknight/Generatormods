@@ -18,6 +18,7 @@
  */
 package generatormods.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChestContentsConfig {
@@ -29,6 +30,15 @@ public class ChestContentsConfig {
         this.chestType = type;
         this.tries = tries;
         this.chestItems = chestItems;
+    }
+
+    public ChestContentsConfig(ChestType type, int tries, String[] chestItemStrings) {
+        this.chestType = type;
+        this.tries = tries;
+        this.chestItems = new ArrayList<ChestItemSpec>();
+        for (String chestItemString : chestItemStrings) {
+            chestItems.add(new ChestItemSpec(chestItemString));
+        }
     }
 
     public ChestType getChestType() {
@@ -45,11 +55,19 @@ public class ChestContentsConfig {
 
     public Object[][] getChestItemsObjectArray() {
         Object[][] chestItemArray = new Object[chestItems.size()][];
-        for(int i=0; i < chestItems.size() ; i++) {
+        for (int i = 0; i < chestItems.size(); i++) {
             chestItemArray[i] = chestItems.get(i).toObjectArray();
             chestItemArray[i][0] = i;
         }
         return chestItemArray;
     }
 
+    public String toString() {
+        String str = "ChestContentsConfig(" + chestType + ", " + tries + ", {";
+        for (ChestItemSpec chestItem : chestItems) {
+            str += "{" + chestItem.toSpecString() + "}, ";
+        }
+        str += "})";
+        return str;
+    }
 }

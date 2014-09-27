@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.config.ChestType;
+
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -57,7 +59,6 @@ import net.minecraft.world.World;
  */
 public class Building {
 	public final static int HIT_WATER = -666; // , HIT_SWAMP=-667;
-	public final static String EASY_CHEST = "EASY", MEDIUM_CHEST = "MEDIUM", HARD_CHEST = "HARD", TOWER_CHEST = "TOWER";
 	public final static int DIR_NORTH = 0, DIR_EAST = 1, DIR_SOUTH = 2, DIR_WEST = 3;
 	public final static int ROT_R = 1, R_HAND = 1, L_HAND = -1;
 	public final static int SEA_LEVEL = 63, WORLD_MAX_Y = 255;
@@ -104,7 +105,7 @@ public class Building {
 			NORTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_NORTH]), SOUTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_SOUTH]),
 			EAST_FACE_LADDER_BLOCK = new BlockAndMeta(Blocks.ladder, LADDER_DIR_TO_META[DIR_EAST]), HOLE_BLOCK_LIGHTING = new BlockAndMeta(Blocks.air, 0), HOLE_BLOCK_NO_LIGHTING = new BlockAndMeta(Blocks.air, 1),
 			PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, "PRESERVE"),
-			TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, TOWER_CHEST), HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, HARD_CHEST),
+			TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString()), HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString()),
 			GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
 	public final static int MAX_SPHERE_DIAM = 40;
 	public final static int[][] SPHERE_SHAPE = new int[MAX_SPHERE_DIAM + 1][];
@@ -124,37 +125,6 @@ public class Building {
 		for (int m = 0; m < randLightingHash.length; m++)
 			randLightingHash[m] = rand.nextInt(LIGHTING_INVERSE_DENSITY) == 0;
 	}
-	// chest items[n] format is array of 6 arrays
-	// 0array - idx
-	// 1array - blockId
-	// 2array - block damage/meta
-	// 3array - block weight
-	// 4array - block min stacksize
-	// 5array - block max stacksize
-	public final static Object[][][] DEFAULT_CHEST_ITEMS = new Object[][][] { { // Easy
-			{ 0, Items.arrow, 0, 2, 1, 12 }, { 1, Items.iron_sword, 0, 2, 1, 1 }, { 2, Items.leather_leggings, 0, 1, 1, 1 }, { 3, Items.iron_shovel, 0, 1, 1, 1 },
-					{ 4, Items.string, 0, 1, 1, 1 }, { 5, Items.iron_pickaxe, 0, 2, 1, 1 }, { 6, Items.leather_boots, 0, 1, 1, 1 }, { 7, Items.bucket, 0, 1, 1, 1 },
-					{ 8, Items.leather_helmet, 0, 1, 1, 1 }, { 9, Items.wheat_seeds, 0, 1, 10, 15 }, { 10, Items.gold_nugget, 0, 2, 3, 8 }, { 11, Items.potionitem, 5, 2, 1, 1 }, // healing I
-					{ 12, Items.potionitem, 4, 1, 1, 1 } }, // poison, hehe
-			{ // Medium
-			{ 0, Items.golden_sword, 0, 2, 1, 1 }, { 1, Items.milk_bucket, 0, 2, 1, 1 }, { 2, Blocks.web, 0, 1, 8, 16 }, { 3, Items.golden_shovel, 0, 1, 1, 1 },
-					{ 4, Items.golden_hoe, 0, 1, 0, 1 }, { 5, Items.clock, 0, 1, 1, 1 }, { 6, Items.iron_axe, 0, 3, 1, 1 }, { 7, Items.map, 0, 1, 1, 1 },
-					{ 8, Items.apple, 0, 2, 2, 3 }, { 9, Items.compass, 0, 1, 1, 1 }, { 10, Items.iron_ingot, 0, 1, 5, 8 }, { 11, Items.slime_ball, 0, 1, 1, 3 },
-					{ 12, Blocks.obsidian, 0, 1, 1, 4 }, { 13, Items.bread, 0, 2, 8, 15 }, { 14, Items.potionitem, 2, 1, 1, 1 }, { 15, Items.potionitem, 37, 3, 1, 1 }, // healing II
-					{ 16, Items.potionitem, 34, 1, 1, 1 }, // swiftness II
-					{ 17, Items.potionitem, 9, 1, 1, 1 } }, // strength
-			{ // Hard
-			{ 0, Blocks.sticky_piston, 0, 2, 6, 12 }, { 1, Blocks.web, 0, 1, 8, 24 }, { 2, Items.cookie, 0, 2, 8, 18 }, { 3, Items.diamond_axe, 0, 1, 1, 1 },
-					{ 4, Items.minecart, 0, 1, 12, 24 }, { 5, Items.redstone, 0, 2, 12, 24 }, { 6, Items.lava_bucket, 0, 2, 1, 1 }, { 7, Items.ender_pearl, 0, 1, 1, 1 },
-					{ 8, Blocks.mob_spawner, 0, 1, 2, 4 }, { 9, Items.record_13, 0, 1, 1, 1 }, { 10, Items.golden_apple, 0, 1, 4, 8 }, { 11, Blocks.tnt, 0, 2, 8, 20 },
-					{ 12, Items.diamond, 0, 2, 1, 4 }, { 13, Items.gold_ingot, 0, 2, 30, 64 }, { 14, Items.potionitem, 37, 3, 1, 1 }, // healing II
-					{ 15, Items.potionitem, 49, 2, 1, 1 }, // regeneration II
-					{ 16, Items.potionitem, 3, 2, 1, 1 } }, // fire resistance
-			{ // Tower
-			{ 0, Items.arrow, 0, 1, 1, 12 }, { 1, Items.fish, 0, 2, 1, 1 }, { 2, Items.golden_helmet, 0, 1, 1, 1 }, { 3, Blocks.web, 0, 1, 1, 12 },
-					{ 4, Items.iron_ingot, 0, 1, 2, 3 }, { 5, Items.stone_sword, 0, 1, 1, 1 }, { 6, Items.iron_axe, 0, 1, 1, 1 }, { 7, Items.egg, 0, 2, 8, 16 },
-					{ 8, Items.saddle, 0, 1, 1, 1 }, { 9, Items.wheat, 0, 2, 3, 6 }, { 10, Items.gunpowder, 0, 1, 2, 4 }, { 11, Items.leather_chestplate, 0, 1, 1, 1 },
-					{ 12, Blocks.pumpkin, 0, 1, 1, 5 }, { 13, Items.gold_nugget, 0, 2, 1, 3 } } };
 
     // **************************** CONSTRUCTORS - Building
     // *************************************************************************************//
@@ -667,7 +637,7 @@ public class Building {
 	}
 
 	private ItemStack getChestItemstack(String chestType) {
-		if (chestType.equals(TOWER_CHEST) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
+		if (chestType.equals(ChestType.TOWER) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
 			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
 		}
 		Object[][] itempool = wgt.chestItems.get(chestType).getChestItemsObjectArray();
