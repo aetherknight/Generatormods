@@ -61,7 +61,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 			return false;
 		((PopulatorWalledCity) master).cityLocations.get(world).add(new int[] { i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND });
 		((PopulatorWalledCity) master).saveCityLocations(world);
-		master.logger.debug("Building " + pws.name + " city with " + hollows.size() + " hollows at (" + i0 + "," + j0 + "," + k0 + ")");
+		logger.debug("Building " + pws.name + " city with " + hollows.size() + " hollows at (" + i0 + "," + j0 + "," + k0 + ")");
 		List<BuildingUndergroundEntranceway> entranceways = buildEntranceways();
 		//build streets, towers
 		fillHollows();

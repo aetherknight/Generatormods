@@ -26,6 +26,8 @@ import java.util.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
+import org.apache.logging.log4j.Logger;
+
 /*
  * WorldGeneratorThread is a thread that generates structures in the Minecraft
  * world. It is intended to serially hand back and forth control with a
@@ -33,16 +35,22 @@ import net.minecraft.world.biome.BiomeGenBase;
  */
 public abstract class WorldGeneratorThread {
 	public final static int LAYOUT_CODE_NOCODE = -1;
-	public final static int LAYOUT_CODE_EMPTY = 0, LAYOUT_CODE_WALL = 1, LAYOUT_CODE_AVENUE = 2, LAYOUT_CODE_STREET = 3, LAYOUT_CODE_TOWER = 4, LAYOUT_CODE_TEMPLATE = 5;
+    public final static int LAYOUT_CODE_EMPTY = 0;
+    public final static int LAYOUT_CODE_WALL = 1;
+    public final static int LAYOUT_CODE_AVENUE = 2;
+    public final static int LAYOUT_CODE_STREET = 3;
+    public final static int LAYOUT_CODE_TOWER = 4;
+    public final static int LAYOUT_CODE_TEMPLATE = 5;
 	protected final static int[][] LAYOUT_CODE_OVERRIDE_MATRIX = new int[][] { //present code=rows, attempted overriding code=columns
-	{ 0, 1, 1, 1, 1, 1 }, //present empty	
-			{ 0, 0, 0, 0, 0, 0 }, //present wall
-			{ 0, 0, 1, 1, 0, 0 }, //present avenue
-			{ 0, 0, 1, 1, 1, 0 }, //present street
-			{ 0, 0, 0, 0, 0, 0 }, //present tower	
-			{ 0, 0, 0, 0, 0, 0 } }; //present template
+		{ 0, 1, 1, 1, 1, 1 }, //present empty
+		{ 0, 0, 0, 0, 0, 0 }, //present wall
+		{ 0, 0, 1, 1, 0, 0 }, //present avenue
+		{ 0, 0, 1, 1, 1, 0 }, //present street
+		{ 0, 0, 0, 0, 0, 0 }, //present tower
+		{ 0, 0, 0, 0, 0, 0 } }; //present template
 	public final static char[] LAYOUT_CODE_TO_CHAR = new char[] { ' ', '#', '=', '-', '@', '&' };
 	public final BuildingExplorationHandler master;
+    protected final Logger logger;
 	public final World world;
 	public final Random random;
 	public final int chunkI, chunkK, triesPerChunk;
@@ -57,6 +65,7 @@ public abstract class WorldGeneratorThread {
 	//****************************  CONSTRUCTOR - WorldGeneratorThread *************************************************************************************//
 	public WorldGeneratorThread(BuildingExplorationHandler master, World world, Random random, int chunkI, int chunkK, int TriesPerChunk, double ChunkTryProb) {
 		this.master = master;
+        this.logger = master.logger;
 		this.chestItems = master.sharedConfig.chestConfigs;
 		this.world = world;
 		this.random = random;

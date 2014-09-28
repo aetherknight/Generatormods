@@ -148,7 +148,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		jmean /= (Lmean * 4);
 		for (BuildingWall w : walls) {
 			if (Math.abs(w.j1 - jmean) > w.bLength / JMEAN_DEVIATION_SLOPE) {
-				master.logger.info("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".");
+				logger.info("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".");
 				return false;
 			}
 		}
@@ -173,13 +173,13 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 			}
 		}
 		if (!ows.LevelInterior && (float) waterArea / (float) cityArea > MAX_WATER_PERCENTAGE) {
-			master.logger.info("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!", "INFO");
+			logger.info("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!", "INFO");
 			return false;
 		}
 		//query the exploration handler again to see if we've built nearby cities in the meanwhile
 		for (BuildingWall w : walls) {
 			if (!((PopulatorWalledCity) master).cityIsSeparated(world, w.i1, w.k1, cityType)) {
-				master.logger.warn("Rejected city " + ID + " nearby city was built during planning!");
+				logger.warn("Rejected city " + ID + " nearby city was built during planning!");
 				return false;
 			}
 		}
@@ -462,7 +462,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	private int[] randInteriorPoint() {
 		int tries = 0;
 		int[] pt = new int[3];
-        master.logger.debug("Finding random interior point for city seeded at corner (" + walls[0].i1 + "," + walls[0].j1 + "," + walls[0].k1 + ")" + walls[0].IDString());
+        logger.debug("Finding random interior point for city seeded at corner (" + walls[0].i1 + "," + walls[0].j1 + "," + walls[0].k1 + ")" + walls[0].IDString());
 		while (tries < 20) {
 			pt[0] = mincorner[0] + random.nextInt(Math.abs(corner1[0] - corner2[0]));
 			pt[2] = mincorner[2] + random.nextInt(Math.abs(corner1[2] - corner2[2]));
@@ -475,7 +475,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 				return pt;
 			tries++;
 		}
-		master.logger.warn("Could not find point within bounds!");
+		logger.warn("Could not find point within bounds!");
 		return null;
 	}
 }
