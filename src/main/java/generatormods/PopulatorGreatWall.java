@@ -28,10 +28,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -56,7 +53,6 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-		settingsFileName = "GreatWallSettings.txt";
 		templateFolderName = "greatwall";
         if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
             try {
@@ -74,8 +70,17 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
 			initializeLogging("Loading options and templates for the Great Wall Mod.");
-			//read and check values from file
-			getGlobalOptions();
+
+            config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
+            config.initialize();
+
+            GlobalFrequency = config.globalFrequency;
+            TriesPerChunk = config.triesPerChunk;
+            AllowedDimensions = config.allowedDimensions;
+            logActivated = config.logActivated;
+
+            chestItems = config.chestConfigs;
+
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
 			wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);
 			finalizeLoading(true, "wall");
@@ -100,28 +105,12 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	}
 
 	@Override
-	public void loadGlobalOptions(BufferedReader br) {
-        GlobalFrequency = config.globalFrequency;
-        TriesPerChunk = config.triesPerChunk;
-        AllowedDimensions = config.allowedDimensions;
-        logActivated = config.logActivated;
-
-        chestItems = config.chestConfigs;
-	}
-
-	@Override
-    public void writeGlobalOptions(PrintWriter pw) {}
-
-	@Override
 	public String toString() {
 		return "GreatWallMod";
 	}
 
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
-        config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
-        config.initialize();
-
 		if (!dataFilesLoaded)
 			loadDataFiles();
 		if (!errFlag) {

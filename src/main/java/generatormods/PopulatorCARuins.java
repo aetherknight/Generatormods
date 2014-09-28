@@ -50,7 +50,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-		settingsFileName = "CARuinsSettings.txt";
         if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
             try {
                 Class.forName("mods.mud.ModUpdateDetector").getDeclaredMethod("registerMod", ModContainer.class, String.class, String.class).invoke(null,
@@ -73,7 +72,17 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
 			initializeLogging("Loading options for the Cellular Automata Generator.");
-			getGlobalOptions();
+
+            config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
+            config.initialize();
+
+            GlobalFrequency = config.globalFrequency;
+            TriesPerChunk = config.triesPerChunk;
+            AllowedDimensions = config.allowedDimensions;
+            logActivated = config.logActivated;
+
+            chestItems = config.chestConfigs;
+
 			finalizeLoading(false, "ruin");
 		} catch (Exception e) {
 			errFlag = true;
@@ -89,19 +98,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 		dataFilesLoaded = true;
 	}
 
-    @Override
-    public void loadGlobalOptions(BufferedReader br) {
-        GlobalFrequency = config.globalFrequency;
-        TriesPerChunk = config.triesPerChunk;
-        AllowedDimensions = config.allowedDimensions;
-        logActivated = config.logActivated;
-
-        chestItems = config.chestConfigs;
-    }
-
-    @Override
-    public void writeGlobalOptions(PrintWriter pw) {}
-
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
 		if (random.nextFloat() < GlobalFrequency)
@@ -115,9 +111,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
-        config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
-        config.initialize();
-
 		if (!dataFilesLoaded)
 			loadDataFiles();
 		if (!errFlag) {

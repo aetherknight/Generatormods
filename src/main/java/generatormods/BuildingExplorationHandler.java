@@ -17,26 +17,20 @@
  */
 package generatormods;
 
-import generatormods.caruins.config.CARule;
 import generatormods.config.ChestContentsConfig;
-import generatormods.config.ChestItemSpec;
 import generatormods.config.ChestType;
-import generatormods.config.ParseError;
+
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,8 +94,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	abstract public void loadDataFiles();
 
-	abstract public void loadGlobalOptions(BufferedReader br);
-
 	public void logOrPrint(String str, String lvl) {
 		if (this.logActivated)
 			logger.log(Level.toLevel(lvl), str);
@@ -113,39 +105,11 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		}
 	}
 
-	abstract public void writeGlobalOptions(PrintWriter pw);
-
-	protected void copyDefaultChestItems() {
-        this.chestItems = new HashMap<ChestType, ChestContentsConfig>();
-        for(ChestType chestType : ChestType.values()) {
-            this.chestItems.put(chestType, chestType.getDefaultChestContentsConfig());
-        }
-	}
-
 	protected void finalizeLoading(boolean hasTemplate, String structure) {
 		if (hasTemplate) {
 			lw.println("\nTemplate loading complete.");
 		}
 		lw.println("Probability of " + structure + " generation attempt per chunk explored is " + GlobalFrequency + ", with " + TriesPerChunk + " tries per chunk.");
-	}
-
-	//****************************  FUNCTION - getGlobalOptions *************************************************************************************//
-	protected final void getGlobalOptions() {
-		File settingsFile = new File(CONFIG_DIRECTORY, settingsFileName);
-		if (settingsFile.exists()) {
-			lw.println("Getting global options for " + this.toString() + " ...");
-			try {
-				loadGlobalOptions(new BufferedReader(new FileReader(settingsFile)));
-			} catch (FileNotFoundException e) {
-			}
-		} else {
-			copyDefaultChestItems();
-			try {
-				writeGlobalOptions(new PrintWriter(new BufferedWriter(new FileWriter(settingsFile))));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	protected void initializeLogging(String message) throws IOException {
@@ -180,41 +144,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 			}
 			return false;
 		}
-	}
-
-	protected void printDefaultChestItems(PrintWriter pw) {
-		pw.println();
-		pw.println("<-Chest contents->");
-		pw.println("<-Tries is the number of selections that will be made for this chest type.->");
-		pw.println("<-Format for items is <item name>,<selection weight>,<min stack size>,<max stack size> ->");
-		pw.println("<-So e.g. minecraft:arrow,2,1,12 means a stack of between 1 and 12 arrows, with a selection weight of 2.->");
-        for (ChestType chestType : ChestType.values()) {
-			pw.println("CHEST_" + chestType.toString());
-			pw.println("Tries:" + chestType.getDefaultChestTries());
-			for (ChestItemSpec chestItem : chestType.getDefaultChestItems()) {
-                try{
-                    pw.println(chestItem.toSpecString());
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-			}
-			pw.println();
-		}
-	}
-
-	protected void printGlobalOptions(PrintWriter pw, boolean frequency) {
-		pw.println("<-README: This file should be in the config/generatormods folder->");
-		pw.println();
-		if (frequency) {
-			pw.println("<-GlobalFrequency controls how likely structures are to appear. Should be between 0.0 and 1.0. Lower to make less common->");
-			pw.println("GlobalFrequency:" + GlobalFrequency);
-		}
-		pw.println("<-TriesPerChunk allows multiple attempts per chunk. Only change from 1 if you want very dense generation!->");
-		pw.println("TriesPerChunk:" + TriesPerChunk);
-		pw.println("<-AllowedDimensions allows structures in corresponding dimension, by dimension ID. Default is Nether(-1) and OverWorld(0)->");
-		pw.println("AllowedDimensions:" + (AllowedDimensions.isEmpty() ? "-1,0" : Arrays.toString(AllowedDimensions.toArray()).replace("[", "").replace("]", "").trim()));
-		pw.println("<-LogActivated controls information stored into forge logs. Set to true if you want to report an issue with complete forge logs.->");
-		pw.println("LogActivated:" + logActivated);
 	}
 
 	protected static File getWorldSaveDir(World world) {

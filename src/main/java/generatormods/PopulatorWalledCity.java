@@ -166,8 +166,17 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
 			initializeLogging("Loading options and templates for the Walled City Generator.");
-			//read and check values from file
-			getGlobalOptions();
+
+            config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
+            config.initialize();
+
+            GlobalFrequency = config.globalFrequency;
+            TriesPerChunk = config.triesPerChunk;
+            AllowedDimensions = config.allowedDimensions;
+            logActivated = config.logActivated;
+
+            chestItems = config.chestConfigs;
+
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
 			cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);
 			TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, STREET_TEMPLATES_FOLDER_NAME), this);
@@ -194,23 +203,9 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		dataFilesLoaded = true;
 	}
 
-	//****************************  FUNCTION - getGlobalOptions  *************************************************************************************//
-	@Override
-	public void loadGlobalOptions(BufferedReader br) {
-        GlobalFrequency = config.globalFrequency;
-        TriesPerChunk = config.triesPerChunk;
-        AllowedDimensions = config.allowedDimensions;
-        logActivated = config.logActivated;
-
-        chestItems = config.chestConfigs;
-	}
-
 	//Load templates after mods have loaded so we can check whether any modded blockIDs are valid
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
-        config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
-        config.initialize();
-
 		if (!dataFilesLoaded)
 			loadDataFiles();
 		if (!errFlag) {
@@ -224,7 +219,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		cityLocations = new HashMap<World, List<int[]>>();
 		cityDoors = new HashMap<Integer, List<VillageDoorInfo>>();
 		logger = event.getModLog();
-		settingsFileName = "WalledCitySettings.txt";
 		templateFolderName = "walledcity";
         if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
             try {
@@ -277,9 +271,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 			logOrPrint(e.getMessage(), "WARNING");
 		}
 	}
-
-	@Override
-	public void writeGlobalOptions(PrintWriter pw) {}
 
 	public static List<int[]> getCityLocs(File city) {
 		List<int[]> cityLocs = new ArrayList<int[]>();
