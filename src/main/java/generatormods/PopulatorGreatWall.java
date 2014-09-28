@@ -56,6 +56,14 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
         ModUpdateDetectorWrapper.checkForUpdates(this, event);
 	}
 
+    @EventHandler
+    public void modsLoaded(FMLPostInitializationEvent event) {
+        loadConfiguration();
+        if (!errFlag) {
+            GameRegistry.registerWorldGenerator(this, 1);
+        }
+    }
+
     public final void loadConfiguration() {
 		try {
             logger.info("Loading options and templates for the Great Wall Mod.");
@@ -86,13 +94,5 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Override
 	public String toString() {
 		return "GreatWallMod";
-	}
-
-	@EventHandler
-	public void modsLoaded(FMLPostInitializationEvent event) {
-        loadConfiguration();
-		if (!errFlag) {
-			GameRegistry.registerWorldGenerator(this, 1);
-		}
 	}
 }

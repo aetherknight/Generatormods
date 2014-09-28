@@ -74,6 +74,52 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
     public WalledCityConfig config;
 
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        cityFiles = new HashMap<World, File>();
+        cityLocations = new HashMap<World, List<int[]>>();
+        cityDoors = new HashMap<Integer, List<VillageDoorInfo>>();
+        logger = event.getModLog();
+        templateFolderName = "walledcity";
+        ModUpdateDetectorWrapper.checkForUpdates(this, event);
+    }
+
+	//Load templates after mods have loaded so we can check whether any modded blockIDs are valid
+	@EventHandler
+	public void modsLoaded(FMLPostInitializationEvent event) {
+        loadConfiguration();
+		if (!errFlag) {
+			GameRegistry.registerWorldGenerator(this, 0);
+		}
+	}
+
+    @Override
+    public final void generate(World world, Random random, int i, int k) {
+        if (config.cityBuiltMessage && world.playerEntities != null)
+            while (citiesBuiltMessages.size() > 0)
+                chatCityBuilt(citiesBuiltMessages.remove());
+        if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId)
+                && random.nextFloat() < config.globalFrequency) {
+            (new WorldGenWalledCity(this, world, random, i, k, config.triesPerChunk,
+                    config.globalFrequency)).run();
+        }
+        if (undergroundCityStyles.size() > 0 && cityIsSeparated(world, i, k, CITY_TYPE_UNDERGROUND)
+                && random.nextFloat() < config.undergroundGlobalFrequency) {
+            WorldGeneratorThread wgt =
+                    new WorldGenUndergroundCity(this, world, random, i, k, 1,
+                            config.undergroundGlobalFrequency);
+            // 44 at sea level
+            int maxSpawnHeight =
+                    Building.findSurfaceJ(world, i, k, Building.WORLD_MAX_Y, false,
+                            Building.IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5;
+            // 34, a pretty thin margin. Too thin for underocean cities?
+            int minSpawnHeight = MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8;
+            if (minSpawnHeight <= maxSpawnHeight)
+                wgt.setSpawnHeight(minSpawnHeight, maxSpawnHeight, false);
+            (wgt).run();
+        }
+    }
+
 	//****************************  FUNCTION - addCityToVillages*************************************************************************************//
 	public void addCityToVillages(World world, int id) {
 		if (world != null && world.provider.dimensionId != CITY_TYPE_UNDERGROUND) {
@@ -144,25 +190,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		return true;
 	}
 
-	//****************************  FUNCTION - generate *************************************************************************************//
-	@Override
-	public final void generate(World world, Random random, int i, int k) {
-		if (config.cityBuiltMessage && world.playerEntities != null)
-			while (citiesBuiltMessages.size() > 0)
-				chatCityBuilt(citiesBuiltMessages.remove());
-		if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId) && random.nextFloat() < config.globalFrequency) {
-			(new WorldGenWalledCity(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
-		}
-		if (undergroundCityStyles.size() > 0 && cityIsSeparated(world, i, k, CITY_TYPE_UNDERGROUND) && random.nextFloat() < config.undergroundGlobalFrequency) {
-			WorldGeneratorThread wgt = new WorldGenUndergroundCity(this, world, random, i, k, 1, config.undergroundGlobalFrequency);
-			int maxSpawnHeight = Building.findSurfaceJ(world, i, k, Building.WORLD_MAX_Y, false, Building.IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5; //44 at sea level
-			int minSpawnHeight = MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8; //34, a pretty thin margin. Too thin for underocean cities?
-			if (minSpawnHeight <= maxSpawnHeight)
-				wgt.setSpawnHeight(minSpawnHeight, maxSpawnHeight, false);
-			(wgt).run();
-		}
-	}
-
     public final void loadConfiguration() {
 		try {
             logger.info("Loading options and templates for the Walled City Generator.");
@@ -191,25 +218,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		}
 		if (config.globalFrequency < 0.000001 && config.undergroundGlobalFrequency < 0.000001)
 			errFlag = true;
-	}
-
-	//Load templates after mods have loaded so we can check whether any modded blockIDs are valid
-	@EventHandler
-	public void modsLoaded(FMLPostInitializationEvent event) {
-        loadConfiguration();
-		if (!errFlag) {
-			GameRegistry.registerWorldGenerator(this, 0);
-		}
-	}
-
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		cityFiles = new HashMap<World, File>();
-		cityLocations = new HashMap<World, List<int[]>>();
-		cityDoors = new HashMap<Integer, List<VillageDoorInfo>>();
-		logger = event.getModLog();
-		templateFolderName = "walledcity";
-        ModUpdateDetectorWrapper.checkForUpdates(this, event);
 	}
 
 	//****************************  FUNCTION - saveCityLocations *************************************************************************************//

@@ -49,6 +49,14 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         ModUpdateDetectorWrapper.checkForUpdates(this, event);
 	}
 
+    @EventHandler
+    public void modsLoaded(FMLPostInitializationEvent event) {
+        loadConfiguration();
+        if (!errFlag) {
+            GameRegistry.registerWorldGenerator(this, 2);
+        }
+    }
+
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(new CommandBuild());
@@ -81,13 +89,5 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Override
 	public String toString() {
 		return "CARuins";
-	}
-
-	@EventHandler
-	public void modsLoaded(FMLPostInitializationEvent event) {
-        loadConfiguration();
-		if (!errFlag) {
-			GameRegistry.registerWorldGenerator(this, 2);
-		}
 	}
 }
