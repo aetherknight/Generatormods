@@ -44,6 +44,11 @@ public abstract class AbstractConfig {
 
     public Map<ChestType, ChestContentsConfig> chestConfigs;
 
+    // sharedConfig provides a common way to provide type-safe access to the
+    // global configs across all 3 mods without having to pass the mod
+    // instances around everywhere as the bearer of configuration.
+    public SharedConfig sharedConfig;
+
     public AbstractConfig(File configDir, String configName, Logger logger) {
         configFile = new File(configDir + "/" + configName + ".cfg");
         this.logger = logger;
@@ -85,9 +90,15 @@ public abstract class AbstractConfig {
                         true,
                         "Controls information stored into forge logs. Set to true if you want to report\nan issue with complete forge logs.")
                         .getBoolean();
+
+        initChestConfigs(config, section);
+
+        sharedConfig =
+                new SharedConfig(globalFrequency, triesPerChunk, allowedDimensions, logActivated,
+                        chestConfigs, logger);
     }
 
-    protected void initChestConfigs(Configuration config, String baseSection) {
+    private void initChestConfigs(Configuration config, String baseSection) {
         // Chest contents. Grouped by chest type.
         chestConfigs = new HashMap<ChestType, ChestContentsConfig>();
         for (ChestType chestType : ChestType.values()) {

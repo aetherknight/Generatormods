@@ -47,7 +47,6 @@ public class WalledCityConfig extends AbstractConfig {
         String section = "CARuins";
 
         initCommonConfig(config, section);
-        initChestConfigs(config, section);
 
         initWalledCityConfig(config, section);
 

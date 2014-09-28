@@ -75,13 +75,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
             config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
-
-            GlobalFrequency = config.globalFrequency;
-            TriesPerChunk = config.triesPerChunk;
-            AllowedDimensions = config.allowedDimensions;
-            logActivated = config.logActivated;
-
-            chestItems = config.chestConfigs;
+            sharedConfig = config.sharedConfig;
 
 			finalizeLoading(false, "ruin");
 		} catch (Exception e) {
@@ -100,8 +94,8 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
-		if (random.nextFloat() < GlobalFrequency)
-			(new WorldGenCARuins(this, world, random, i, k, TriesPerChunk, GlobalFrequency)).run();
+		if (random.nextFloat() < config.globalFrequency)
+			(new WorldGenCARuins(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
 	}
 
 	@Override

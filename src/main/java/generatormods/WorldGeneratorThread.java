@@ -57,7 +57,7 @@ public abstract class WorldGeneratorThread {
 	//****************************  CONSTRUCTOR - WorldGeneratorThread *************************************************************************************//
 	public WorldGeneratorThread(BuildingExplorationHandler master, World world, Random random, int chunkI, int chunkK, int TriesPerChunk, double ChunkTryProb) {
 		this.master = master;
-		this.chestItems = master.chestItems;
+		this.chestItems = master.sharedConfig.chestConfigs;
 		this.world = world;
 		this.random = random;
 		this.chunkI = chunkI;

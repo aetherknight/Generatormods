@@ -129,7 +129,6 @@ public class CARuinsConfig extends AbstractConfig{
         String section = "CARuins";
 
         initCommonConfig(config, section);
-        initChestConfigs(config, section);
 
         initCARuinsConfig(config, section);
         initSeedWeights(config, section);

@@ -64,7 +64,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	public final static int CITY_TYPE_UNDERGROUND = 1;//TheEnd dimension id, since we don't generate there
 	private final static String CITY_FILE_SAVE = "WalledCities.txt", STREET_TEMPLATES_FOLDER_NAME = "streets";
 	//DATA VARIABLES
-	public List<TemplateWall> cityStyles = null, undergroundCityStyles = new ArrayList<TemplateWall>();
+	public List<TemplateWall> cityStyles = null;
+    public List<TemplateWall> undergroundCityStyles = new ArrayList<TemplateWall>();
 	public Map<World, List<int[]>> cityLocations;
 	public Map<Integer, List<VillageDoorInfo>> cityDoors;
 	public LinkedList<int[]> citiesBuiltMessages = new LinkedList<int[]>();
@@ -148,8 +149,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		if (config.cityBuiltMessage && world.playerEntities != null)
 			while (citiesBuiltMessages.size() > 0)
 				chatCityBuilt(citiesBuiltMessages.remove());
-		if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId) && random.nextFloat() < GlobalFrequency) {
-			(new WorldGenWalledCity(this, world, random, i, k, TriesPerChunk, GlobalFrequency)).run();
+		if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId) && random.nextFloat() < config.globalFrequency) {
+			(new WorldGenWalledCity(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
 		}
 		if (undergroundCityStyles.size() > 0 && cityIsSeparated(world, i, k, CITY_TYPE_UNDERGROUND) && random.nextFloat() < config.undergroundGlobalFrequency) {
 			WorldGeneratorThread wgt = new WorldGenUndergroundCity(this, world, random, i, k, 1, config.undergroundGlobalFrequency);
@@ -169,13 +170,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
             config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
-
-            GlobalFrequency = config.globalFrequency;
-            TriesPerChunk = config.triesPerChunk;
-            AllowedDimensions = config.allowedDimensions;
-            logActivated = config.logActivated;
-
-            chestItems = config.chestConfigs;
+            sharedConfig = config.sharedConfig;
 
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
 			cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);

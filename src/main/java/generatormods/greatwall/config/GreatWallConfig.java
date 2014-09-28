@@ -44,7 +44,7 @@ public class GreatWallConfig extends AbstractConfig {
         String section = "CARuins";
 
         initCommonConfig(config, section);
-        initChestConfigs(config, section);
+
         initGreatWallConfig(config, section);
 
         if (config.hasChanged())

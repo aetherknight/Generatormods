@@ -19,6 +19,7 @@ package generatormods;
 
 import generatormods.config.ChestContentsConfig;
 import generatormods.config.ChestType;
+import generatormods.config.SharedConfig;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -56,27 +57,25 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	protected final static int MAX_TRIES_PER_CHUNK = 100;
 	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
 	protected final static File LOG = new File(new File(getMinecraftBaseDir(), "logs"), "generatormods_log.txt");
-	protected String settingsFileName, templateFolderName;
+
+	protected String templateFolderName;
 	public Logger logger;
 	public PrintWriter lw = null;
-	public float GlobalFrequency = 0.025F;
-	public int TriesPerChunk = 1;
-	protected Map<ChestType, ChestContentsConfig> chestItems = new HashMap<ChestType, ChestContentsConfig>();
 	protected boolean errFlag = false, dataFilesLoaded = false;
-	protected boolean logActivated = false;
-	protected List<Integer> AllowedDimensions = new ArrayList<Integer>();
 	private List<World> currentWorld = new ArrayList<World>();
 	public static String[] BIOME_NAMES = new String[BiomeGenBase.getBiomeGenArray().length + 1];
 	static {
 		BIOME_NAMES[0] = "Underground";
 	}
 
+    public SharedConfig sharedConfig;
+
 	//**************************** FORGE WORLD GENERATING HOOK ****************************************************************************//
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
 		if (world.getWorldInfo().isMapFeaturesEnabled() && !(world.provider instanceof WorldProviderEnd)) {
 			//if structures are enabled can generate in any world except in The End, if id is in AllowedDimensions list
-			if (AllowedDimensions.contains(world.provider.dimensionId)) {
+			if (sharedConfig.allowedDimensions.contains(world.provider.dimensionId)) {
 				generateSurface(world, random, chunkX, chunkZ);
 			}
 		}
@@ -95,7 +94,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	abstract public void loadDataFiles();
 
 	public void logOrPrint(String str, String lvl) {
-		if (this.logActivated)
+		if (sharedConfig.logActivated)
 			logger.log(Level.toLevel(lvl), str);
 	}
 
@@ -109,7 +108,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		if (hasTemplate) {
 			lw.println("\nTemplate loading complete.");
 		}
-		lw.println("Probability of " + structure + " generation attempt per chunk explored is " + GlobalFrequency + ", with " + TriesPerChunk + " tries per chunk.");
+		lw.println("Probability of " + structure + " generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 	}
 
 	protected void initializeLogging(String message) throws IOException {

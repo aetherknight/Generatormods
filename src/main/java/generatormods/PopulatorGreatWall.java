@@ -73,13 +73,7 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
             config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
-
-            GlobalFrequency = config.globalFrequency;
-            TriesPerChunk = config.triesPerChunk;
-            AllowedDimensions = config.allowedDimensions;
-            logActivated = config.logActivated;
-
-            chestItems = config.chestConfigs;
+            sharedConfig = config.sharedConfig;
 
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
 			wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);
@@ -93,15 +87,15 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 			if (lw != null)
 				lw.close();
 		}
-		if (GlobalFrequency < 0.000001)
+		if (config.globalFrequency < 0.000001)
 			errFlag = true;
 		dataFilesLoaded = true;
 	}
 
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
-		if (random.nextFloat() < GlobalFrequency)
-			(new WorldGenGreatWall(this, world, random, i, k, TriesPerChunk, GlobalFrequency)).run();
+		if (random.nextFloat() < config.globalFrequency)
+			(new WorldGenGreatWall(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
 	}
 
 	@Override
