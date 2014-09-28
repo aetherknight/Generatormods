@@ -17,13 +17,12 @@
  */
 package generatormods;
 
+import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.walledcity.config.WalledCityConfig;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -210,16 +209,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		cityDoors = new HashMap<Integer, List<VillageDoorInfo>>();
 		logger = event.getModLog();
 		templateFolderName = "walledcity";
-        if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
-            try {
-                Class.forName("mods.mud.ModUpdateDetector").getDeclaredMethod("registerMod", ModContainer.class, String.class, String.class).invoke(null,
-                        FMLCommonHandler.instance().findContainerFor(this),
-                        "https://raw.github.com/GotoLink/Generatormods/master/update.xml",
-                        "https://raw.github.com/GotoLink/Generatormods/master/changelog.md"
-                );
-            } catch (Throwable e) {
-            }
-        }
+        ModUpdateDetectorWrapper.checkForUpdates(this, event);
 	}
 
 	//****************************  FUNCTION - saveCityLocations *************************************************************************************//

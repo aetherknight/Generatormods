@@ -18,12 +18,11 @@
 package generatormods;
 
 import generatormods.caruins.config.CARuinsConfig;
+import generatormods.common.ModUpdateDetectorWrapper;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -47,16 +46,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-        if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
-            try {
-                Class.forName("mods.mud.ModUpdateDetector").getDeclaredMethod("registerMod", ModContainer.class, String.class, String.class).invoke(null,
-                        FMLCommonHandler.instance().findContainerFor(this),
-                        "https://raw.github.com/GotoLink/Generatormods/master/update.xml",
-                        "https://raw.github.com/GotoLink/Generatormods/master/changelog.md"
-                );
-            } catch (Throwable e) {
-            }
-        }
+        ModUpdateDetectorWrapper.checkForUpdates(this, event);
 	}
 
 	@EventHandler
