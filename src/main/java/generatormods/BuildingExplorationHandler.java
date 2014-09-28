@@ -17,8 +17,6 @@
  */
 package generatormods;
 
-import generatormods.config.ChestContentsConfig;
-import generatormods.config.ChestType;
 import generatormods.config.SharedConfig;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -26,15 +24,9 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.world.World;
@@ -44,7 +36,6 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.ISaveHandler;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 /*
@@ -88,14 +79,9 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	abstract public void loadDataFiles();
 
-	public void logOrPrint(String str, String lvl) {
-		if (sharedConfig.logActivated)
-			logger.log(Level.toLevel(lvl), str);
-	}
-
 	public void updateWorldExplored(World world) {
 		if (isNewWorld(world)) {
-			logOrPrint("Starting to survey " + world.provider.getDimensionName() + " for generation...", "INFO");
+            logger.info("Starting to survey " + world.provider.getDimensionName() + " for generation...");
 		}
 	}
 
@@ -144,12 +130,5 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 			return ((AnvilChunkLoader) worldSaver.getChunkLoader(world.provider)).chunkSaveLocation;
 		}
 		return null;
-	}
-
-	private static File getMinecraftBaseDir() {
-		if (FMLCommonHandler.instance().getSide().isClient()) {
-			return FMLClientHandler.instance().getClient().mcDataDir;
-		}
-		return FMLCommonHandler.instance().getMinecraftServerInstance().getFile("");
 	}
 }

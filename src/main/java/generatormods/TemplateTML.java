@@ -229,21 +229,15 @@ public class TemplateTML {
 		return weightsAndIndex;
 	}
 
-	//****************************  FUNCTION - printTemplate*************************************************************************************//
-	public void printTemplate() {
-        explorationHandler.logOrPrint(printableString(), "CONFIG");
-	}
-
+    // currently unused
     public String printableString() {
         String temp = "TEMPLATE - " + name;
 		for (int z = 0; z < height; z++) {
 			for (int y = 0; y < length; y++) {
 				for (int x = 0; x < width; x++) {
-					explorationHandler.logOrPrint(template[z][x][length - y - 1] + ",", "CONFIG");
 					temp += template[z][x][length - y - 1] + ",";
 				}
 			}
-			explorationHandler.logOrPrint("endlayer\n", "CONFIG");
 			temp += "endlayer";
 		}
         return temp;

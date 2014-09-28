@@ -148,7 +148,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		jmean /= (Lmean * 4);
 		for (BuildingWall w : walls) {
 			if (Math.abs(w.j1 - jmean) > w.bLength / JMEAN_DEVIATION_SLOPE) {
-				master.logOrPrint("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".", "INFO");
+				master.logger.info("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".");
 				return false;
 			}
 		}
@@ -166,20 +166,20 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					if (j2 == Building.HIT_WATER)
 						waterArea++;
 					if (((PopulatorWalledCity) master).config.rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
-						master.logOrPrint("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!", "WARNING");
+						master.logger.warn("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
 						return false;
 					}
 				}
 			}
 		}
 		if (!ows.LevelInterior && (float) waterArea / (float) cityArea > MAX_WATER_PERCENTAGE) {
-			master.logOrPrint("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!", "INFO");
+			master.logger.info("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!", "INFO");
 			return false;
 		}
 		//query the exploration handler again to see if we've built nearby cities in the meanwhile
 		for (BuildingWall w : walls) {
 			if (!((PopulatorWalledCity) master).cityIsSeparated(world, w.i1, w.k1, cityType)) {
-				master.logOrPrint("Rejected city " + ID + " nearby city was built during planning!", "WARNING");
+				master.logger.warn("Rejected city " + ID + " nearby city was built during planning!");
 				return false;
 			}
 		}
@@ -462,7 +462,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	private int[] randInteriorPoint() {
 		int tries = 0;
 		int[] pt = new int[3];
-		master.logOrPrint("Finding random interior point for city seeded at corner (" + walls[0].i1 + "," + walls[0].j1 + "," + walls[0].k1 + ")" + walls[0].IDString(), "FINE");
+        master.logger.debug("Finding random interior point for city seeded at corner (" + walls[0].i1 + "," + walls[0].j1 + "," + walls[0].k1 + ")" + walls[0].IDString());
 		while (tries < 20) {
 			pt[0] = mincorner[0] + random.nextInt(Math.abs(corner1[0] - corner2[0]));
 			pt[2] = mincorner[2] + random.nextInt(Math.abs(corner1[2] - corner2[2]));
@@ -475,7 +475,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 				return pt;
 			tries++;
 		}
-		master.logOrPrint("Could not find point within bounds!", "WARNING");
+		master.logger.warn("Could not find point within bounds!");
 		return null;
 	}
 }

@@ -40,7 +40,6 @@ public abstract class AbstractConfig {
     public float globalFrequency;
     public int triesPerChunk;
     public List<Integer> allowedDimensions;
-    public boolean logActivated;
 
     public Map<ChestType, ChestContentsConfig> chestConfigs;
 
@@ -83,19 +82,11 @@ public abstract class AbstractConfig {
             allowedDimensions.add(dimensionInt);
         }
 
-        logActivated =
-                config.get(
-                        section,
-                        "Log Activated",
-                        true,
-                        "Controls information stored into forge logs. Set to true if you want to report\nan issue with complete forge logs.")
-                        .getBoolean();
-
         initChestConfigs(config, section);
 
         sharedConfig =
-                new SharedConfig(globalFrequency, triesPerChunk, allowedDimensions, logActivated,
-                        chestConfigs, logger);
+                new SharedConfig(globalFrequency, triesPerChunk, allowedDimensions, chestConfigs,
+                        logger);
     }
 
     private void initChestConfigs(Configuration config, String baseSection) {

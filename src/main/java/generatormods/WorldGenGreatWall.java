@@ -60,7 +60,7 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 			 */
 			double p = 1.0 / (1.0 + Math.exp(-30.0 * (curviness - (((PopulatorGreatWall) master).config.curveBias / 5.0))));
 			if (random.nextFloat() > p && curviness != 0) {
-				master.logOrPrint("Rejected great wall, curviness=" + curviness + ", length=" + (dw.wall1.bLength + dw.wall1.bLength - 1) + ", P=" + p, "INFO");
+				master.logger.info("Rejected great wall, curviness=" + curviness + ", length=" + (dw.wall1.bLength + dw.wall1.bLength - 1) + ", P=" + p);
 				return false;
 			}
 		}

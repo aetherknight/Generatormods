@@ -50,6 +50,8 @@ import net.minecraft.village.Village;
 import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
 
+import org.apache.logging.log4j.Logger;
+
 /*
  * PopulatorWalledCity is the main class that hooks into ModLoader for the
  * Walled City Mod. It reads the globalSettings file, keeps track of city
@@ -92,7 +94,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	//****************************  FUNCTION - chatCityBuilt *************************************************************************************//
 	public void chatBuildingCity(String chatString, String logString) {
 		if (logString != null)
-			logOrPrint(logString, "FINEST");
+            logger.debug(logString);
 		if (!config.cityBuiltMessage)
 			return;
 		List<?> playerList = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
@@ -237,7 +239,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 			int[] location = cityLocations.get(world).get(cityLocations.get(world).size() - 1);
 			pw.println(new StringBuilder(Integer.toString(location[0])).append(",").append(Integer.toString(location[1])).append(",").append(Integer.toString(location[2])));
 		} catch (IOException e) {
-			logOrPrint(e.getMessage(), "WARNING");
+            logger.warn(e);
 		} finally {
 			if (pw != null)
 				pw.close();
@@ -258,13 +260,13 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 			cityFiles.put(world, cityFile);
 		try {
 			if (!cityFile.createNewFile() && !cityLocations.containsKey(world))
-				cityLocations.put(world, getCityLocs(cityFile));
+				cityLocations.put(world, getCityLocs(cityFile, logger));
 		} catch (IOException e) {
-			logOrPrint(e.getMessage(), "WARNING");
+            logger.warn(e);
 		}
 	}
 
-	public static List<int[]> getCityLocs(File city) {
+	public static List<int[]> getCityLocs(File city, Logger logger) {
 		List<int[]> cityLocs = new ArrayList<int[]>();
 		BufferedReader br = null;
 		try {
@@ -276,7 +278,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 				}
 			}
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
+            logger.warn(e);
 		} finally {
 			try {
 				if (br != null)
