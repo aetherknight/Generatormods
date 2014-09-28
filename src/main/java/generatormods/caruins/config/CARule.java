@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.config;
+package generatormods.caruins.config;
 
 import generatormods.BuildingCellularAutomaton;
+import generatormods.config.ParseError;
 
 /**
  * CARule is used by the CARuins mod and can be used to generate towers for

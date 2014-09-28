@@ -17,8 +17,7 @@
  */
 package generatormods;
 
-import generatormods.config.CARuinsConfig;
-
+import generatormods.caruins.config.CARuinsConfig;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;

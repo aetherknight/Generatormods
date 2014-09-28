@@ -17,16 +17,15 @@
  */
 package generatormods;
 
+import generatormods.caruins.config.CARuinsConfig;
+import generatormods.caruins.config.CARule;
+import generatormods.caruins.config.SeedType;
+import generatormods.caruins.config.WeightedCARule;
 import generatormods.caruins.seeds.CircularSeed;
 import generatormods.caruins.seeds.CruciformSeed;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.LinearSeed;
 import generatormods.caruins.seeds.SymmetricSeed;
-
-import generatormods.config.CARuinsConfig;
-import generatormods.config.CARule;
-import generatormods.config.SeedType;
-import generatormods.config.WeightedCARule;
 
 import java.util.Random;
 

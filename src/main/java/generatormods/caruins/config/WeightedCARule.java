@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.config;
+package generatormods.caruins.config;
 
 import generatormods.BuildingCellularAutomaton;
+import generatormods.config.ParseError;
 
 import java.util.ArrayList;
 import java.util.List;

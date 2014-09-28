@@ -17,7 +17,7 @@
  */
 package generatormods;
 
-import generatormods.config.CARule;
+import generatormods.caruins.config.CARule;
 import generatormods.config.ChestContentsConfig;
 import generatormods.config.ChestItemSpec;
 import generatormods.config.ChestType;
