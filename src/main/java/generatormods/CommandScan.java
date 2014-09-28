@@ -91,7 +91,7 @@ public class CommandScan extends CommandBase{
                             for (int z = minZ; z <= maxZ; z++) {
                                 BlockAndMeta blc = new BlockAndMeta(var1.getEntityWorld().getBlock(x, y, z), var1.getEntityWorld().getBlockMetadata(x, y, z));
                                 if (!blocks.contains(blc)) {
-                                    rules.add("rule" + blocks.size() + "=0,100," + GameData.blockRegistry.getNameForObject(blc.get()) + "-" + blc.getMeta());
+                                    rules.add("rule" + blocks.size() + "=0,100," + GameData.getBlockRegistry().getNameForObject(blc.get()) + "-" + blc.getMeta());
                                     blocks.add(blc);
                                 }
                                 temp.add(blocks.indexOf(blc));
@@ -111,7 +111,7 @@ public class CommandScan extends CommandBase{
                             for (int y = minY; y <= maxY; y++) {
                                 BlockAndMeta blc = new BlockAndMeta(var1.getEntityWorld().getBlock(x, y, z), var1.getEntityWorld().getBlockMetadata(x, y, z));
                                 if (!blocks.contains(blc)) {
-                                    rules.add("rule" + blocks.size() + "=0,100," + GameData.blockRegistry.getNameForObject(blc.get()) + "-" + blc.getMeta());
+                                    rules.add("rule" + blocks.size() + "=0,100," + GameData.getBlockRegistry().getNameForObject(blc.get()) + "-" + blc.getMeta());
                                     blocks.add(blc);
                                 }
                                 temp.add(blocks.indexOf(blc));
