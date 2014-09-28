@@ -54,23 +54,18 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	//**************************** FORGE WORLD GENERATING HOOK ****************************************************************************//
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+        if (errFlag)
+            return;
 		if (world.getWorldInfo().isMapFeaturesEnabled() && !(world.provider instanceof WorldProviderEnd)) {
 			//if structures are enabled can generate in any world except in The End, if id is in AllowedDimensions list
 			if (sharedConfig.allowedDimensions.contains(world.provider.dimensionId)) {
-				generateSurface(world, random, chunkX, chunkZ);
+                updateWorldExplored(world);
+                generate(world, random, chunkX * 16, chunkZ * 16);
 			}
 		}
 	}
 
 	abstract public void generate(World world, Random random, int i, int k);
-
-	//****************************  FUNCTION - GenerateSurface  *************************************************************************************//
-	public void generateSurface(World world, Random random, int i, int k) {
-		if (errFlag)
-			return;
-		updateWorldExplored(world);
-		generate(world, random, i * 16, k * 16);
-	}
 
 	abstract public void loadDataFiles();
 
