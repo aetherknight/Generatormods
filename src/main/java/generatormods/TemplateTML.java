@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.common.Util;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -122,30 +124,30 @@ public class TemplateTML {
 				String[] parts = line.split("=");
 				rulesArrayList.add(new TemplateRule(parts[1], true));
 			} else if (line.startsWith("dimensions")) {
-				Integer[] dim = BuildingExplorationHandler.readIntList(lw, null, "=", line);
+				Integer[] dim = Util.readIntList(lw, null, "=", line);
 				if (dim == null || dim.length != 3)
 					throw new Exception("Bad dimension input!" + line);
 				height = dim[0];
 				length = dim[1];
 				width = dim[2];
 			}
-			//else if(line.startsWith("acceptable_target_blocks" )) targets=BuildingExplorationHandler.readIntList(lw,targets,"=",line);
+			//else if(line.startsWith("acceptable_target_blocks" )) targets=Util.readIntList(lw,targets,"=",line);
 			else if (line.startsWith("weight")) {
-				weight = BuildingExplorationHandler.readIntParam(lw, weight, "=", line);
+				weight = Util.readIntParam(lw, weight, "=", line);
 				if (weight <= 0)
 					throw ZERO_WEIGHT_EXCEPTION;
 			} else if (line.startsWith("embed_into_distance"))
-				embed = BuildingExplorationHandler.readIntParam(lw, embed, "=", line);
+				embed = Util.readIntParam(lw, embed, "=", line);
 			else if (line.startsWith("max_cut_in"))
-				cutIn = BuildingExplorationHandler.readIntParam(lw, cutIn, "=", line);
+				cutIn = Util.readIntParam(lw, cutIn, "=", line);
 			else if (line.startsWith("max_leveling"))
-				leveling = BuildingExplorationHandler.readIntParam(lw, leveling, "=", line);
+				leveling = Util.readIntParam(lw, leveling, "=", line);
 			else if (line.startsWith("water_height")) {
 				readInWaterHeight = true;
 				if (line.contains(NO_WATER_CHECK_STR))
 					waterHeight = NO_WATER_CHECK;
 				else
-					waterHeight = BuildingExplorationHandler.readIntParam(lw, waterHeight, "=", line);
+					waterHeight = Util.readIntParam(lw, waterHeight, "=", line);
 			} else if (line.length() > 0) {
 				String[] spl = line.split("=");
 				if (spl.length == 2 && !spl[0].equals("") && !spl[1].equals(""))
