@@ -77,7 +77,7 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
             sharedConfig = config.sharedConfig;
 
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
-			wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);
+            wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
 			finalizeLoading(true, "wall");
 		} catch (Exception e) {
 			errFlag = true;

@@ -48,7 +48,6 @@ public class TemplateTML {
 	public boolean buildOverStreets = false;
 	public HashMap<String, int[][]> namedLayers = null;
 	public HashMap<String, String> extraOptions = null;
-	public BuildingExplorationHandler explorationHandler = null;
 	public String name = "";
 	protected boolean readInWaterHeight = false;
 	public int templateTypeCode = TML_CODE;
@@ -59,12 +58,11 @@ public class TemplateTML {
 
     protected Logger logger;
 
-	public TemplateTML(File file, BuildingExplorationHandler beh) throws Exception {
+    public TemplateTML(File file, Logger logger) throws Exception {
 		// load in the given file as a template
-		explorationHandler = beh;
 		BufferedReader br;
 		name = file.getName();
-		logger = beh.logger;
+        this.logger = logger;
 		ArrayList<String> lines = new ArrayList<String>();
 		br = new BufferedReader(new FileReader(file));
 		try {

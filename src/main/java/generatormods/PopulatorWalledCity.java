@@ -176,8 +176,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
             sharedConfig = config.sharedConfig;
 
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
-			cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);
-			TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, STREET_TEMPLATES_FOLDER_NAME), this);
+            cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
+            TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, STREET_TEMPLATES_FOLDER_NAME), logger);
 			for (int m = 0; m < cityStyles.size(); m++) {
 				if (cityStyles.get(m).underground) {
 					TemplateWall uws = cityStyles.remove(m);

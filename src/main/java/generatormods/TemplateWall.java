@@ -31,6 +31,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
+import org.apache.logging.log4j.Logger;
+
 /*
  * TemplateWall reads in additional variables from a .tml file to define a wall template.
  * The class includes static functions used to load template folders and link together hierarchical templates.
@@ -71,8 +73,8 @@ public class TemplateWall extends TemplateTML {
 	List<byte[][]> CARuinAutomataRules = null;
 
 	//****************************************  CONSTRUCTOR - WallStyle*************************************************************************************//
-	public TemplateWall(File wallFile, HashMap<String, TemplateTML> buildingTemplateMap, BuildingExplorationHandler beh) throws Exception {
-		super(wallFile, beh);
+    public TemplateWall(File wallFile, HashMap<String, TemplateTML> buildingTemplateMap, Logger logger) throws Exception {
+        super(wallFile, logger);
 		readTowerParameters();
 		buildings = loadChildTemplates("building_templates", buildingTemplateMap);
 		//build the weights index, first making dummy templates for default towers and CARuins
@@ -328,22 +330,21 @@ public class TemplateWall extends TemplateTML {
 		return circular ? CircMinHeight + random.nextInt(CircMaxHeight - CircMinHeight + 1) : SqrMinHeight + random.nextInt(SqrMaxHeight - SqrMinHeight + 1);
 	}
 
-	//****************************************  FUNCTION - loadTemplatesFromDir *************************************************************************************//
-	public static ArrayList<TemplateTML> loadTemplatesFromDir(File tmlDirectory, BuildingExplorationHandler explorationHandler) {
+    public static ArrayList<TemplateTML> loadTemplatesFromDir(File tmlDirectory, Logger logger) {
 		ArrayList<TemplateTML> templates = new ArrayList<TemplateTML>();
 		for (File f : tmlDirectory.listFiles()) {
 			if (getFileType(f.getName()).equals("tml")) {
 				try {
-					TemplateTML t = new TemplateTML(f, explorationHandler).buildLayout();
+                    TemplateTML t = new TemplateTML(f, logger).buildLayout();
 					templates.add(t);
 				} catch (Exception e) {
 					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-						explorationHandler.logger.warn("Did not load " + f.getName() + ", weight was zero.");
+                        logger.warn("Did not load " + f.getName() + ", weight was zero.");
 					} else {
 						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
-                            explorationHandler.logger.error("There was a problem loading the .tml file " + f.getName(), e);
+                            logger.error("There was a problem loading the .tml file " + f.getName(), e);
 						} else
-                            explorationHandler.logger.error("There was a problem loading the .tml file " + f.getName() + ": " + e.getMessage());
+                            logger.error("There was a problem loading the .tml file " + f.getName() + ": " + e.getMessage());
 					}
 				}
 			}
@@ -351,18 +352,17 @@ public class TemplateWall extends TemplateTML {
 		return templates;
 	}
 
-	//****************************************  FUNCTION - loadWallStylesFromDir *************************************************************************************//
-	public static ArrayList<TemplateWall> loadWallStylesFromDir(File stylesDirectory, BuildingExplorationHandler explorationHandler) throws Exception {
+    public static ArrayList<TemplateWall> loadWallStylesFromDir(File stylesDirectory, Logger logger) throws Exception {
 		if (!stylesDirectory.exists())
 			throw new Exception("Could not find directory /" + stylesDirectory.getName() + " in the config folder " + stylesDirectory.getParent() + "!");
 		//load buildings
-		explorationHandler.logger.info("Loading building subfolder in " + stylesDirectory + "/" + BUILDING_DIRECTORY_NAME + "...");
+        logger.info("Loading building subfolder in " + stylesDirectory + "/" + BUILDING_DIRECTORY_NAME + "...");
 		HashMap<String, TemplateTML> buildingTemplates = new HashMap<String, TemplateTML>();
 		Iterator<TemplateTML> itr = null;
 		try {
-			itr = loadTemplatesFromDir(new File(stylesDirectory, BUILDING_DIRECTORY_NAME), explorationHandler).iterator();
+            itr = loadTemplatesFromDir(new File(stylesDirectory, BUILDING_DIRECTORY_NAME), logger).iterator();
 		} catch (NullPointerException e) {
-			explorationHandler.logger.error("No buildings folder for " + stylesDirectory.getName(), e);
+            logger.error("No buildings folder for " + stylesDirectory.getName(), e);
 		}
 		if (itr != null)
 			while (itr.hasNext()) {
@@ -370,21 +370,21 @@ public class TemplateWall extends TemplateTML {
 				buildingTemplates.put(t.name, t);
 			}
 		//load walls
-		explorationHandler.logger.info("Loading wall styles from directory " + stylesDirectory + "...");
+        logger.info("Loading wall styles from directory " + stylesDirectory + "...");
 		ArrayList<TemplateWall> styles = new ArrayList<TemplateWall>();
 		for (File f : stylesDirectory.listFiles()) {
 			if (getFileType(f.getName()).equals("tml")) {
 				try {
-					TemplateWall ws = new TemplateWall(f, buildingTemplates, explorationHandler);
+					TemplateWall ws = new TemplateWall(f, buildingTemplates, logger);
 					styles.add(ws);
 				} catch (Exception e) {
 					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-						explorationHandler.logger.warn("Did not load " + f.getName() + ", weight was zero.");
+                        logger.warn("Did not load " + f.getName() + ", weight was zero.");
 					} else {
 						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
-                            explorationHandler.logger.error("Error loading wall style " + f.getName(), e);
+                            logger.error("Error loading wall style " + f.getName(), e);
 						} else
-                            explorationHandler.logger.error("Error loading wall style " + f.getName() + ": " + e.getMessage());
+                            logger.error("Error loading wall style " + f.getName() + ": " + e.getMessage());
 					}
 				}
 			}
@@ -416,20 +416,19 @@ public class TemplateWall extends TemplateTML {
 		return null;
 	}
 
-	//****************************************  FUNCTION - loadStreets *************************************************************************************//
-	public static void loadStreets(List<TemplateWall> cityStyles, File streetsDirectory, BuildingExplorationHandler explorationHandler) throws Exception {
+    public static void loadStreets(List<TemplateWall> cityStyles, File streetsDirectory, Logger logger) throws Exception {
 		//streets, don't print error if directory DNE
 		HashMap<String, TemplateWall> streetTemplateMap = new HashMap<String, TemplateWall>();
 		Iterator<TemplateWall> itr;
 		try {
-			explorationHandler.logger.info("Loading streets subfolder in " + streetsDirectory + "...");
-			itr = loadWallStylesFromDir(streetsDirectory, explorationHandler).iterator();
+            logger.info("Loading streets subfolder in " + streetsDirectory + "...");
+            itr = loadWallStylesFromDir(streetsDirectory, logger).iterator();
 			while (itr.hasNext()) {
 				TemplateWall cs = itr.next();
 				streetTemplateMap.put(cs.name, cs);
 			}
 		} catch (Exception e) {
-			explorationHandler.logger.error("No street folder for " + streetsDirectory.getName(), e);
+            logger.error("No street folder for " + streetsDirectory.getName(), e);
 		}
 		itr = cityStyles.iterator();
 		while (itr.hasNext()) {
@@ -437,7 +436,7 @@ public class TemplateWall extends TemplateTML {
 			cs.streets = cs.loadChildStyles("street_templates", streetTemplateMap);
 			if (cs.streets.size() == 0 && !cs.underground) {
 				itr.remove();
-				explorationHandler.logger.warn("No valid street styles for " + cs.name + ". Disabling this city style.");
+                logger.warn("No valid street styles for " + cs.name + ". Disabling this city style.");
 			}
 			//else cs.streetWeights=buildWeightsAndIndex(cs.streets);
 		}
