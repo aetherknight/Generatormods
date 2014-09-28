@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.walledcity.config.WalledCityConfig;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -61,18 +63,14 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	final static int MAX_FOG_HEIGHT = 27;
 	public final static int CITY_TYPE_UNDERGROUND = 1;//TheEnd dimension id, since we don't generate there
 	private final static String CITY_FILE_SAVE = "WalledCities.txt", STREET_TEMPLATES_FOLDER_NAME = "streets";
-	//USER MODIFIABLE PARAMETERS, values here are defaults
-	public float UndergroundGlobalFrequency = 0.015F;
-	public int MinCitySeparation = 500, UndergroundMinCitySeparation = 500;
-	public boolean CityBuiltMessage = false;
-	public int BacktrackLength = 9;
-	public boolean RejectOnPreexistingArtifacts = true;
 	//DATA VARIABLES
 	public List<TemplateWall> cityStyles = null, undergroundCityStyles = new ArrayList<TemplateWall>();
 	public Map<World, List<int[]>> cityLocations;
 	public Map<Integer, List<VillageDoorInfo>> cityDoors;
 	public LinkedList<int[]> citiesBuiltMessages = new LinkedList<int[]>();
 	private Map<World, File> cityFiles;
+
+    public WalledCityConfig config;
 
 	//****************************  FUNCTION - addCityToVillages*************************************************************************************//
 	public void addCityToVillages(World world, int id) {
@@ -94,7 +92,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	public void chatBuildingCity(String chatString, String logString) {
 		if (logString != null)
 			logOrPrint(logString, "FINEST");
-		if (!CityBuiltMessage)
+		if (!config.cityBuiltMessage)
 			return;
 		List<?> playerList = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 		if (playerList != null) {
@@ -106,7 +104,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	}
 
 	public void chatCityBuilt(int[] args) {
-		if (!CityBuiltMessage)
+		if (!config.cityBuiltMessage)
 			return;
 		List<?> playerList = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 		if (playerList == null) {
@@ -136,7 +134,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	public boolean cityIsSeparated(World world, int i, int k, int cityType) {
 		if (cityLocations.containsKey(world)) {
 			for (int[] location : cityLocations.get(world)) {
-				if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == CITY_TYPE_UNDERGROUND ? UndergroundMinCitySeparation : MinCitySeparation)) {
+				if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == CITY_TYPE_UNDERGROUND ? config.undergroundMinCitySeparation : config.minCitySeparation)) {
 					return false;
 				}
 			}
@@ -147,14 +145,14 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	//****************************  FUNCTION - generate *************************************************************************************//
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
-		if (CityBuiltMessage && world.playerEntities != null)
+		if (config.cityBuiltMessage && world.playerEntities != null)
 			while (citiesBuiltMessages.size() > 0)
 				chatCityBuilt(citiesBuiltMessages.remove());
 		if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId) && random.nextFloat() < GlobalFrequency) {
 			(new WorldGenWalledCity(this, world, random, i, k, TriesPerChunk, GlobalFrequency)).run();
 		}
-		if (undergroundCityStyles.size() > 0 && cityIsSeparated(world, i, k, CITY_TYPE_UNDERGROUND) && random.nextFloat() < UndergroundGlobalFrequency) {
-			WorldGeneratorThread wgt = new WorldGenUndergroundCity(this, world, random, i, k, 1, UndergroundGlobalFrequency);
+		if (undergroundCityStyles.size() > 0 && cityIsSeparated(world, i, k, CITY_TYPE_UNDERGROUND) && random.nextFloat() < config.undergroundGlobalFrequency) {
+			WorldGeneratorThread wgt = new WorldGenUndergroundCity(this, world, random, i, k, 1, config.undergroundGlobalFrequency);
 			int maxSpawnHeight = Building.findSurfaceJ(world, i, k, Building.WORLD_MAX_Y, false, Building.IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5; //44 at sea level
 			int minSpawnHeight = MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8; //34, a pretty thin margin. Too thin for underocean cities?
 			if (minSpawnHeight <= maxSpawnHeight)
@@ -191,7 +189,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 			if (lw != null)
 				lw.close();
 		}
-		if (GlobalFrequency < 0.000001 && UndergroundGlobalFrequency < 0.000001)
+		if (config.globalFrequency < 0.000001 && config.undergroundGlobalFrequency < 0.000001)
 			errFlag = true;
 		dataFilesLoaded = true;
 	}
@@ -199,42 +197,20 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	//****************************  FUNCTION - getGlobalOptions  *************************************************************************************//
 	@Override
 	public void loadGlobalOptions(BufferedReader br) {
-		try {
-			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				//outer wall parameters
-				readGlobalOptions(lw, read);
-				if (read.startsWith("UndergroundGlobalFrequency"))
-					UndergroundGlobalFrequency = readFloatParam(lw, UndergroundGlobalFrequency, ":", read);
-				if (read.startsWith("MinCitySeparation"))
-					MinCitySeparation = readIntParam(lw, MinCitySeparation, ":", read);
-				if (read.startsWith("MinUndergroundCitySeparation"))
-					UndergroundMinCitySeparation = readIntParam(lw, UndergroundMinCitySeparation, ":", read);
-				//if(read.startsWith( "ConcaveSmoothingScale" )) ConcaveSmoothingScale = readIntParam(lw,ConcaveSmoothingScale,":",read);
-				//if(read.startsWith( "ConvexSmoothingScale" )) ConvexSmoothingScale = readIntParam(lw,ConvexSmoothingScale,":",read);
-				if (read.startsWith("BacktrackLength"))
-					BacktrackLength = readIntParam(lw, BacktrackLength, ":", read);
-				if (read.startsWith("CityBuiltMessage"))
-					CityBuiltMessage = readBooleanParam(lw, CityBuiltMessage, ":", read);
-				if (read.startsWith("RejectOnPreexistingArtifacts"))
-					RejectOnPreexistingArtifacts = readBooleanParam(lw, RejectOnPreexistingArtifacts, ":", read);
-				readChestItemsList(lw, read, br);
-			}
-			if (TriesPerChunk > MAX_TRIES_PER_CHUNK)
-				TriesPerChunk = MAX_TRIES_PER_CHUNK;
-		} catch (IOException e) {
-			lw.println(e.getMessage());
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException e) {
-			}
-		}
+        GlobalFrequency = config.globalFrequency;
+        TriesPerChunk = config.triesPerChunk;
+        AllowedDimensions = config.allowedDimensions;
+        logActivated = config.logActivated;
+
+        chestItems = config.chestConfigs;
 	}
 
 	//Load templates after mods have loaded so we can check whether any modded blockIDs are valid
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
+        config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
+        config.initialize();
+
 		if (!dataFilesLoaded)
 			loadDataFiles();
 		if (!errFlag) {
@@ -303,26 +279,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	}
 
 	@Override
-	public void writeGlobalOptions(PrintWriter pw) {
-		printGlobalOptions(pw, false);
-		pw.println("<-GlobalFrequency/UndergroundGlobalFrequency controls how likely aboveground/belowground cities are to appear. Should be between 0.0 and 1.0. Lower to make less common->");
-		pw.println("GlobalFrequency:" + GlobalFrequency);
-		pw.println("UndergroundGlobalFrequency:" + UndergroundGlobalFrequency);
-		pw.println("<-MinCitySeparation/UndergroundMinCitySeparation define a minimum allowable separation between city spawns.->");
-		pw.println("MinCitySeparation:" + MinCitySeparation);
-		pw.println("MinUndergroundCitySeparation:" + UndergroundMinCitySeparation);
-		pw.println();
-		pw.println("<-BacktrackLength - length of backtracking for wall planning if a dead end is hit->");
-		pw.println("BacktrackLength:" + BacktrackLength);
-		pw.println("<-CityBuiltMessage controls whether players receive message when a city is building. Set to true to receive message.->");
-		pw.println("CityBuiltMessage:" + CityBuiltMessage);
-		pw.println("<-RejectOnPreexistingArtifacts determines whether the planner rejects city sites that contain preexiting man-made blocks. Set to true to do this check.->");
-		pw.println("RejectOnPreexistingArtifacts:" + RejectOnPreexistingArtifacts);
-		pw.println();
-		printDefaultChestItems(pw);
-		if (pw != null)
-			pw.close();
-	}
+	public void writeGlobalOptions(PrintWriter pw) {}
 
 	public static List<int[]> getCityLocs(File city) {
 		List<int[]> cityLocs = new ArrayList<int[]>();

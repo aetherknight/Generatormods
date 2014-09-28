@@ -165,7 +165,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					cityArea++;
 					if (j2 == Building.HIT_WATER)
 						waterArea++;
-					if (((PopulatorWalledCity) master).RejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
+					if (((PopulatorWalledCity) master).config.rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
 						master.logOrPrint("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!", "WARNING");
 						return false;
 					}
