@@ -74,7 +74,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
             config.initialize();
             sharedConfig = config.sharedConfig;
 
-			finalizeLoading(false, "ruin");
+            logger.info("Probability of ruin generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
             logger.fatal("There was a problem loading the Cellular Automata Generator");

@@ -185,7 +185,9 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 					m--;
 				}
 			}
-			finalizeLoading(true, "city");
+            logger.info("Template loading complete.");
+
+            logger.info("Probability of city generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
             logger.fatal("There was a problem loading the walled city mod");

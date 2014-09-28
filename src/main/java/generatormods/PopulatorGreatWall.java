@@ -77,7 +77,9 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
             wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
-			finalizeLoading(true, "wall");
+            logger.info("Template loading complete.");
+
+            logger.info("Probability of wall generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
             logger.fatal("There was a problem loading the great wall mod");

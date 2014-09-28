@@ -80,13 +80,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		}
 	}
 
-	protected void finalizeLoading(boolean hasTemplate, String structure) {
-		if (hasTemplate) {
-            logger.info("Template loading complete.");
-		}
-		logger.info("Probability of " + structure + " generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
-	}
-
 	protected boolean isNewWorld(World world) {
 		if (currentWorld.isEmpty()) {
 			currentWorld.add(world);
