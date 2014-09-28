@@ -27,13 +27,10 @@ import net.minecraft.world.World;
  * curviness and length.
  */
 public class WorldGenGreatWall extends WorldGeneratorThread {
-	//private final static boolean DEBUG=false;
-	//****************************  CONSTRUCTOR - WorldGenGreatWall *************************************************************************************//
 	public WorldGenGreatWall(PopulatorGreatWall gw, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(gw, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
 	}
 
-	//****************************  FUNCTION - generate  *************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
 		TemplateWall ws = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorGreatWall) master).wallStyles, world, i0, k0, world.rand, false);
@@ -43,7 +40,7 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 		if (!dw.plan())
 			return false;
 		//calculate the integrated curvature
-		if (((PopulatorGreatWall) master).CurveBias > 0.01) {
+		if (((PopulatorGreatWall) master).config.curveBias > 0.01) {
 			//Perform a probabilistic test
 			//Test formula considers both length and curvature, bias is towards longer and curvier walls.
 			double curviness = 0;
@@ -61,7 +58,7 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 			 * ,curvebias),ylim=c(0,1),xlim=c(0,0.5),xlab="curviness"
 			 * ,ylab="p",main=paste("curvebias=",curvebias)) } plotpwall(0.5)
 			 */
-			double p = 1.0 / (1.0 + Math.exp(-30.0 * (curviness - (((PopulatorGreatWall) master).CurveBias / 5.0))));
+			double p = 1.0 / (1.0 + Math.exp(-30.0 * (curviness - (((PopulatorGreatWall) master).config.curveBias / 5.0))));
 			if (random.nextFloat() > p && curviness != 0) {
 				master.logOrPrint("Rejected great wall, curviness=" + curviness + ", length=" + (dw.wall1.bLength + dw.wall1.bLength - 1) + ", P=" + p, "INFO");
 				return false;

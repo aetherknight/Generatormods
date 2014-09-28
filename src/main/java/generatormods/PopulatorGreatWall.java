@@ -46,10 +46,6 @@ import net.minecraft.world.World;
 public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Instance("GreatWallMod")
 	public static PopulatorGreatWall instance;
-	//USER MODIFIABLE PARAMETERS, values below are defaults
-	public float CurveBias = 0.5F;
-	public int LengthBiasNorm = 200;
-	public int BacktrackLength = 9;
 	//DATA VARIABLES
 	public ArrayList<TemplateWall> wallStyles = null;
 	public int[] placedCoords = null;
@@ -74,7 +70,6 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
         }
 	}
 
-	//****************************  FUNCTION - loadDataFiles *************************************************************************************//
 	@Override
 	public final void loadDataFiles() {
 		try {
@@ -98,14 +93,12 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 		dataFilesLoaded = true;
 	}
 
-	//****************************  FUNCTION - generate *************************************************************************************//
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
 		if (random.nextFloat() < GlobalFrequency)
 			(new WorldGenGreatWall(this, world, random, i, k, TriesPerChunk, GlobalFrequency)).run();
 	}
 
-	//****************************  FUNCTION - getGlobalOptions  *************************************************************************************//
 	@Override
 	public void loadGlobalOptions(BufferedReader br) {
         GlobalFrequency = config.globalFrequency;
@@ -114,10 +107,6 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
         logActivated = config.logActivated;
 
         chestItems = config.chestConfigs;
-
-        CurveBias = config.curveBias;
-        LengthBiasNorm = config.lengthBiasNorm;
-        BacktrackLength = config.backtrackLength;
 	}
 
 	@Override
