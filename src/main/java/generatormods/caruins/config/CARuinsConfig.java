@@ -16,16 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.config;
+package generatormods.caruins.config;
 
 import generatormods.BuildingCellularAutomaton;
 import generatormods.TemplateRule;
+import generatormods.config.AbstractConfig;
+import generatormods.config.ParseError;
 
 import java.io.File;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -34,9 +35,7 @@ import net.minecraftforge.common.config.Configuration;
 
 import org.apache.logging.log4j.Logger;
 
-public class CARuinsConfig {
-    // Defaults to the Nether and the Overworld
-    private static final int[] DEFAULT_DIM_LIST = {-1, 0};
+public class CARuinsConfig extends AbstractConfig{
     // Default CARuins template is 1/3 cobblestone, 2/3 mossy cobblestone.
     private final static TemplateRule DEFAULT_TEMPLATE = new TemplateRule(new Block[] {
             Blocks.cobblestone, Blocks.mossy_cobblestone, Blocks.mossy_cobblestone}, new int[] {0,
@@ -88,11 +87,6 @@ public class CARuinsConfig {
         }
     }
 
-    public float globalFrequency;
-    public int triesPerChunk;
-    public List<Integer> allowedDimensions;
-    public boolean logActivated;
-
     public int minHeight;
     public int maxHeight;
     public int minHeightBeforeOscillation;
@@ -100,8 +94,6 @@ public class CARuinsConfig {
     public boolean makeFloors;
     public int containerWidth;
     public int containerLength;
-
-    public Map<ChestType, ChestContentsConfig> chestConfigs;
 
     public float symmetricSeedDensity;
     public int symmetricSeedWeight;
@@ -124,12 +116,8 @@ public class CARuinsConfig {
 
     public List<WeightedCARule> caRules;
 
-    private File configFile;
-    private Logger logger;
-
     public CARuinsConfig(File configDir, Logger logger) {
-        configFile = new File(configDir + "/CARuins.cfg");
-        this.logger = logger;
+        super(configDir, "CARuins", logger);
     }
 
     /**
@@ -141,8 +129,9 @@ public class CARuinsConfig {
         String section = "CARuins";
 
         initCommonConfig(config, section);
-        initCARuinsConfig(config, section);
         initChestConfigs(config, section);
+
+        initCARuinsConfig(config, section);
         initSeedWeights(config, section);
         initSpawnerRules(config, section);
         initBlockRules(config, section);
@@ -150,44 +139,6 @@ public class CARuinsConfig {
 
         if (config.hasChanged())
             config.save();
-    }
-
-    private void initCommonConfig(Configuration config, String section) {
-        // TODO: turn this into an integer n where 1/n is the odds that a given chunk will attempt
-        // to generate a structure.
-        globalFrequency =
-                (float) config
-                        .get(section,
-                                "Global Frequency",
-                                0.025,
-                                "Controls how likely structures are to appear --- it is the probability for\ntrying to make a structure in a given chunk. Should be between 0.0 and 1.0.\nSmaller values make structures less common.",
-                                0.0, 1.0).getDouble();
-        triesPerChunk =
-                config.get(
-                        section,
-                        "Tries Per Chunk",
-                        1,
-                        "Allows multiple attempts to build a structure per chunk. If a chunk is selected\nfor a structure, but that structure is rejected for some reason, then a value\ngreater than 1 will attempt to create another structure. Only set it to larger\nthan 1 if you want very dense generation!",
-                        0, 100).getInt();
-        int[] rawAllowedDimensions =
-                config.get(
-                        section,
-                        "Allowed Dimensions",
-                        DEFAULT_DIM_LIST,
-                        "Whitelist of dimension IDs where structures may be gnerated. Default is Nether\n(-1) and Overworld (0).")
-                        .getIntList();
-        allowedDimensions = new ArrayList<Integer>();
-        for (int dimensionInt : rawAllowedDimensions) {
-            allowedDimensions.add(dimensionInt);
-        }
-
-        logActivated =
-                config.get(
-                        section,
-                        "Log Activated",
-                        true,
-                        "Controls information stored into forge logs. Set to true if you want to report\nan issue with complete forge logs.")
-                        .getBoolean();
     }
 
     private void initCARuinsConfig(Configuration config, String section) {
@@ -215,36 +166,6 @@ public class CARuinsConfig {
         containerLength =
                 config.get(section, "Container Length", 40,
                         "The length of the bounding rectangle.", 0, 4096).getInt();
-    }
-
-    private void initChestConfigs(Configuration config, String baseSection) {
-        // Chest contents. Grouped by chest type.
-        chestConfigs = new HashMap<ChestType, ChestContentsConfig>();
-        for (ChestType chestType : ChestType.values()) {
-            String section = baseSection + ".ChestContents." + chestType;
-
-            String[] defaultChestItems = new String[chestType.getDefaultChestItems().size()];
-            for (int i = 0; i < defaultChestItems.length; i++) {
-                defaultChestItems[i] = chestType.getDefaultChestItems().get(i).toSpecString();
-            }
-
-            int chestTries =
-                    config.get(section, "Tries", chestType.getDefaultChestTries(),
-                            "The number of selections that will be made for this chest type.")
-                            .getInt();
-            String[] rawChestItemArray =
-                    config.get(
-                            section,
-                            "Chest Contents",
-                            defaultChestItems,
-                            "Format for each item is:\n\n    <item name>-<metadata>,<selection weight>,<min stack size>,<max stack size>\n\nE.g.:\n\n    minecraft:arrow-0,2,1,12\n\nMeans a stack of between 1 and 12 arrows, with a selection weight of 2.")
-                            .getStringList();
-
-            // Create a list of ChestItemSpecs from the config
-            ChestContentsConfig chestConfig =
-                    new ChestContentsConfig(chestType, chestTries, rawChestItemArray);
-            chestConfigs.put(chestType, chestConfig);
-        }
     }
 
     private void initSeedWeights(Configuration config, String baseSection) {

@@ -26,7 +26,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameData;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

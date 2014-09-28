@@ -18,6 +18,7 @@
 package generatormods;
 
 import generatormods.caruins.config.CARuinsConfig;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -95,7 +96,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         AllowedDimensions = config.allowedDimensions;
         logActivated = config.logActivated;
 
-        // Support the existing old chest format (array of values)
         chestItems = config.chestConfigs;
     }
 

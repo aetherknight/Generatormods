@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.greatwall.config.GreatWallConfig;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -52,6 +54,8 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	public ArrayList<TemplateWall> wallStyles = null;
 	public int[] placedCoords = null;
 	public World placedWorld = null;
+
+    public GreatWallConfig config;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -104,49 +108,20 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	//****************************  FUNCTION - getGlobalOptions  *************************************************************************************//
 	@Override
 	public void loadGlobalOptions(BufferedReader br) {
-		try {
-			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				readGlobalOptions(lw, read);
-				if (read.startsWith("CurveBias"))
-					CurveBias = readFloatParam(lw, CurveBias, ":", read);
-				if (read.startsWith("LengthBiasNorm"))
-					LengthBiasNorm = readIntParam(lw, LengthBiasNorm, ":", read);
-				if (read.startsWith("BacktrackLength"))
-					BacktrackLength = readIntParam(lw, BacktrackLength, ":", read);
-				readChestItemsList(lw, read, br);
-			}
-			if (TriesPerChunk > MAX_TRIES_PER_CHUNK)
-				TriesPerChunk = MAX_TRIES_PER_CHUNK;
-			if (CurveBias < 0.0)
-				CurveBias = 0.0F;
-			if (CurveBias > 1.0)
-				CurveBias = 1.0F;
-		} catch (IOException e) {
-			lw.println(e.getMessage());
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException e) {
-			}
-		}
+        GlobalFrequency = config.globalFrequency;
+        TriesPerChunk = config.triesPerChunk;
+        AllowedDimensions = config.allowedDimensions;
+        logActivated = config.logActivated;
+
+        chestItems = config.chestConfigs;
+
+        CurveBias = config.curveBias;
+        LengthBiasNorm = config.lengthBiasNorm;
+        BacktrackLength = config.backtrackLength;
 	}
 
 	@Override
-	public void writeGlobalOptions(PrintWriter pw) {
-		printGlobalOptions(pw, true);
-		pw.println();
-		pw.println("<-BacktrackLength - length of backtracking for wall planning if a dead end is hit->");
-		pw.println("<-CurveBias - strength of the bias towards curvier walls. Value should be between 0.0 and 1.0.->");
-		pw.println("<-LengthBiasNorm - wall length at which there is no penalty for generation>");
-		pw.println("BacktrackLength:" + BacktrackLength);
-		pw.println("CurveBias:" + CurveBias);
-		pw.println("LengthBiasNorm:" + LengthBiasNorm);
-		pw.println();
-		printDefaultChestItems(pw);
-		if (pw != null)
-			pw.close();
-	}
+    public void writeGlobalOptions(PrintWriter pw) {}
 
 	@Override
 	public String toString() {
@@ -155,6 +130,9 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
+        config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
+        config.initialize();
+
 		if (!dataFilesLoaded)
 			loadDataFiles();
 		if (!errFlag) {
