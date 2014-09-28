@@ -46,7 +46,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	protected String templateFolderName;
 	public Logger logger;
-	protected boolean errFlag = false, dataFilesLoaded = false;
+	protected boolean errFlag = false;
 	private List<World> currentWorld = new ArrayList<World>();
 
     public SharedConfig sharedConfig;
@@ -66,8 +66,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	}
 
 	abstract public void generate(World world, Random random, int i, int k);
-
-	abstract public void loadDataFiles();
 
 	public void updateWorldExplored(World world) {
 		if (isNewWorld(world)) {

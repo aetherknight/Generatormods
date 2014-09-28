@@ -164,9 +164,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		}
 	}
 
-	//****************************  FUNCTION - loadDataFiles *************************************************************************************//
-	@Override
-	public final void loadDataFiles() {
+    public final void loadConfiguration() {
 		try {
             logger.info("Loading options and templates for the Walled City Generator.");
 
@@ -190,19 +188,16 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
             logger.info("Probability of city generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
-            logger.fatal("There was a problem loading the walled city mod");
-            logger.fatal(e);
+            logger.fatal("There was a problem loading the walled city mod", e);
 		}
 		if (config.globalFrequency < 0.000001 && config.undergroundGlobalFrequency < 0.000001)
 			errFlag = true;
-		dataFilesLoaded = true;
 	}
 
 	//Load templates after mods have loaded so we can check whether any modded blockIDs are valid
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
-		if (!dataFilesLoaded)
-			loadDataFiles();
+        loadConfiguration();
 		if (!errFlag) {
 			GameRegistry.registerWorldGenerator(this, 0);
 		}

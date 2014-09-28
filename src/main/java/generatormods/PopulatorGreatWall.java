@@ -66,8 +66,7 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
         }
 	}
 
-	@Override
-	public final void loadDataFiles() {
+    public final void loadConfiguration() {
 		try {
             logger.info("Loading options and templates for the Great Wall Mod.");
 
@@ -82,12 +81,10 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
             logger.info("Probability of wall generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
-            logger.fatal("There was a problem loading the great wall mod");
-            logger.fatal(e);
+            logger.fatal("There was a problem loading the great wall mod", e);
 		}
 		if (config.globalFrequency < 0.000001)
 			errFlag = true;
-		dataFilesLoaded = true;
 	}
 
 	@Override
@@ -103,8 +100,7 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
-		if (!dataFilesLoaded)
-			loadDataFiles();
+        loadConfiguration();
 		if (!errFlag) {
 			GameRegistry.registerWorldGenerator(this, 1);
 		}

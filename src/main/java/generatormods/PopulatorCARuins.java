@@ -65,8 +65,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
         event.registerServerCommand(new CommandScan());
 	}
 
-	@Override
-	public final void loadDataFiles() {
+    private final void loadConfiguration() {
 		try {
             logger.info("Loading options for the Cellular Automata Generator.");
 
@@ -77,12 +76,10 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
             logger.info("Probability of ruin generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
-            logger.fatal("There was a problem loading the Cellular Automata Generator");
-            logger.fatal(e);
+            logger.fatal("There was a problem loading the Cellular Automata Generator", e);
 		}
 		if (config.globalFrequency < 0.000001 || config.caRules == null || config.caRules.size() == 0)
 			errFlag = true;
-		dataFilesLoaded = true;
 	}
 
 	@Override
@@ -98,8 +95,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
-		if (!dataFilesLoaded)
-			loadDataFiles();
+        loadConfiguration();
 		if (!errFlag) {
 			GameRegistry.registerWorldGenerator(this, 2);
 		}
