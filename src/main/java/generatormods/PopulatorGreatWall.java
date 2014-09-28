@@ -70,7 +70,6 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
             logger.info("Loading options and templates for the Great Wall Mod.");
-            initializeBiomeNames();
 
             config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
             config.initialize();

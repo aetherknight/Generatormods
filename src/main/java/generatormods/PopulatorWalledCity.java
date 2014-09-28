@@ -169,7 +169,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
             logger.info("Loading options and templates for the Walled City Generator.");
-            initializeBiomeNames();
 
             config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
             config.initialize();

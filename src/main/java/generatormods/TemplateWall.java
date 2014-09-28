@@ -19,6 +19,8 @@ package generatormods;
 
 import generatormods.common.Util;
 
+import generatormods.common.BiomeNames;
+
 import java.io.File;
 
 import java.util.ArrayList;
@@ -98,7 +100,7 @@ public class TemplateWall extends TemplateTML {
 	public void readTowerParameters() throws Exception {
 		float mobProb = 0.0F, pigZombieProb = 0.0F, endermanProb = 0.0F, caveSpiderProb = 0.0F; //deprecated, for backwards compatibility
 		if (extraOptions.containsKey("biomes"))
-			Biomes = Util.readNamedCheckList(logger, Biomes, "=", extraOptions.get("biomes"), BuildingExplorationHandler.BIOME_NAMES, "ALL");
+			Biomes = Util.readNamedCheckList(logger, Biomes, "=", extraOptions.get("biomes"), BiomeNames.getBiomeNames(), "ALL");
 		if (extraOptions.containsKey("street_density"))
 			StreetDensity = Util.readIntParam(logger, StreetDensity, "=", extraOptions.get("street_density"));
 		if (extraOptions.containsKey("level_interior"))

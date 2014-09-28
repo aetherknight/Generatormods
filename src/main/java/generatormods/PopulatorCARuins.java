@@ -69,7 +69,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	public final void loadDataFiles() {
 		try {
             logger.info("Loading options for the Cellular Automata Generator.");
-            initializeBiomeNames();
 
             config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
             config.initialize();

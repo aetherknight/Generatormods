@@ -19,8 +19,6 @@ package generatormods;
 
 import generatormods.config.SharedConfig;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
 
@@ -31,7 +29,6 @@ import java.util.Random;
 
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderEnd;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.ISaveHandler;
@@ -51,7 +48,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	public Logger logger;
 	protected boolean errFlag = false, dataFilesLoaded = false;
 	private List<World> currentWorld = new ArrayList<World>();
-	public static String[] BIOME_NAMES = new String[BiomeGenBase.getBiomeGenArray().length + 1];
 
     public SharedConfig sharedConfig;
 
@@ -90,17 +86,6 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		}
 		logger.info("Probability of " + structure + " generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 	}
-
-
-    protected void initializeBiomeNames() {
-		BIOME_NAMES[0] = "Underground";
-        if (BIOME_NAMES[1] == null || BIOME_NAMES[1].equals("")) {
-            for (int i = 0; i < BIOME_NAMES.length - 1; i++) {
-                if (BiomeGenBase.getBiomeGenArray()[i] != null)
-                    BIOME_NAMES[i + 1] = BiomeGenBase.getBiomeGenArray()[i].biomeName;
-            }
-        }
-    }
 
 	protected boolean isNewWorld(World world) {
 		if (currentWorld.isEmpty()) {
