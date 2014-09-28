@@ -56,17 +56,12 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
     protected final static String VERSION = "0.1.6";
 	protected final static int MAX_TRIES_PER_CHUNK = 100;
 	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
-	protected final static File LOG = new File(new File(getMinecraftBaseDir(), "logs"), "generatormods_log.txt");
 
 	protected String templateFolderName;
 	public Logger logger;
-	public PrintWriter lw = null;
 	protected boolean errFlag = false, dataFilesLoaded = false;
 	private List<World> currentWorld = new ArrayList<World>();
 	public static String[] BIOME_NAMES = new String[BiomeGenBase.getBiomeGenArray().length + 1];
-	static {
-		BIOME_NAMES[0] = "Underground";
-	}
 
     public SharedConfig sharedConfig;
 
@@ -106,23 +101,21 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	protected void finalizeLoading(boolean hasTemplate, String structure) {
 		if (hasTemplate) {
-			lw.println("\nTemplate loading complete.");
+            logger.info("Template loading complete.");
 		}
-		lw.println("Probability of " + structure + " generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
+		logger.info("Probability of " + structure + " generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 	}
 
-	protected void initializeLogging(String message) throws IOException {
-		if (LOG.length() > 8350)
-			LOG.delete();
-		lw = new PrintWriter(new BufferedWriter(new FileWriter(LOG, LOG.canWrite())));
-		logOrPrint(message, "INFO");
-		if (BIOME_NAMES[1] == null || BIOME_NAMES[1].equals("")) {
-			for (int i = 0; i < BIOME_NAMES.length - 1; i++) {
-				if (BiomeGenBase.getBiomeGenArray()[i] != null)
-					BIOME_NAMES[i + 1] = BiomeGenBase.getBiomeGenArray()[i].biomeName;
-			}
-		}
-	}
+
+    protected void initializeBiomeNames() {
+		BIOME_NAMES[0] = "Underground";
+        if (BIOME_NAMES[1] == null || BIOME_NAMES[1].equals("")) {
+            for (int i = 0; i < BIOME_NAMES.length - 1; i++) {
+                if (BiomeGenBase.getBiomeGenArray()[i] != null)
+                    BIOME_NAMES[i + 1] = BiomeGenBase.getBiomeGenArray()[i].biomeName;
+            }
+        }
+    }
 
 	protected boolean isNewWorld(World world) {
 		if (currentWorld.isEmpty()) {

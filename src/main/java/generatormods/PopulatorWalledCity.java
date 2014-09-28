@@ -166,7 +166,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	@Override
 	public final void loadDataFiles() {
 		try {
-			initializeLogging("Loading options and templates for the Walled City Generator.");
+            logger.info("Loading options and templates for the Walled City Generator.");
+            initializeBiomeNames();
 
             config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
@@ -186,12 +187,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 			finalizeLoading(true, "city");
 		} catch (Exception e) {
 			errFlag = true;
-			lw.println("There was a problem loading the walled city mod: " + e.getMessage());
-			logOrPrint("There was a problem loading the walled city mod: " + e.getMessage(), "SEVERE");
-			e.printStackTrace();
-		} finally {
-			if (lw != null)
-				lw.close();
+            logger.fatal("There was a problem loading the walled city mod");
+            logger.fatal(e);
 		}
 		if (config.globalFrequency < 0.000001 && config.undergroundGlobalFrequency < 0.000001)
 			errFlag = true;

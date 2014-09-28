@@ -22,13 +22,13 @@ import generatormods.TemplateRule;
 import generatormods.caruins.config.CARule;
 import generatormods.config.ParseError;
 
-import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
+
 public class Util {
-	public static List<byte[][]> readAutomataList(PrintWriter lw, String splitString, String read) {
+	public static List<byte[][]> readAutomataList(Logger logger, String splitString, String read) {
 		List<byte[][]> rules = new ArrayList<byte[][]>();
 		String[] ruleStrs = (read.split(splitString)[1]).split(",");
 		for (String ruleStr : ruleStrs) {
@@ -36,7 +36,7 @@ public class Util {
                 byte[][] rule = (new CARule(ruleStr.trim())).toBytes();
 				rules.add(rule);
             } catch (ParseError e) {
-                lw.println("Error parsing automaton rule " + ruleStr + ": " + e.getMessage());
+                logger.error("Error parsing automaton rule " + ruleStr, e);
             }
 		}
 		if (rules.size() == 0)
@@ -44,27 +44,25 @@ public class Util {
 		return rules;
 	}
 
-	public static boolean readBooleanParam(PrintWriter lw, boolean defaultVal, String splitString, String read) {
+	public static boolean readBooleanParam(Logger logger, boolean defaultVal, String splitString, String read) {
 		try {
 			defaultVal = Boolean.parseBoolean(read.split(splitString)[1].trim());
 		} catch (NullPointerException e) {
-			lw.println("Error parsing boolean: " + e.toString());
-			lw.println("Using default " + defaultVal + ". Line:" + read);
+			logger.error("Error parsing boolean, using default: " + defaultVal + " Line: " + read, e);
 		}
 		return defaultVal;
 	}
 
-	public static float readFloatParam(PrintWriter lw, float defaultVal, String splitString, String read) {
+	public static float readFloatParam(Logger logger, float defaultVal, String splitString, String read) {
 		try {
 			defaultVal = Float.parseFloat(read.split(splitString)[1].trim());
 		} catch (Exception e) {
-			lw.println("Error parsing double: " + e.toString());
-			lw.println("Using default " + defaultVal + ". Line:" + read);
+			logger.error("Error parsing double, using default: " + defaultVal + " Line: " + read, e);
 		}
 		return defaultVal;
 	}
 
-	public static Integer[] readIntList(PrintWriter lw, Integer[] defaultVals, String splitString, String read) {
+	public static Integer[] readIntList(Logger logger, Integer[] defaultVals, String splitString, String read) {
 		try {
 			String[] check = (read.split(splitString)[1]).split(",");
 			Integer[] newVals = new Integer[check.length];
@@ -73,23 +71,21 @@ public class Util {
 			}
 			return newVals;
 		} catch (Exception e) {
-			lw.println("Error parsing intlist input: " + e.toString());
-			lw.println("Using default. Line:" + read);
+			logger.error("Error parsing intlist, using defaults. Line: " + read, e);
 		}
 		return defaultVals;
 	}
 
-	public static int readIntParam(PrintWriter lw, int defaultVal, String splitString, String read) {
+	public static int readIntParam(Logger logger, int defaultVal, String splitString, String read) {
 		try {
 			defaultVal = Integer.parseInt(read.split(splitString)[1].trim());
 		} catch (NumberFormatException e) {
-			lw.println("Error parsing int: " + e.toString());
-			lw.println("Using default " + defaultVal + ". Line:" + read);
+			logger.error("Error parsing int, using default: " + defaultVal + " Line: " + read, e);
 		}
 		return defaultVal;
 	}
 
-	public static int[] readNamedCheckList(PrintWriter lw, int[] defaultVals, String splitString, String read, String[] names, String allStr) {
+	public static int[] readNamedCheckList(Logger logger, int[] defaultVals, String splitString, String read, String[] names, String allStr) {
 		if (defaultVals == null || names.length != defaultVals.length)
 			defaultVals = new int[names.length];
 		try {
@@ -109,13 +105,12 @@ public class Util {
 						}
 					}
 					if (!found)
-						lw.println("Warning, named checklist item not found:" + check + ". Line:" + read);
+						logger.warn("Warning, named checklist item not found:" + check + ". Line:" + read);
 				}
 			}
 			return newVals;
 		} catch (Exception e) {
-			lw.println("Error parsing checklist input: " + e.toString());
-			lw.println("Using default. Line:" + read);
+			logger.error("Error parsing checklist, using defaults. Line: " + read, e);
 		}
 		return defaultVals;
 	}
@@ -130,7 +125,7 @@ public class Util {
 		} catch (NumberFormatException e) {
 			return new TemplateRule(postSplit, false);
 		} catch (Exception e) {
-			throw new Exception("Error reading block rule for variable: " + e.toString() + ". Line:" + read);
+            throw new ParseError("Error reading block rule for variable. Line: " + read, e);
 		}
 	}
 }

@@ -96,98 +96,98 @@ public class TemplateWall extends TemplateTML {
 	public void readTowerParameters() throws Exception {
 		float mobProb = 0.0F, pigZombieProb = 0.0F, endermanProb = 0.0F, caveSpiderProb = 0.0F; //deprecated, for backwards compatibility
 		if (extraOptions.containsKey("biomes"))
-			Biomes = Util.readNamedCheckList(lw, Biomes, "=", extraOptions.get("biomes"), BuildingExplorationHandler.BIOME_NAMES, "ALL");
+			Biomes = Util.readNamedCheckList(logger, Biomes, "=", extraOptions.get("biomes"), BuildingExplorationHandler.BIOME_NAMES, "ALL");
 		if (extraOptions.containsKey("street_density"))
-			StreetDensity = Util.readIntParam(lw, StreetDensity, "=", extraOptions.get("street_density"));
+			StreetDensity = Util.readIntParam(logger, StreetDensity, "=", extraOptions.get("street_density"));
 		if (extraOptions.containsKey("level_interior"))
-			LevelInterior = Util.readIntParam(lw, 1, "=", extraOptions.get("level_interior")) == 1;
+			LevelInterior = Util.readIntParam(logger, 1, "=", extraOptions.get("level_interior")) == 1;
 		if (extraOptions.containsKey("walk_height"))
-			WalkHeight = Util.readIntParam(lw, WalkHeight, "=", extraOptions.get("walk_height"));
+			WalkHeight = Util.readIntParam(logger, WalkHeight, "=", extraOptions.get("walk_height"));
 		if (extraOptions.containsKey("min_length"))
-			MinL = Util.readIntParam(lw, MinL, "=", extraOptions.get("min_length"));
+			MinL = Util.readIntParam(logger, MinL, "=", extraOptions.get("min_length"));
 		if (extraOptions.containsKey("max_length"))
-			MaxL = Util.readIntParam(lw, MaxL, "=", extraOptions.get("max_length"));
+			MaxL = Util.readIntParam(logger, MaxL, "=", extraOptions.get("max_length"));
 		if (extraOptions.containsKey("tower_rule"))
 			TowerRule = Util.readRuleIdOrRule("=", extraOptions.get("tower_rule"), rules);
 		if (extraOptions.containsKey("building_interval"))
-			BuildingInterval = Util.readIntParam(lw, BuildingInterval, "=", extraOptions.get("building_interval"));
+			BuildingInterval = Util.readIntParam(logger, BuildingInterval, "=", extraOptions.get("building_interval"));
 		if (extraOptions.containsKey("make_buildings"))
-			MakeBuildings = Util.readIntParam(lw, 1, "=", extraOptions.get("make_buildings")) == 1;
+			MakeBuildings = Util.readIntParam(logger, 1, "=", extraOptions.get("make_buildings")) == 1;
 		if (extraOptions.containsKey("make_gatehouse_towers"))
-			MakeGatehouseTowers = Util.readIntParam(lw, 1, "=", extraOptions.get("make_gatehouse_towers")) == 1;
+			MakeGatehouseTowers = Util.readIntParam(logger, 1, "=", extraOptions.get("make_gatehouse_towers")) == 1;
 		if (extraOptions.containsKey("make_end_towers"))
-			MakeEndTowers = Util.readIntParam(lw, 1, "=", extraOptions.get("make_end_towers")) == 1;
+			MakeEndTowers = Util.readIntParam(logger, 1, "=", extraOptions.get("make_end_towers")) == 1;
 		if (extraOptions.containsKey("make_underground_entranceways"))
-			MakeUndergroundEntranceways = Util.readIntParam(lw, 1, "=", extraOptions.get("make_underground_entranceways")) == 1;
+			MakeUndergroundEntranceways = Util.readIntParam(logger, 1, "=", extraOptions.get("make_underground_entranceways")) == 1;
 		if (extraOptions.containsKey("merge_walls"))
-			MergeWalls = Util.readIntParam(lw, 0, "=", extraOptions.get("merge_walls")) == 1;
+			MergeWalls = Util.readIntParam(logger, 0, "=", extraOptions.get("merge_walls")) == 1;
 		if (extraOptions.containsKey("lateral_smoothing_scale"))
-			LateralSmoothingScale = Util.readIntParam(lw, LateralSmoothingScale, "=", extraOptions.get("lateral_smoothing_scale"));
+			LateralSmoothingScale = Util.readIntParam(logger, LateralSmoothingScale, "=", extraOptions.get("lateral_smoothing_scale"));
 		if (extraOptions.containsKey("concave_up_smoothing_scale"))
-			ConcaveUpSmoothingScale = Util.readIntParam(lw, ConcaveUpSmoothingScale, "=", extraOptions.get("concave_up_smoothing_scale"));
+			ConcaveUpSmoothingScale = Util.readIntParam(logger, ConcaveUpSmoothingScale, "=", extraOptions.get("concave_up_smoothing_scale"));
 		if (extraOptions.containsKey("concave_down_smoothing_scale"))
-			ConcaveDownSmoothingScale = Util.readIntParam(lw, ConcaveDownSmoothingScale, "=", extraOptions.get("concave_down_smoothing_scale"));
+			ConcaveDownSmoothingScale = Util.readIntParam(logger, ConcaveDownSmoothingScale, "=", extraOptions.get("concave_down_smoothing_scale"));
 		//default tower variables
 		if (extraOptions.containsKey("default_tower_weight"))
-			DefaultTowerWeight = Util.readIntParam(lw, DefaultTowerWeight, "=", extraOptions.get("default_tower_weight"));
+			DefaultTowerWeight = Util.readIntParam(logger, DefaultTowerWeight, "=", extraOptions.get("default_tower_weight"));
 		if (extraOptions.containsKey("tower_offset"))
-			TowerXOffset = Util.readIntParam(lw, TowerXOffset, "=", extraOptions.get("tower_offset"));
+			TowerXOffset = Util.readIntParam(logger, TowerXOffset, "=", extraOptions.get("tower_offset"));
 		if (extraOptions.containsKey("spawner_rule"))
 			SpawnerRule = Util.readRuleIdOrRule("=", extraOptions.get("spawner_rule"), rules);
 		if (extraOptions.containsKey("populate_furniture"))
-			PopulateFurniture = Util.readFloatParam(lw, 0, "=", extraOptions.get("populate_furniture")) == 1;
+			PopulateFurniture = Util.readFloatParam(logger, 0, "=", extraOptions.get("populate_furniture")) == 1;
 		if (extraOptions.containsKey("make_doors"))
-			MakeDoors = Util.readFloatParam(lw, 0, "=", extraOptions.get("make_doors")) == 1;
+			MakeDoors = Util.readFloatParam(logger, 0, "=", extraOptions.get("make_doors")) == 1;
 		if (extraOptions.containsKey("circular_probability"))
-			CircularProb = Util.readFloatParam(lw, CircularProb, "=", extraOptions.get("circular_probability"));
+			CircularProb = Util.readFloatParam(logger, CircularProb, "=", extraOptions.get("circular_probability"));
 		if (extraOptions.containsKey("chest_rule"))
 			ChestRule = Util.readRuleIdOrRule("=", extraOptions.get("chest_rule"), rules);
 		if (extraOptions.containsKey("square_min_height"))
-			SqrMinHeight = Util.readIntParam(lw, SqrMinHeight, "=", extraOptions.get("square_min_height"));
+			SqrMinHeight = Util.readIntParam(logger, SqrMinHeight, "=", extraOptions.get("square_min_height"));
 		if (extraOptions.containsKey("square_max_height"))
-			SqrMaxHeight = Util.readIntParam(lw, SqrMaxHeight, "=", extraOptions.get("square_max_height"));
+			SqrMaxHeight = Util.readIntParam(logger, SqrMaxHeight, "=", extraOptions.get("square_max_height"));
 		if (extraOptions.containsKey("square_min_width"))
-			SqrMinWidth = Util.readIntParam(lw, SqrMinWidth, "=", extraOptions.get("square_min_width"));
+			SqrMinWidth = Util.readIntParam(logger, SqrMinWidth, "=", extraOptions.get("square_min_width"));
 		if (extraOptions.containsKey("square_max_width"))
-			SqrMaxWidth = Util.readIntParam(lw, SqrMaxWidth, "=", extraOptions.get("square_max_width"));
+			SqrMaxWidth = Util.readIntParam(logger, SqrMaxWidth, "=", extraOptions.get("square_max_width"));
 		if (extraOptions.containsKey("square_roof_styles"))
-			SqrRoofStyles = Util.readNamedCheckList(lw, SqrRoofStyles, "=", extraOptions.get("square_roof_styles"), BuildingTower.ROOFSTYLE_NAMES, "");
+			SqrRoofStyles = Util.readNamedCheckList(logger, SqrRoofStyles, "=", extraOptions.get("square_roof_styles"), BuildingTower.ROOFSTYLE_NAMES, "");
 		if (extraOptions.containsKey("square_roof_rule"))
 			SqrRoofRule = Util.readRuleIdOrRule("=", extraOptions.get("square_roof_rule"), rules);
 		if (extraOptions.containsKey("circular_tower_min_height"))
-			CircMinHeight = Util.readIntParam(lw, CircMinHeight, "=", extraOptions.get("circular_tower_min_height"));
+			CircMinHeight = Util.readIntParam(logger, CircMinHeight, "=", extraOptions.get("circular_tower_min_height"));
 		if (extraOptions.containsKey("circular_tower_max_height"))
-			CircMaxHeight = Util.readIntParam(lw, CircMaxHeight, "=", extraOptions.get("circular_tower_max_height"));
+			CircMaxHeight = Util.readIntParam(logger, CircMaxHeight, "=", extraOptions.get("circular_tower_max_height"));
 		if (extraOptions.containsKey("circular_tower_min_width"))
-			CircMinWidth = Util.readIntParam(lw, CircMinWidth, "=", extraOptions.get("circular_tower_min_width"));
+			CircMinWidth = Util.readIntParam(logger, CircMinWidth, "=", extraOptions.get("circular_tower_min_width"));
 		if (extraOptions.containsKey("circular_tower_max_width"))
-			CircMaxWidth = Util.readIntParam(lw, CircMaxWidth, "=", extraOptions.get("circular_tower_max_width"));
+			CircMaxWidth = Util.readIntParam(logger, CircMaxWidth, "=", extraOptions.get("circular_tower_max_width"));
 		if (extraOptions.containsKey("circular_tower_roof_styles"))
-			CircRoofStyles = Util.readNamedCheckList(lw, CircRoofStyles, "=", extraOptions.get("circular_tower_roof_styles"), BuildingTower.ROOFSTYLE_NAMES, "");
+			CircRoofStyles = Util.readNamedCheckList(logger, CircRoofStyles, "=", extraOptions.get("circular_tower_roof_styles"), BuildingTower.ROOFSTYLE_NAMES, "");
 		if (extraOptions.containsKey("circular_tower_roof_rule"))
 			CircRoofRule = Util.readRuleIdOrRule("=", extraOptions.get("circular_tower_roof_rule"), rules);
 		//default tower variables (deprecated)
 		if (extraOptions.containsKey("mob_probability"))
-			mobProb = Util.readFloatParam(lw, mobProb, "=", extraOptions.get("mob_probability"));
+			mobProb = Util.readFloatParam(logger, mobProb, "=", extraOptions.get("mob_probability"));
 		if (extraOptions.containsKey("pig_zombie_probability"))
-			pigZombieProb = Util.readFloatParam(lw, pigZombieProb, "=", extraOptions.get("pig_zombie_probability"));
+			pigZombieProb = Util.readFloatParam(logger, pigZombieProb, "=", extraOptions.get("pig_zombie_probability"));
 		if (extraOptions.containsKey("enderman_probability"))
-			endermanProb = Util.readFloatParam(lw, endermanProb, "=", extraOptions.get("enderman_probability"));
+			endermanProb = Util.readFloatParam(logger, endermanProb, "=", extraOptions.get("enderman_probability"));
 		if (extraOptions.containsKey("cave_spider_probability"))
-			caveSpiderProb = Util.readFloatParam(lw, caveSpiderProb, "=", extraOptions.get("cave_spider_probability"));
+			caveSpiderProb = Util.readFloatParam(logger, caveSpiderProb, "=", extraOptions.get("cave_spider_probability"));
 		//caruin variables
 		if (extraOptions.containsKey("ca_ruin_rule"))
 			CARuinRule = Util.readRuleIdOrRule("=", extraOptions.get("ca_ruin_rule"), rules);
 		if (extraOptions.containsKey("ca_ruin_weight"))
-			CARuinWeight = Util.readIntParam(lw, CARuinWeight, "=", extraOptions.get("ca_ruin_weight"));
+			CARuinWeight = Util.readIntParam(logger, CARuinWeight, "=", extraOptions.get("ca_ruin_weight"));
 		if (extraOptions.containsKey("ca_ruin_min_height"))
-			CARuinMinHeight = Util.readIntParam(lw, CARuinMinHeight, "=", extraOptions.get("ca_ruin_min_height"));
+			CARuinMinHeight = Util.readIntParam(logger, CARuinMinHeight, "=", extraOptions.get("ca_ruin_min_height"));
 		if (extraOptions.containsKey("ca_ruin_max_height"))
-			CARuinMaxHeight = Util.readIntParam(lw, CARuinMaxHeight, "=", extraOptions.get("ca_ruin_max_height"));
+			CARuinMaxHeight = Util.readIntParam(logger, CARuinMaxHeight, "=", extraOptions.get("ca_ruin_max_height"));
 		if (extraOptions.containsKey("ca_ruin_max_width"))
-			CARuinContainerWidth = Util.readIntParam(lw, CARuinContainerWidth, "=", extraOptions.get("ca_ruin_max_width"));
+			CARuinContainerWidth = Util.readIntParam(logger, CARuinContainerWidth, "=", extraOptions.get("ca_ruin_max_width"));
 		if (extraOptions.containsKey("ca_ruin_automata_rules"))
-			CARuinAutomataRules = Util.readAutomataList(lw, "=", extraOptions.get("ca_ruin_automata_rules"));
+			CARuinAutomataRules = Util.readAutomataList(logger, "=", extraOptions.get("ca_ruin_automata_rules"));
 		//&&&&&&&&&&&&&&&&&&&&&&  post-processing  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 		if (MaxL <= MinL)
 			MaxL = MinL + 1;
@@ -338,14 +338,12 @@ public class TemplateWall extends TemplateTML {
 					templates.add(t);
 				} catch (Exception e) {
 					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-						explorationHandler.lw.println("Did not load " + f.getName() + ", weight was zero.");
+						explorationHandler.logger.warn("Did not load " + f.getName() + ", weight was zero.");
 					} else {
-						explorationHandler.lw.println("\nThere was a problem loading the .tml file " + f.getName());
 						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
-							e.printStackTrace(explorationHandler.lw);
-							explorationHandler.lw.println();
+                            explorationHandler.logger.error("There was a problem loading the .tml file " + f.getName(), e);
 						} else
-							explorationHandler.lw.println(e.getMessage());
+                            explorationHandler.logger.error("There was a problem loading the .tml file " + f.getName() + ": " + e.getMessage());
 					}
 				}
 			}
@@ -358,13 +356,13 @@ public class TemplateWall extends TemplateTML {
 		if (!stylesDirectory.exists())
 			throw new Exception("Could not find directory /" + stylesDirectory.getName() + " in the config folder " + stylesDirectory.getParent() + "!");
 		//load buildings
-		explorationHandler.lw.println("\nLoading building subfolder in " + stylesDirectory + "\\" + BUILDING_DIRECTORY_NAME + "...");
+		explorationHandler.logger.info("Loading building subfolder in " + stylesDirectory + "/" + BUILDING_DIRECTORY_NAME + "...");
 		HashMap<String, TemplateTML> buildingTemplates = new HashMap<String, TemplateTML>();
 		Iterator<TemplateTML> itr = null;
 		try {
 			itr = loadTemplatesFromDir(new File(stylesDirectory, BUILDING_DIRECTORY_NAME), explorationHandler).iterator();
 		} catch (NullPointerException e) {
-			explorationHandler.lw.println("No buildings folder for " + stylesDirectory.getName() + e.toString());
+			explorationHandler.logger.error("No buildings folder for " + stylesDirectory.getName(), e);
 		}
 		if (itr != null)
 			while (itr.hasNext()) {
@@ -372,7 +370,7 @@ public class TemplateWall extends TemplateTML {
 				buildingTemplates.put(t.name, t);
 			}
 		//load walls
-		explorationHandler.lw.println("\nLoading wall styles from directory " + stylesDirectory + "...");
+		explorationHandler.logger.info("Loading wall styles from directory " + stylesDirectory + "...");
 		ArrayList<TemplateWall> styles = new ArrayList<TemplateWall>();
 		for (File f : stylesDirectory.listFiles()) {
 			if (getFileType(f.getName()).equals("tml")) {
@@ -381,19 +379,16 @@ public class TemplateWall extends TemplateTML {
 					styles.add(ws);
 				} catch (Exception e) {
 					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-						explorationHandler.lw.println("Did not load " + f.getName() + ", weight was zero.");
+						explorationHandler.logger.warn("Did not load " + f.getName() + ", weight was zero.");
 					} else {
-						explorationHandler.lw.println("\nError loading wall style " + f.getName());
 						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
-							e.printStackTrace(explorationHandler.lw);
-							explorationHandler.lw.println();
+                            explorationHandler.logger.error("Error loading wall style " + f.getName(), e);
 						} else
-							explorationHandler.lw.println(e.getMessage());
+                            explorationHandler.logger.error("Error loading wall style " + f.getName() + ": " + e.getMessage());
 					}
 				}
 			}
 		}
-		explorationHandler.lw.flush();
 		if (styles.size() == 0)
 			throw new Exception("Did not find any valid wall styles!");
 		return styles;
@@ -427,23 +422,22 @@ public class TemplateWall extends TemplateTML {
 		HashMap<String, TemplateWall> streetTemplateMap = new HashMap<String, TemplateWall>();
 		Iterator<TemplateWall> itr;
 		try {
-			explorationHandler.lw.println("\nLoading streets subfolder in " + streetsDirectory + "...");
+			explorationHandler.logger.info("Loading streets subfolder in " + streetsDirectory + "...");
 			itr = loadWallStylesFromDir(streetsDirectory, explorationHandler).iterator();
 			while (itr.hasNext()) {
 				TemplateWall cs = itr.next();
 				streetTemplateMap.put(cs.name, cs);
 			}
 		} catch (Exception e) {
-			explorationHandler.lw.println("No street folder for " + streetsDirectory.getName() + e.toString());
+			explorationHandler.logger.error("No street folder for " + streetsDirectory.getName(), e);
 		}
-		explorationHandler.lw.println();
 		itr = cityStyles.iterator();
 		while (itr.hasNext()) {
 			TemplateWall cs = itr.next();
 			cs.streets = cs.loadChildStyles("street_templates", streetTemplateMap);
 			if (cs.streets.size() == 0 && !cs.underground) {
 				itr.remove();
-				explorationHandler.lw.println("No valid street styles for " + cs.name + ". Disabling this city style.");
+				explorationHandler.logger.warn("No valid street styles for " + cs.name + ". Disabling this city style.");
 			}
 			//else cs.streetWeights=buildWeightsAndIndex(cs.streets);
 		}

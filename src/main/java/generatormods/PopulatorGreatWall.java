@@ -69,7 +69,8 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Override
 	public final void loadDataFiles() {
 		try {
-			initializeLogging("Loading options and templates for the Great Wall Mod.");
+            logger.info("Loading options and templates for the Great Wall Mod.");
+            initializeBiomeNames();
 
             config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
@@ -80,12 +81,8 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 			finalizeLoading(true, "wall");
 		} catch (Exception e) {
 			errFlag = true;
-			logOrPrint("There was a problem loading the great wall mod: " + e.getMessage(), "SEVERE");
-			lw.println("There was a problem loading the great wall mod: " + e.getMessage());
-			e.printStackTrace();
-		} finally {
-			if (lw != null)
-				lw.close();
+            logger.fatal("There was a problem loading the great wall mod");
+            logger.fatal(e);
 		}
 		if (config.globalFrequency < 0.000001)
 			errFlag = true;

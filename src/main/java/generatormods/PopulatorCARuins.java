@@ -29,9 +29,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-
 import java.util.Random;
 
 import net.minecraft.world.World;
@@ -71,7 +68,8 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Override
 	public final void loadDataFiles() {
 		try {
-			initializeLogging("Loading options for the Cellular Automata Generator.");
+            logger.info("Loading options for the Cellular Automata Generator.");
+            initializeBiomeNames();
 
             config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
@@ -80,12 +78,8 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 			finalizeLoading(false, "ruin");
 		} catch (Exception e) {
 			errFlag = true;
-			logOrPrint("There was a problem loading the Cellular Automata Generator: " + e.getMessage(), "SEVERE");
-			lw.println("There was a problem loading the Cellular Automata Generator: " + e.getMessage());
-			e.printStackTrace();
-		} finally {
-			if (lw != null)
-				lw.close();
+            logger.fatal("There was a problem loading the Cellular Automata Generator");
+            logger.fatal(e);
 		}
 		if (config.globalFrequency < 0.000001 || config.caRules == null || config.caRules.size() == 0)
 			errFlag = true;
