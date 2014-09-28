@@ -45,7 +45,6 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class BuildingExplorationHandler implements IWorldGenerator {
     protected final static String VERSION = "0.1.6";
-	protected final static int MAX_TRIES_PER_CHUNK = 100;
 	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
 
 	protected String templateFolderName;

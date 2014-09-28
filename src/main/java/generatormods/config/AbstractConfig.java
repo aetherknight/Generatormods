@@ -102,8 +102,8 @@ public abstract class AbstractConfig {
 
             int chestTries =
                     config.get(section, "Tries", chestType.getDefaultChestTries(),
-                            "The number of selections that will be made for this chest type.")
-                            .getInt();
+                            "The number of selections that will be made for this chest type.", 0,
+                            100).getInt();
             String[] rawChestItemArray =
                     config.get(
                             section,
