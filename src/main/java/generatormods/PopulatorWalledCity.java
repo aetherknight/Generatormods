@@ -18,6 +18,7 @@
 package generatormods;
 
 import generatormods.common.ModUpdateDetectorWrapper;
+import generatormods.walledcity.WalledCityChatHandler;
 import generatormods.walledcity.config.WalledCityConfig;
 
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -37,14 +38,10 @@ import java.io.PrintWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.village.Village;
 import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
@@ -69,8 +66,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
     public List<TemplateWall> undergroundCityStyles = new ArrayList<TemplateWall>();
 	public Map<World, List<int[]>> cityLocations;
 	public Map<Integer, List<VillageDoorInfo>> cityDoors;
-	public LinkedList<int[]> citiesBuiltMessages = new LinkedList<int[]>();
 	private Map<World, File> cityFiles;
+    public WalledCityChatHandler chatHandler;
 
     public WalledCityConfig config;
 
@@ -95,9 +92,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
     @Override
     public final void generate(World world, Random random, int i, int k) {
-        if (config.cityBuiltMessage && world.playerEntities != null)
-            while (citiesBuiltMessages.size() > 0)
-                chatCityBuilt(citiesBuiltMessages.remove());
         if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId)
                 && random.nextFloat() < config.globalFrequency) {
             (new WorldGenWalledCity(this, world, random, i, k, config.triesPerChunk,
@@ -136,48 +130,6 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 		}
 	}
 
-	//****************************  FUNCTION - chatCityBuilt *************************************************************************************//
-	public void chatBuildingCity(String chatString, String logString) {
-		if (logString != null)
-            logger.debug(logString);
-		if (!config.cityBuiltMessage)
-			return;
-		List<?> playerList = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-		if (playerList != null) {
-			for (int index = 0; index < playerList.size(); ++index) {
-				EntityPlayerMP player = (EntityPlayerMP) playerList.get(index);
-				player.addChatComponentMessage(new ChatComponentText(chatString));
-			}
-		}
-	}
-
-	public void chatCityBuilt(int[] args) {
-		if (!config.cityBuiltMessage)
-			return;
-		List<?> playerList = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-		if (playerList == null) {
-			citiesBuiltMessages.add(args);
-		} else {
-			for (int index = 0; index < playerList.size(); ++index) {
-				EntityPlayerMP player = (EntityPlayerMP) playerList.get(index);
-				String dirStr;
-				int dI = args[0] - (int) player.posX;
-				int dK = args[2] - (int) player.posZ;
-				if (dI * dI + dK * dK < args[4] * args[4]) {
-					dirStr = "nearby";
-				}
-				dirStr = "to the ";
-				if (Math.abs(dI) > 2 * Math.abs(dK))
-					dirStr += dI > 0 ? "east" : "west";
-				else if (Math.abs(dK) > 2 * Math.abs(dI))
-					dirStr += dK > 0 ? "south" : "north";
-				else
-					dirStr += dI > 0 ? (dK > 0 ? "southeast" : "northeast") : (dK > 0 ? "southwest" : "northwest");
-				player.addChatComponentMessage(new ChatComponentText("** Built city " + dirStr + " (" + args[0] + "," + args[1] + "," + args[2] + ")! **"));
-			}
-		}
-	}
-
 	//****************************  FUNCTION - cityIsSeparated *************************************************************************************//
 	public boolean cityIsSeparated(World world, int i, int k, int cityType) {
 		if (cityLocations.containsKey(world)) {
@@ -210,6 +162,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 				}
 			}
             logger.info("Template loading complete.");
+
+            chatHandler = new WalledCityChatHandler(config.cityBuiltMessage);
 
             logger.info("Probability of city generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {

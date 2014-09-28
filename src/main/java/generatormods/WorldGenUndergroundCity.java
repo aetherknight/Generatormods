@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.walledcity.WalledCityChatHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,9 +44,12 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 	private double cavernMass = 0.0, cavernMass_i = 0.0, cavernMass_k = 0.0;
 	TemplateWall pws;
 
+    private WalledCityChatHandler chatHandler;
+
 	//****************************************  CONSTRUCTOR - WorldGenUndergroundCity   *************************************************************************************//
 	public WorldGenUndergroundCity(PopulatorWalledCity wc, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(wc, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
+        chatHandler = wc.chatHandler;
 	}
 
 	//****************************  FUNCTION - generate*************************************************************************************//
@@ -98,7 +103,9 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 			BuildingUndergroundEntranceway entranceway = new BuildingUndergroundEntranceway(attempts, this, pws, axDir, pt);
 			if (separated && entranceway.build()) {
 				entranceways.add(entranceway);
-				((PopulatorWalledCity) master).chatBuildingCity("Built an underground entranceway at (" + hollow[0] + "," + hollow[1] + "," + hollow[2] + ").", null);
+                String logAndChatMessage = "Built an underground entranceway at (" + hollow[0] + "," + hollow[1] + "," + hollow[2] + ").";
+                logger.info(logAndChatMessage);
+                chatHandler.tellAllPlayers(logAndChatMessage);
 			}
 			pole[0] = center[0] + (center[2] - hollow[2]) / 2; //new pole is midpoint of old center and hollow, rotated by 90 degrees.
 			pole[2] = center[2] + (hollow[0] - center[0]) / 2;
@@ -155,8 +162,11 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		if (j - diam / 2 < 10 || j + diam / 2 > Building.findSurfaceJ(world, i + diam / 2, k + diam / 2, Building.WORLD_MAX_Y, false, Building.IGNORE_WATER) - 3)
 			return false;
 		hollows.add(new int[] { i, j, k, diam, 0 });
-		if (diam == MAX_DIAM)
-			((PopulatorWalledCity) master).chatBuildingCity("** Building underground city... **", null);
+		if (diam == MAX_DIAM) {
+            String logAndChatMessage = "Building underground city";
+            logger.info(logAndChatMessage);
+            chatHandler.tellAllPlayers(logAndChatMessage);
+        }
 		for (int z1 = 0; z1 < (diam + 1) / 2; z1++) {
 			//top half
 			int top_diam = Building.SPHERE_SHAPE[diam][z1];
@@ -225,4 +235,8 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		}
 		return true;
 	}
+
+    protected boolean isUnderground() {
+        return true;
+    }
 }

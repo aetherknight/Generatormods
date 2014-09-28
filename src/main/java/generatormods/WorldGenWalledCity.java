@@ -17,6 +17,8 @@
  */
 package generatormods;
 
+import generatormods.walledcity.WalledCityChatHandler;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -27,6 +29,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
+import net.minecraft.util.ChunkCoordinates;
 
 /*
  * WorldGenWalledCity generates walled cities in the Minecraft world. Walled
@@ -50,10 +53,13 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	private int corner1[], corner2[], mincorner[];
 	public int[][] layout;
 
+    private WalledCityChatHandler chatHandler;
+
 	//****************************************  CONSTRUCTOR - WorldGenWalledCity  *************************************************************************************//
 	public WorldGenWalledCity(PopulatorWalledCity wc, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(wc, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
 		cityType = world.provider.dimensionId;
+        chatHandler = wc.chatHandler;
 	}
 
 	//****************************************  FUNCTION - generate  *************************************************************************************//
@@ -166,14 +172,14 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					if (j2 == Building.HIT_WATER)
 						waterArea++;
 					if (((PopulatorWalledCity) master).config.rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
-						master.logger.warn("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
+						logger.warn("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
 						return false;
 					}
 				}
 			}
 		}
 		if (!ows.LevelInterior && (float) waterArea / (float) cityArea > MAX_WATER_PERCENTAGE) {
-			logger.info("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!", "INFO");
+			logger.info("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!");
 			return false;
 		}
 		//query the exploration handler again to see if we've built nearby cities in the meanwhile
@@ -190,10 +196,11 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		((PopulatorWalledCity) master).cityLocations.get(world).add(new int[] { cityCenter[0], cityCenter[2], cityType });
 		((PopulatorWalledCity) master).saveCityLocations(world);
 		//=================================== Build it! =========================================
-		((PopulatorWalledCity) master).chatBuildingCity(
-				"** Building city... **",
-				"\n***** Building " + ows.name + " city" + ", ID=" + ID + " in " + world.getBiomeGenForCoordsBody(walls[0].i1, walls[0].k1).biomeName + " biome between "
-						+ walls[0].localCoordString(0, 0, 0) + " and " + walls[2].localCoordString(0, 0, 0) + " ******\n");
+        logger.info("Building " + ows.name + " city" + ", ID=" + ID + " in "
+                + world.getBiomeGenForCoordsBody(walls[0].i1, walls[0].k1).biomeName
+                + " biome between " + walls[0].localCoordString(0, 0, 0) + " and "
+                + walls[2].localCoordString(0, 0, 0));
+        chatHandler.tellAllPlayers( "Building city...");
 		if (ows.LevelInterior)
 			levelCity();
 		TemplateWall avenueWS = TemplateWall.pickBiomeWeightedWallStyle(ows.streets, world, i0, k0, world.rand, false);
@@ -305,7 +312,10 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		for (BuildingDoubleWall street : plannedStreets) {
 			street.buildTowers(true, true, sws.MakeGatehouseTowers, cityIsDense, false);
 		}
-		((PopulatorWalledCity) master).chatCityBuilt(new int[] { i0, j0, k0, cityType, Lmean / 2 + 40 });
+
+        logger.info("Built " + (isUnderground() ? "underground city" : "city") + " at " + (new ChunkCoordinates(i0, j0, k0)));
+		chatHandler.chatCityBuilt(new int[] { i0, j0, k0, cityType, Lmean / 2 + 40 }, isUnderground());
+
 		((PopulatorWalledCity) master).addCityToVillages(world, ID);
 		//printLayout(new File("layout.txt"));
 		//guard against memory leaks
@@ -478,4 +488,8 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		logger.warn("Could not find point within bounds!");
 		return null;
 	}
+
+    protected boolean isUnderground() {
+        return false;
+    }
 }
