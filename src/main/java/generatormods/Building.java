@@ -18,9 +18,9 @@
 package generatormods;
 
 import generatormods.config.ChestType;
+import generatormods.walledcity.CityDataManager;
 
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -29,13 +29,11 @@ import java.util.Set;
 import net.minecraft.block.*;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
 
 /*
@@ -585,9 +583,10 @@ public class Building {
 		if (!(this.wgt instanceof WorldGenWalledCity)) {
 			return;
 		}
-		int id = getKnownBuilding();
+        CityDataManager cityDataManager = ((WorldGenWalledCity) this.wgt).cityDataManager;
+		int id = getKnownBuilding(cityDataManager);
 		if (id == -1) {
-			((PopulatorWalledCity) this.wgt.master).cityDoors.put(bID, new ArrayList<VillageDoorInfo>());
+            cityDataManager.addBuildingToDoorList(bID);
 			id = bID;
 		}
 		int l = ((BlockDoor) Blocks.wooden_door).func_150013_e(this.world, par1, par2, par3);
@@ -605,7 +604,7 @@ public class Building {
 				}
 			}
 			if (i1 != 0) {
-				((PopulatorWalledCity) this.wgt.master).cityDoors.get(id).add(new VillageDoorInfo(par1, par2, par3, 0, i1 > 0 ? -2 : 2, 0));
+                cityDataManager.addDoor(id, par1, par2, par3, 0, i1 > 0 ? -2 : 2, 0);
 			}
 		} else {
 			i1 = 0;
@@ -620,7 +619,7 @@ public class Building {
 				}
 			}
 			if (i1 != 0) {
-				((PopulatorWalledCity) this.wgt.master).cityDoors.get(id).add(new VillageDoorInfo(par1, par2, par3, i1 > 0 ? -2 : 2, 0, 0));
+                cityDataManager.addDoor(id, par1, par2, par3, i1 > 0 ? -2 : 2, 0, 0);
 			}
 		}
 	}
@@ -654,8 +653,22 @@ public class Building {
 		return new ItemStack((Item)obj, Integer.class.cast(itempool[4][idx]) + random.nextInt(Integer.class.cast(itempool[5][idx]) - Integer.class.cast(itempool[4][idx]) + 1), Integer.class.cast(itempool[2][idx]));
 	}
 
-	private int getKnownBuilding() {
-		Set<?> keys = ((PopulatorWalledCity) this.wgt.master).cityDoors.keySet();
+    // TODO: Why do we look for a building whose ID is 3 less or 3 more than
+    // this one? Not sure what that does for us, although I think it means that
+    // ultimately only building IDs close to the the first constructed building
+    // will have their doors added to the village door list.
+    //
+    // When building a city, the city gets a base ID, and then buildings get
+    // IDs that add onto that ID. A few IDs would fall into this range, but
+    // many of them do not.
+    //
+    // Perhaps a better approach is for there to be a City object, and a data
+    // manager object. The city object is passed to the building and the
+    // building gives its city its doors. The city object would then be given
+    // to the city data manager in order to give the data to minecraft and to
+    // store city locations.
+    private int getKnownBuilding(CityDataManager cityDataManager) {
+        Set<Integer> keys = cityDataManager.getDoorListKnownBuildingIds();
 		for (int id = bID - 3; id < bID + 4; id++) {
 			if (keys.contains(id))
 				return id;

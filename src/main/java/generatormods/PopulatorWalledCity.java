@@ -18,6 +18,7 @@
 package generatormods;
 
 import generatormods.common.ModUpdateDetectorWrapper;
+import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 import generatormods.walledcity.config.WalledCityConfig;
 
@@ -28,25 +29,14 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import net.minecraft.village.Village;
-import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
-
-import org.apache.logging.log4j.Logger;
 
 /*
  * PopulatorWalledCity is the main class that hooks into ModLoader for the
@@ -57,25 +47,21 @@ import org.apache.logging.log4j.Logger;
 public class PopulatorWalledCity extends BuildingExplorationHandler {
 	@Instance("WalledCityMod")
 	public static PopulatorWalledCity instance;
+
 	public final static int MIN_CITY_LENGTH = 40;
 	final static int MAX_FOG_HEIGHT = 27;
 	public final static int CITY_TYPE_UNDERGROUND = 1;//TheEnd dimension id, since we don't generate there
-	private final static String CITY_FILE_SAVE = "WalledCities.txt", STREET_TEMPLATES_FOLDER_NAME = "streets";
+    private final static String STREET_TEMPLATES_FOLDER_NAME = "streets";
 	//DATA VARIABLES
 	public List<TemplateWall> cityStyles = null;
     public List<TemplateWall> undergroundCityStyles = new ArrayList<TemplateWall>();
-	public Map<World, List<int[]>> cityLocations;
-	public Map<Integer, List<VillageDoorInfo>> cityDoors;
-	private Map<World, File> cityFiles;
     public WalledCityChatHandler chatHandler;
+    public CityDataManager cityDataManager;
 
     public WalledCityConfig config;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        cityFiles = new HashMap<World, File>();
-        cityLocations = new HashMap<World, List<int[]>>();
-        cityDoors = new HashMap<Integer, List<VillageDoorInfo>>();
         logger = event.getModLog();
         templateFolderName = "walledcity";
         ModUpdateDetectorWrapper.checkForUpdates(this, event);
@@ -85,6 +71,10 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	@EventHandler
 	public void modsLoaded(FMLPostInitializationEvent event) {
         loadConfiguration();
+        cityDataManager =
+                new CityDataManager(logger, config.undergroundMinCitySeparation,
+                        config.minCitySeparation);
+        chatHandler = new WalledCityChatHandler(config.cityBuiltMessage);
 		if (!errFlag) {
 			GameRegistry.registerWorldGenerator(this, 0);
 		}
@@ -92,12 +82,12 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
     @Override
     public final void generate(World world, Random random, int i, int k) {
-        if (cityStyles.size() > 0 && cityIsSeparated(world, i, k, world.provider.dimensionId)
+        if (cityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, world.provider.dimensionId)
                 && random.nextFloat() < config.globalFrequency) {
             (new WorldGenWalledCity(this, world, random, i, k, config.triesPerChunk,
                     config.globalFrequency)).run();
         }
-        if (undergroundCityStyles.size() > 0 && cityIsSeparated(world, i, k, CITY_TYPE_UNDERGROUND)
+        if (undergroundCityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, CITY_TYPE_UNDERGROUND)
                 && random.nextFloat() < config.undergroundGlobalFrequency) {
             WorldGeneratorThread wgt =
                     new WorldGenUndergroundCity(this, world, random, i, k, 1,
@@ -114,35 +104,23 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
         }
     }
 
-	//****************************  FUNCTION - addCityToVillages*************************************************************************************//
-	public void addCityToVillages(World world, int id) {
-		if (world != null && world.provider.dimensionId != CITY_TYPE_UNDERGROUND) {
-			if (world.villageCollectionObj != null) {
-				Village city = new Village(world);
-				if (cityDoors.containsKey(id)) {
-					for (VillageDoorInfo door : cityDoors.get(id))
-						if (door != null)
-							city.addVillageDoorInfo(door);
-					world.villageCollectionObj.getVillageList().add(city);
-					cityDoors.remove(id);
-				}
-			}
-		}
-	}
+    private void loadTemplates() throws Exception {
+        File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
+        cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
+        TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, STREET_TEMPLATES_FOLDER_NAME), logger);
+        // TODO: does this work? I worry that the remove() screws up indices.
+        for (int m = 0; m < cityStyles.size(); m++) {
+            if (cityStyles.get(m).underground) {
+                TemplateWall uws = cityStyles.remove(m);
+                uws.streets.add(uws); //underground cities have no outer walls, so this should be a street style
+                undergroundCityStyles.add(uws);
+                m--;
+            }
+        }
+        logger.info("Template loading complete.");
+    }
 
-	//****************************  FUNCTION - cityIsSeparated *************************************************************************************//
-	public boolean cityIsSeparated(World world, int i, int k, int cityType) {
-		if (cityLocations.containsKey(world)) {
-			for (int[] location : cityLocations.get(world)) {
-				if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == CITY_TYPE_UNDERGROUND ? config.undergroundMinCitySeparation : config.minCitySeparation)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-    public final void loadConfiguration() {
+    private final void loadConfiguration() {
 		try {
             logger.info("Loading options and templates for the Walled City Generator.");
 
@@ -150,20 +128,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
             config.initialize();
             sharedConfig = config.sharedConfig;
 
-			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
-            cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
-            TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, STREET_TEMPLATES_FOLDER_NAME), logger);
-			for (int m = 0; m < cityStyles.size(); m++) {
-				if (cityStyles.get(m).underground) {
-					TemplateWall uws = cityStyles.remove(m);
-					uws.streets.add(uws); //underground cities have no outer walls, so this should be a street style
-					undergroundCityStyles.add(uws);
-					m--;
-				}
-			}
-            logger.info("Template loading complete.");
-
-            chatHandler = new WalledCityChatHandler(config.cityBuiltMessage);
+            loadTemplates();
 
             logger.info("Probability of city generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
@@ -174,66 +139,18 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 			errFlag = true;
 	}
 
-	//****************************  FUNCTION - saveCityLocations *************************************************************************************//
-	public void saveCityLocations(World world) {
-		PrintWriter pw = null;
-		try {
-			pw = new PrintWriter(new BufferedWriter(new FileWriter(cityFiles.get(world), true)));
-			BufferedReader br = new BufferedReader(new FileReader(cityFiles.get(world)));
-			if (br.readLine() == null) {
-				pw.println("City locations in " + world.provider.getDimensionName() + " of : " + world.getWorldInfo().getWorldName());
-			}
-			br.close();
-			int[] location = cityLocations.get(world).get(cityLocations.get(world).size() - 1);
-			pw.println(new StringBuilder(Integer.toString(location[0])).append(",").append(Integer.toString(location[1])).append(",").append(Integer.toString(location[2])));
-		} catch (IOException e) {
-            logger.warn(e);
-		} finally {
-			if (pw != null)
-				pw.close();
-		}
-	}
-
 	@Override
 	public String toString() {
 		return "WalledCityMod";
 	}
 
-	//****************************  FUNCTION - updateWorldExplored *************************************************************************************//
 	@Override
 	public void updateWorldExplored(World world) {
 		super.updateWorldExplored(world);
-		File cityFile = new File(getWorldSaveDir(world), world.provider.getDimensionName() + CITY_FILE_SAVE);
-		if (cityFiles.isEmpty() || !cityFiles.containsKey(world))
-			cityFiles.put(world, cityFile);
 		try {
-			if (!cityFile.createNewFile() && !cityLocations.containsKey(world))
-				cityLocations.put(world, getCityLocs(cityFile, logger));
+            cityDataManager.updateWorldExplored(world);
 		} catch (IOException e) {
             logger.warn(e);
 		}
-	}
-
-	public static List<int[]> getCityLocs(File city, Logger logger) {
-		List<int[]> cityLocs = new ArrayList<int[]>();
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(city));
-			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				String[] split = read.split(",");
-				if (split.length == 3) {
-					cityLocs.add(new int[] { Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]) });
-				}
-			}
-		} catch (IOException e) {
-            logger.warn(e);
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException e) {
-			}
-		}
-		return cityLocs;
 	}
 }

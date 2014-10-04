@@ -22,8 +22,14 @@ import generatormods.TemplateRule;
 import generatormods.caruins.config.CARule;
 import generatormods.config.ParseError;
 
+import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.world.storage.ISaveHandler;
 
 import org.apache.logging.log4j.Logger;
 
@@ -127,5 +133,13 @@ public class Util {
 		} catch (Exception e) {
             throw new ParseError("Error reading block rule for variable. Line: " + read, e);
 		}
+	}
+
+	public static File getWorldSaveDir(World world) {
+		ISaveHandler worldSaver = world.getSaveHandler();
+		if (worldSaver.getChunkLoader(world.provider) instanceof AnvilChunkLoader) {
+			return ((AnvilChunkLoader) worldSaver.getChunkLoader(world.provider)).chunkSaveLocation;
+		}
+		return null;
 	}
 }

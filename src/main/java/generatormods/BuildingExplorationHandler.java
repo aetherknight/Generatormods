@@ -17,6 +17,7 @@
  */
 package generatormods;
 
+import generatormods.common.Util;
 import generatormods.config.SharedConfig;
 
 import cpw.mods.fml.common.IWorldGenerator;
@@ -30,8 +31,6 @@ import java.util.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.minecraft.world.storage.ISaveHandler;
 
 import org.apache.logging.log4j.Logger;
 
@@ -80,10 +79,10 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		} else if (currentWorld.contains(world)) {
 			return false;
 		} else {
-			File newdir = getWorldSaveDir(world);
+            File newdir = Util.getWorldSaveDir(world);
 			for (World w : currentWorld) {
 				//check the filename in case we changed of dimension
-				File olddir = getWorldSaveDir(w);
+                File olddir = Util.getWorldSaveDir(w);
 				if (newdir != null && olddir != null && olddir.compareTo(newdir) != 0) {
 					// new world has definitely been created.
 					currentWorld.add(world);
@@ -92,13 +91,5 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 			}
 			return false;
 		}
-	}
-
-	protected static File getWorldSaveDir(World world) {
-		ISaveHandler worldSaver = world.getSaveHandler();
-		if (worldSaver.getChunkLoader(world.provider) instanceof AnvilChunkLoader) {
-			return ((AnvilChunkLoader) worldSaver.getChunkLoader(world.provider)).chunkSaveLocation;
-		}
-		return null;
 	}
 }

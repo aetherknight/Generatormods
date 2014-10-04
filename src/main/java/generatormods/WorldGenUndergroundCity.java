@@ -17,6 +17,7 @@
  */
 package generatormods;
 
+import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
 import java.util.ArrayList;
@@ -45,11 +46,13 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 	TemplateWall pws;
 
     private WalledCityChatHandler chatHandler;
+    private CityDataManager cityDataManager;
 
 	//****************************************  CONSTRUCTOR - WorldGenUndergroundCity   *************************************************************************************//
 	public WorldGenUndergroundCity(PopulatorWalledCity wc, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(wc, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
         chatHandler = wc.chatHandler;
+        cityDataManager = wc.cityDataManager;
 	}
 
 	//****************************  FUNCTION - generate*************************************************************************************//
@@ -58,14 +61,14 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		pws = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorWalledCity) master).undergroundCityStyles, world, i0, k0, world.rand, true);
 		if (pws == null)
 			return false;
-		if (!((PopulatorWalledCity) master).cityIsSeparated(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND))
+        if (!cityDataManager.isCitySeparated(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND))
 			return false;
 		//make hollows recursively
 		hollow(i0, j0, k0, MAX_DIAM);
 		if (hollows.size() == 0)
 			return false;
-		((PopulatorWalledCity) master).cityLocations.get(world).add(new int[] { i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND });
-		((PopulatorWalledCity) master).saveCityLocations(world);
+        cityDataManager.addCity(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND);
+        cityDataManager.saveCityLocations(world);
 		logger.debug("Building " + pws.name + " city with " + hollows.size() + " hollows at (" + i0 + "," + j0 + "," + k0 + ")");
 		List<BuildingUndergroundEntranceway> entranceways = buildEntranceways();
 		//build streets, towers

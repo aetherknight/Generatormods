@@ -17,6 +17,7 @@
  */
 package generatormods;
 
+import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
 import java.io.BufferedWriter;
@@ -54,12 +55,14 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	public int[][] layout;
 
     private WalledCityChatHandler chatHandler;
+    public CityDataManager cityDataManager;
 
 	//****************************************  CONSTRUCTOR - WorldGenWalledCity  *************************************************************************************//
 	public WorldGenWalledCity(PopulatorWalledCity wc, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
 		super(wc, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
 		cityType = world.provider.dimensionId;
         chatHandler = wc.chatHandler;
+        cityDataManager = wc.cityDataManager;
 	}
 
 	//****************************************  FUNCTION - generate  *************************************************************************************//
@@ -71,7 +74,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		sws = TemplateWall.pickBiomeWeightedWallStyle(ows.streets, world, i0, k0, world.rand, false);
 		if (sws == null)
 			return false;
-		if (!((PopulatorWalledCity) master).cityIsSeparated(world, i0, k0, cityType))
+        if (!cityDataManager.isCitySeparated(world, i0, k0, cityType))
 			return false;
 		int ID = (random.nextInt(9000) + 1000) * 100;
 		int minJ = ows.LevelInterior ? Building.SEA_LEVEL - 1 : BuildingWall.NO_MIN_J;
@@ -91,7 +94,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		walls[0].setCursor(walls[0].bLength - 1);
 		walls[1] = new BuildingWall(ID + 1, this, ows, dir[1], axXHand, ows.MinL + random.nextInt(ows.MaxL - ows.MinL), false, walls[0].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset))
 				.setTowers(walls[0]).setMinJ(minJ);
-		if (!((PopulatorWalledCity) master).cityIsSeparated(world, walls[1].i1, walls[1].k1, cityType))
+		if (!cityDataManager.isCitySeparated(world, walls[1].i1, walls[1].k1, cityType))
 			return false;
 		walls[1].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
 		if (walls[1].bLength < ows.MinL)
@@ -102,7 +105,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		if (distToTarget < MIN_SIDE_LENGTH)
 			return false;
 		walls[2] = new BuildingWall(ID + 2, this, ows, dir[2], axXHand, distToTarget + 2, false, walls[1].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset)).setTowers(walls[0]).setMinJ(minJ);
-		if (!((PopulatorWalledCity) master).cityIsSeparated(world, walls[2].i1, walls[2].k1, cityType))
+        if (!cityDataManager.isCitySeparated(world, walls[2].i1, walls[2].k1, cityType))
 			return false;
 		walls[2].setCursor(0);
 		walls[2].setTarget(walls[2].getIJKPt(0, 0, distToTarget));
@@ -117,7 +120,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		if (distToTarget < MIN_SIDE_LENGTH)
 			return false;
 		walls[3] = new BuildingWall(ID + 3, this, ows, dir[3], axXHand, distToTarget + 2, false, walls[2].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset)).setTowers(walls[0]).setMinJ(minJ);
-		if (!((PopulatorWalledCity) master).cityIsSeparated(world, walls[3].i1, walls[3].k1, cityType))
+        if (!cityDataManager.isCitySeparated(world, walls[3].i1, walls[3].k1, cityType))
 			return false;
 		walls[0].setCursor(0);
 		walls[3].setCursor(0);
@@ -184,7 +187,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		}
 		//query the exploration handler again to see if we've built nearby cities in the meanwhile
 		for (BuildingWall w : walls) {
-			if (!((PopulatorWalledCity) master).cityIsSeparated(world, w.i1, w.k1, cityType)) {
+            if (!cityDataManager.isCitySeparated(world, w.i1, w.k1, cityType)) {
 				logger.warn("Rejected city " + ID + " nearby city was built during planning!");
 				return false;
 			}
@@ -193,8 +196,8 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		walls[0].setCursor(0);
 		int[] cityCenter = new int[] { (walls[0].i1 + walls[1].i1 + walls[2].i1 + walls[3].i1) / 4, 0, (walls[0].k1 + walls[1].k1 + walls[2].k1 + walls[3].k1) / 4 };
 		cityCenter[1] = Building.findSurfaceJ(world, cityCenter[0], cityCenter[1], Building.WORLD_MAX_Y, false, 3);
-		((PopulatorWalledCity) master).cityLocations.get(world).add(new int[] { cityCenter[0], cityCenter[2], cityType });
-		((PopulatorWalledCity) master).saveCityLocations(world);
+        cityDataManager.addCity(world, cityCenter[0], cityCenter[2], cityType);
+        cityDataManager.saveCityLocations(world);
 		//=================================== Build it! =========================================
         logger.info("Building " + ows.name + " city" + ", ID=" + ID + " in "
                 + world.getBiomeGenForCoordsBody(walls[0].i1, walls[0].k1).biomeName
@@ -316,7 +319,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
         logger.info("Built " + (isUnderground() ? "underground city" : "city") + " at " + (new ChunkCoordinates(i0, j0, k0)));
 		chatHandler.chatCityBuilt(new int[] { i0, j0, k0, cityType, Lmean / 2 + 40 }, isUnderground());
 
-		((PopulatorWalledCity) master).addCityToVillages(world, ID);
+        cityDataManager.addCityToVillages(world, ID);
 		//printLayout(new File("layout.txt"));
 		//guard against memory leaks
 		layout = null;
