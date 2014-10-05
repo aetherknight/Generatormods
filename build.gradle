@@ -18,7 +18,7 @@ buildscript {
 apply plugin: 'forge'
 
 version = "0.1.6"
-group = "generator" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "generatormods" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = project.projectDir.name
 
 minecraft {
@@ -46,7 +46,7 @@ processResources {
 
     // copy licensing, documentation from the project base directory
     from(project.projectDir.getPath()) {
-        include "*.md", "*.txt"
+        include "*.md", "*.markdown", "*.txt"
     }
 
 }
@@ -56,8 +56,7 @@ jar {
     includeEmptyDirs = false
 
     //Append with minecraft version
-    classifier = "("+minecraft.version+")"
-    archiveName = archivesBaseName + "-" + version + classifier+"."+extension
+    archiveName = archivesBaseName + "-" + minecraft.version + "-" + version + "." + extension
 }
 
 compileJava {
