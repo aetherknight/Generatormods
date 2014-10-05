@@ -1,15 +1,16 @@
 [
 {
   "modid": "CARuins",
-  "name": "Cellular Automata Generator",
-  "description": "",
+  "name": "Cellular Automata Ruins",
+  "description": "Generates strange towers and ruins using cellualar automata.
+This mod comes without ABSOLUTELY NO WARRANTY, and it is licensed under the LGPL. For details see the license within the mod's jar file.",
   "version": $version,
-  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7",
+  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7, forked by AetherKnight",
   "logoFile": "",
   "mcversion": $mcversion,
   "url": "http://www.minecraftforum.net/topic/171188-",
   "updateUrl": "",
-  "authorList": ["Formivore","GotoLink"],
+  "authorList": ["Formivore","GotoLink","AetherKnight"],
   "parent":"",
   "screenshots": [],
   "dependencies": []
@@ -17,14 +18,15 @@
 {
   "modid": "GreatWallMod",
   "name": "Great Wall Mod",
-  "description": "",
+  "description": "Generates Great walls in the world.
+This mod comes without ABSOLUTELY NO WARRANTY, and it is licensed under the LGPL. For details see the license within the mod's jar file.",
   "version": $version,
-  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7",
+  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7, forked by AetherKnight",
   "logoFile": "",
   "mcversion": $mcversion,
   "url": "http://www.minecraftforum.net/topic/171188-",
   "updateUrl": "",
-  "authorList": ["Formivore","GotoLink"],
+  "authorList": ["Formivore","GotoLink","AetherKnight"],
   "parent":"",
   "screenshots": [],
   "dependencies": []
@@ -32,14 +34,15 @@
 {
   "modid": "WalledCityMod",
   "name": "Walled City Generator",
-  "description": "",
+  "description": "Generates walled and underground cities in the world.
+This mod comes without ABSOLUTELY NO WARRANTY, and it is licensed under the LGPL. For details see the license within the mod's jar file.",
   "version": $version,
-  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7",
+  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7, forked by AetherKnight",
   "logoFile": "",
   "mcversion": $mcversion,
   "url": "http://www.minecraftforum.net/topic/171188-",
   "updateUrl": "",
-  "authorList": ["Formivore","GotoLink"],
+  "authorList": ["Formivore","GotoLink","AetherKnight"],
   "parent":"",
   "screenshots": [],
   "dependencies": []
