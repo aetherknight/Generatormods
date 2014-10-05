@@ -19,7 +19,7 @@
 package generatormods;
 
 import generatormods.common.Util;
-import generatormods.config.SharedConfig;
+import generatormods.common.config.SharedConfig;
 
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;

@@ -20,7 +20,7 @@ package generatormods.common;
 
 import generatormods.TemplateRule;
 import generatormods.caruins.config.CARule;
-import generatormods.config.ParseError;
+import generatormods.common.config.ParseError;
 
 import java.io.File;
 

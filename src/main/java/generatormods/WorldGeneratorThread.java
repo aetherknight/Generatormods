@@ -18,8 +18,8 @@
  */
 package generatormods;
 
-import generatormods.config.ChestType;
-import generatormods.config.ChestContentsConfig;
+import generatormods.common.config.ChestContentsConfig;
+import generatormods.common.config.ChestType;
 
 import java.util.Map;
 import java.util.Random;

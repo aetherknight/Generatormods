@@ -20,8 +20,8 @@ package generatormods.caruins.config;
 
 import generatormods.BuildingCellularAutomaton;
 import generatormods.TemplateRule;
-import generatormods.config.AbstractConfig;
-import generatormods.config.ParseError;
+import generatormods.common.config.AbstractConfig;
+import generatormods.common.config.ParseError;
 
 import java.io.File;
 

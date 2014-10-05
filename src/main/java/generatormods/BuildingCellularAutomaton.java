@@ -18,7 +18,7 @@
  */
 package generatormods;
 
-import generatormods.config.ChestType;
+import generatormods.common.config.ChestType;
 
 import java.util.ArrayList;
 import java.util.Collections;

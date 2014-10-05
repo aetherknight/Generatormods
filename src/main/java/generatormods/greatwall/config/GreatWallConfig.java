@@ -18,7 +18,7 @@
  */
 package generatormods.greatwall.config;
 
-import generatormods.config.AbstractConfig;
+import generatormods.common.config.AbstractConfig;
 
 import java.io.File;
 

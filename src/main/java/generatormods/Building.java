@@ -18,7 +18,7 @@
  */
 package generatormods;
 
-import generatormods.config.ChestType;
+import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 
 import java.util.Arrays;

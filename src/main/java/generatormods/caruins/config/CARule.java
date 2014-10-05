@@ -19,7 +19,7 @@
 package generatormods.caruins.config;
 
 import generatormods.BuildingCellularAutomaton;
-import generatormods.config.ParseError;
+import generatormods.common.config.ParseError;
 
 /**
  * CARule is used by the CARuins mod and can be used to generate towers for

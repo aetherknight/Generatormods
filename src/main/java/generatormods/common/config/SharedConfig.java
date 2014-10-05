@@ -16,12 +16,35 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.config;
+package generatormods.common.config;
 
-public class ParseError extends Exception {
-    public static final long serialVersionUID = 1;
+import java.io.File;
 
-    public ParseError(String message, Throwable cause) {
-        super(message, cause);
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.Logger;
+
+public class SharedConfig {
+    protected File configFile;
+    protected Logger logger;
+
+    // Defaults to the Nether and the Overworld
+    public static final int[] DEFAULT_DIM_LIST = {-1, 0};
+
+    // Config options common to all the mods
+    public float globalFrequency;
+    public int triesPerChunk;
+    public List<Integer> allowedDimensions;
+
+    public Map<ChestType, ChestContentsConfig> chestConfigs;
+
+    public SharedConfig(float globalFrequency, int triesPerChunk, List<Integer> allowedDimensions,
+            Map<ChestType, ChestContentsConfig> chestConfigs, Logger logger) {
+        this.globalFrequency = globalFrequency;
+        this.triesPerChunk = triesPerChunk;
+        this.allowedDimensions = allowedDimensions;
+        this.chestConfigs = chestConfigs;
+        this.logger = logger;
     }
 }
