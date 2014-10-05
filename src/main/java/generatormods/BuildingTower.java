@@ -18,6 +18,8 @@
  */
 package generatormods;
 
+import generatormods.common.Shape;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -339,7 +341,7 @@ public class BuildingTower extends Building {
 					for (int x1 = 0; x1 < bWidth; x1++) {
 						if (circle_shape[x1][y1] >= 0)
 							buffer[x1 + 1][bHeight + 1][y1 + 1] = bRule.getBlockOrHole(world.rand);
-						if (CIRCLE_CRENEL[minHorizDim][x1][y1] == 1)
+                        if (Shape.CIRCLE_CRENEL[minHorizDim][x1][y1] == 1)
 							buffer[x1 + 1][bHeight + 1 + 1][y1 + 1] = bRule.getBlockOrHole(world.rand);
 					}
 				}
@@ -422,16 +424,16 @@ public class BuildingTower extends Building {
 			}
 		} else if (roofStyle == ROOF_DOME) { //dome
 			for (int z1 = 0; z1 < (minHorizDim + 1) / 2; z1++) {
-				int diam = SPHERE_SHAPE[minHorizDim][z1];
+                int diam = Shape.SPHERE_SHAPE[minHorizDim][z1];
 				for (int y1 = 0; y1 < diam; y1++) {
 					for (int x1 = 0; x1 < diam; x1++) {
-						if (CIRCLE_SHAPE[diam][x1][y1] >= 0)
-							buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1 + (bLength - diam) / 2 + 1] = (CIRCLE_SHAPE[diam][x1][y1] == 1 || z1 >= (minHorizDim + 1) / 2 - 2) ? roofRule
+                        if (Shape.CIRCLE_SHAPE[diam][x1][y1] >= 0)
+                            buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1 + (bLength - diam) / 2 + 1] = (Shape.CIRCLE_SHAPE[diam][x1][y1] == 1 || z1 >= (minHorizDim + 1) / 2 - 2) ? roofRule
 									.getBlockOrHole(world.rand) : HOLE_BLOCK_LIGHTING;
 									if (z1 < (minHorizDim - 1) / 2) {
-										int nextDiam = SPHERE_SHAPE[minHorizDim][z1 + 1];
+                                        int nextDiam = Shape.SPHERE_SHAPE[minHorizDim][z1 + 1];
 										int x2 = x1 - (diam - nextDiam) / 2, y2 = y1 - (diam - nextDiam) / 2;
-										if (CIRCLE_SHAPE[diam][x1][y1] == 0 && (x2 < 0 || y2 < 0 || x2 >= nextDiam || y2 >= nextDiam || CIRCLE_SHAPE[nextDiam][x2][y2] != 0))
+                                        if (Shape.CIRCLE_SHAPE[diam][x1][y1] == 0 && (x2 < 0 || y2 < 0 || x2 >= nextDiam || y2 >= nextDiam || Shape.CIRCLE_SHAPE[nextDiam][x2][y2] != 0))
 											buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1 + (bLength - diam) / 2 + 1] = roofRule.getBlockOrHole(world.rand);
 									}
 					}
@@ -443,10 +445,15 @@ public class BuildingTower extends Building {
 				int diam = minHorizDim % 2 == 0 ? 2 * ((minHorizDim - z1 + 1) / 2) : 2 * ((minHorizDim - z1) / 2) + 1;
 				for (int y1 = 0; y1 < diam; y1++) {
 					for (int x1 = 0; x1 < diam; x1++) {
-						if (CIRCLE_SHAPE[diam][x1][y1] >= 0)
-							buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1 + (bLength - diam) / 2 + 1] = CIRCLE_SHAPE[diam][x1][y1] == 1 ? roofRule.getBlockOrHole(world.rand)
-									: HOLE_BLOCK_LIGHTING;
-							if (z1 > 0 && CIRCLE_SHAPE[diam][x1][y1] != 0 && CIRCLE_SHAPE[prevDiam][x1 + (prevDiam - diam) / 2][y1 + (prevDiam - diam) / 2] == 0)
+                        if (Shape.CIRCLE_SHAPE[diam][x1][y1] >= 0)
+                            buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1
+                                    + (bLength - diam) / 2 + 1] =
+                                    Shape.CIRCLE_SHAPE[diam][x1][y1] == 1 ? roofRule
+                                            .getBlockOrHole(world.rand) : HOLE_BLOCK_LIGHTING;
+                        if (z1 > 0
+                                && Shape.CIRCLE_SHAPE[diam][x1][y1] != 0
+                                && Shape.CIRCLE_SHAPE[prevDiam][x1 + (prevDiam - diam) / 2][y1
+                                        + (prevDiam - diam) / 2] == 0)
 								buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1][y1 + (bLength - diam) / 2 + 1] = roofRule.getBlockOrHole(world.rand);
 					}
 				}
@@ -596,7 +603,7 @@ public class BuildingTower extends Building {
 		baseHeight = 0;
 		roofStyle = roofStyle_;
 		minHorizDim = Math.min(bWidth, bLength);
-		circle_shape = CIRCLE_SHAPE[minHorizDim];
+        circle_shape = Shape.CIRCLE_SHAPE[minHorizDim];
 		circular = circular_;
 		ChestRule = TemplateRule.RULE_NOT_PROVIDED;
 		roofRule = bRule;
@@ -633,7 +640,7 @@ public class BuildingTower extends Building {
 		baseHeight = wall.WalkHeight;
 		roofStyle = wall.roofStyle;
 		minHorizDim = Math.min(bWidth, bLength);
-		circle_shape = CIRCLE_SHAPE[minHorizDim];
+        circle_shape = Shape.CIRCLE_SHAPE[minHorizDim];
 		circular = wall.circular;
 		ChestRule = wall.ws.ChestRule;
 		roofRule = wall.roofRule;

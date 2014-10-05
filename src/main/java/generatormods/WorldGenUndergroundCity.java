@@ -18,6 +18,7 @@
  */
 package generatormods;
 
+import generatormods.common.Shape;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
@@ -98,7 +99,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		List<BuildingUndergroundEntranceway> entranceways = new ArrayList<BuildingUndergroundEntranceway>();
 		for (int attempts = 0; attempts < Math.min(20, hollows.size()); attempts++) {
 			int[] hollow = getFarthestHollowFromPt(pole);
-			int diam = Building.SPHERE_SHAPE[hollow[3]][hollow[3] / 3];
+            int diam = Shape.SPHERE_SHAPE[hollow[3]][hollow[3] / 3];
 			int axDir = Math.abs(center[0] - hollow[0]) > Math.abs(center[2] - hollow[2]) ? hollow[0] > center[0] ? Building.DIR_SOUTH : Building.DIR_NORTH : hollow[2] > center[2] ? Building.DIR_WEST
 					: Building.DIR_EAST;
 			int[] pt = new int[] { hollow[0] + (Math.abs(axDir) == 1 ? hollow[3] / 2 : (axDir == Building.DIR_SOUTH ? (hollow[3] + diam) / 2 : (hollow[3] - diam) / 2 + 1)), hollow[1] - hollow[3] / 3,
@@ -129,7 +130,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		for (int tries = 0; tries < pws.StreetDensity * 4; tries++) {
 			int[] hollow = hollows.get(random.nextInt(hollows.size()));
 			int[] pt = new int[] { random.nextInt(hollow[3]), 0, random.nextInt(hollow[3]) };
-			if (Building.CIRCLE_SHAPE[hollow[3]][pt[0]][pt[2]] == 0) {
+            if (Shape.CIRCLE_SHAPE[hollow[3]][pt[0]][pt[2]] == 0) {
 				pt[0] += hollow[0];
 				pt[2] += hollow[2];
 				pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], hollow[1] - (hollow[3] + 1) / 2, false, Building.IGNORE_WATER) + 1;
@@ -176,44 +177,44 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
         }
 		for (int z1 = 0; z1 < (diam + 1) / 2; z1++) {
 			//top half
-			int top_diam = Building.SPHERE_SHAPE[diam][z1];
+            int top_diam = Shape.SPHERE_SHAPE[diam][z1];
 			int offset = (diam - top_diam) / 2;
 			for (int y1 = 0; y1 < top_diam; y1++) {
 				for (int x1 = 0; x1 < top_diam; x1++) {
-					if (Building.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
+                    if (Shape.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
 						Building.setBlockAndMetaNoLighting(world, i + offset + x1, j + z1, k + offset + y1, Blocks.air, 0);
-					}
+                    }
 				}
 			}
 			for (int y1 = 0; y1 < top_diam; y1++) {
 				for (int x1 = 0; x1 < top_diam; x1++) {
-					if (Building.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
+                    if (Shape.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
 						//keep gravel and water from pouring in
 						for (int z2 = z1 + 1; z2 <= z1 + 3; z2++)
 							if (BlockProperties.get(world.getBlock(i + offset + x1, j + z2, k + offset + y1)).isFlowing) {
 								world.setBlock(i + offset + x1, j + z2, k + offset + y1, Blocks.stone, 0, 2);
 							}
-					}
+                    }
 				}
 			}
 			//bottom half, make flatter than top half
-			int bottom_diam = Building.SPHERE_SHAPE[diam][2 * z1 / 3];
+            int bottom_diam = Shape.SPHERE_SHAPE[diam][2 * z1 / 3];
 			offset = (diam - bottom_diam) / 2;
 			if (z1 > 0) {
 				for (int y1 = 0; y1 < bottom_diam; y1++) {
 					for (int x1 = 0; x1 < bottom_diam; x1++) {
-						if (Building.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
+                        if (Shape.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
 							Building.setBlockAndMetaNoLighting(world, i + offset + x1, j - z1, k + offset + y1, Blocks.air, 0);
-						}
+                        }
 					}
 				}
 				for (int y1 = 0; y1 < bottom_diam; y1++) {
 					for (int x1 = 0; x1 < bottom_diam; x1++) {
-						if (Building.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
+                        if (Shape.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
 							Block blockId = world.getBlock(i + offset + x1, j - z1 - 1, k + offset + y1);
 							if (BlockProperties.get(blockId).isOre && blockId != Blocks.coal_ore)
 								world.setBlock(i + offset + x1, j - z1 - 1, k + offset + y1, Blocks.stone, 0, 2);
-						}
+                        }
 					}
 				}
 			}
@@ -233,7 +234,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 				//theta points away from center of mass + noise
 				else
 					theta = (float) Math.atan((cavernMass * i - cavernMass_i) / (cavernMass * k - cavernMass_k)) + THETA_SHIFT_SIGMA * random.nextFloat() * (random.nextFloat() - 0.5F);
-				float rshift = Building.SPHERE_SHAPE[diam][diam / 3] + diam * (HORIZ_SHIFT_SIGMA / 2 - HORIZ_SHIFT_SIGMA * random.nextFloat());
+                float rshift = Shape.SPHERE_SHAPE[diam][diam / 3] + diam * (HORIZ_SHIFT_SIGMA / 2 - HORIZ_SHIFT_SIGMA * random.nextFloat());
 				if (hollow(i + (int) (MathHelper.sin(theta) * rshift), j + random.nextInt(random.nextInt(Z_SHIFT) + 1) - Z_SHIFT / 4, k + (int) (MathHelper.cos(theta) * rshift), diam - DIAM_INCREMENT))
 					successes++;
 				if (successes >= MAX_CHILDREN)

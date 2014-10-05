@@ -18,8 +18,8 @@
  */
 package generatormods.caruins.seeds;
 
-import generatormods.Building;
 import generatormods.BuildingCellularAutomaton;
+import generatormods.common.Shape;
 
 import java.util.Random;
 
@@ -40,12 +40,12 @@ public class SymmetricSeed implements ISeed {
         int width = random.nextInt(random.nextInt(maxWidth) + 1) + SYMMETRIC_SEED_MIN_WIDTH, length =
                 random.nextInt(random.nextInt(maxWidth) + 1) + SYMMETRIC_SEED_MIN_WIDTH;
         byte[][] seed = new byte[width][length];
-        int diam = Math.min(Math.max(width, length), Building.MAX_SPHERE_DIAM);
+        int diam = Math.min(Math.max(width, length), Shape.MAX_SPHERE_DIAM);
         for (int x = 0; x < (width + 1) / 2; x++) {
             for (int y = 0; y < (length + 1) / 2; y++) {
                 // use a circular mask to avoid ugly corners
                 seed[x][y] =
-                        (Building.CIRCLE_SHAPE[diam][x][y] >= 0 && random.nextFloat() < seedDensity) ? BuildingCellularAutomaton.ALIVE
+                        (Shape.CIRCLE_SHAPE[diam][x][y] >= 0 && random.nextFloat() < seedDensity) ? BuildingCellularAutomaton.ALIVE
                                 : BuildingCellularAutomaton.DEAD;
                 seed[width - x - 1][y] = seed[x][y];
                 seed[x][length - y - 1] = seed[x][y];

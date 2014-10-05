@@ -18,8 +18,8 @@
  */
 package generatormods.caruins.seeds;
 
-import generatormods.Building;
 import generatormods.BuildingCellularAutomaton;
+import generatormods.common.Shape;
 
 import java.util.Random;
 
@@ -37,12 +37,12 @@ public class CircularSeed implements ISeed {
                 Math.min(
                         random.nextInt(random.nextInt(random.nextInt(Math.max(1, maxWidth
                                 - CIRCULAR_SEED_MIN_WIDTH)) + 1) + 1)
-                                + CIRCULAR_SEED_MIN_WIDTH, Building.MAX_SPHERE_DIAM);
+                                + CIRCULAR_SEED_MIN_WIDTH, Shape.MAX_SPHERE_DIAM);
         byte[][] seed = new byte[diam][diam];
         for (int x = 0; x < diam; x++)
             for (int y = 0; y < diam; y++)
                 seed[x][y] =
-                        Building.CIRCLE_SHAPE[diam][x][y] == 1 ? BuildingCellularAutomaton.ALIVE
+                        Shape.CIRCLE_SHAPE[diam][x][y] == 1 ? BuildingCellularAutomaton.ALIVE
                                 : BuildingCellularAutomaton.DEAD;
         return seed;
     }

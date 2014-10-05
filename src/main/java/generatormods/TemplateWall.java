@@ -18,10 +18,10 @@
  */
 package generatormods;
 
-import generatormods.common.PickWeighted;
-import generatormods.common.Util;
-
 import generatormods.common.BiomeNames;
+import generatormods.common.PickWeighted;
+import generatormods.common.Shape;
+import generatormods.common.Util;
 
 import java.io.File;
 
@@ -222,10 +222,10 @@ public class TemplateWall extends TemplateTML {
 			CircMinWidth = BuildingTower.TOWER_UNIV_MIN_WIDTH;
 		if (CircMaxWidth < CircMinWidth)
 			CircMaxWidth = CircMinWidth;
-		if (CircMaxWidth >= Building.CIRCLE_CRENEL.length)
-			CircMaxWidth = Building.CIRCLE_CRENEL.length - 1;
-		if (CircMinWidth >= Building.CIRCLE_CRENEL.length)
-			CircMinWidth = Building.CIRCLE_CRENEL.length - 1;
+        if (CircMaxWidth >= Shape.CIRCLE_CRENEL.length)
+            CircMaxWidth = Shape.CIRCLE_CRENEL.length - 1;
+        if (CircMinWidth >= Shape.CIRCLE_CRENEL.length)
+            CircMinWidth = Shape.CIRCLE_CRENEL.length - 1;
 		if (CircMinHeight < WalkHeight + 4)
 			CircMinHeight = WalkHeight + 4;
 		if (CircMaxHeight < CircMinHeight)

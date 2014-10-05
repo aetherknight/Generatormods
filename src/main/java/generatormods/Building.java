@@ -109,17 +109,6 @@ public class Building {
 			PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, "PRESERVE"),
 			TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString()), HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString()),
 			GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
-	public final static int MAX_SPHERE_DIAM = 40;
-	public final static int[][] SPHERE_SHAPE = new int[MAX_SPHERE_DIAM + 1][];
-	public final static int[][][] CIRCLE_SHAPE = new int[MAX_SPHERE_DIAM + 1][][], CIRCLE_CRENEL = new int[MAX_SPHERE_DIAM + 1][][];
-	static {
-		for (int diam = 1; diam <= MAX_SPHERE_DIAM; diam++) {
-			circleShape(diam);
-		}
-		// change diam 6 shape to look better
-		CIRCLE_SHAPE[6] = new int[][] { { -1, -1, 1, 1, -1, -1 }, { -1, 1, 0, 0, 1, -1 }, { 1, 0, 0, 0, 0, 1 }, { 1, 0, 0, 0, 0, 1 }, { -1, 1, 0, 0, 1, -1 }, { -1, -1, 1, 1, -1, -1 } };
-		CIRCLE_CRENEL[6] = new int[][] { { -1, -1, 1, 0, -1, -1 }, { -1, 0, 0, 0, 1, -1 }, { 1, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 1 }, { -1, 1, 0, 0, 0, -1 }, { -1, -1, 0, 1, -1, -1 } };
-	}
 	private final static int LIGHTING_INVERSE_DENSITY = 10;
 	private final static boolean[] randLightingHash = new boolean[512];
 	static {
@@ -1231,54 +1220,6 @@ public class Building {
 		if (n <= wiggle && -n <= wiggle)
 			return 0;
 		return n < 0 ? -1 : 1;
-	}
-
-	private static void circleShape(int diam) {
-		float rad = diam / 2.0F;
-		float[][] shape_density = new float[diam][diam];
-		for (int x = 0; x < diam; x++)
-			for (int y = 0; y < diam; y++)
-				shape_density[y][x] = ((x + 0.5F - rad) * (x + 0.5F - rad) + (y + 0.5F - rad) * (y + 0.5F - rad)) / (rad * rad);
-		int[] xheight = new int[diam];
-		for (int y = 0; y < diam; y++) {
-			int x = 0;
-			while (shape_density[y][x] > 1.0F) {
-                x++;
-			}
-			xheight[y] = x;
-		}
-		CIRCLE_SHAPE[diam] = new int[diam][diam];
-		CIRCLE_CRENEL[diam] = new int[diam][diam];
-		SPHERE_SHAPE[diam] = new int[(diam + 1) / 2];
-		int nextHeight, crenel_adj = 0;
-		for (int x = 0; x < diam; x++)
-			for (int y = 0; y < diam; y++) {
-				CIRCLE_SHAPE[diam][y][x] = 0;
-				CIRCLE_CRENEL[diam][y][x] = 0;
-			}
-		for (int y = 0; y < diam; y++) {
-			if (y == 0 || y == diam - 1)
-				nextHeight = diam / 2 + 1;
-			else
-				nextHeight = xheight[y < diam / 2 ? y - 1 : y + 1] + (xheight[y] == xheight[y < diam / 2 ? y - 1 : y + 1] ? 1 : 0);
-			if (y > 0 && xheight[y] == xheight[y - 1])
-				crenel_adj++;
-			int x = 0;
-			for (; x < xheight[y]; x++) {
-				CIRCLE_SHAPE[diam][y][x] = -1;
-				CIRCLE_SHAPE[diam][y][diam - x - 1] = -1;
-				CIRCLE_CRENEL[diam][y][x] = -1;
-				CIRCLE_CRENEL[diam][y][diam - x - 1] = -1;
-			}
-			for (; x < nextHeight; x++) {
-				CIRCLE_SHAPE[diam][y][x] = 1;
-				CIRCLE_SHAPE[diam][y][diam - x - 1] = 1;
-				CIRCLE_CRENEL[diam][y][x] = (x + crenel_adj) % 2;
-				CIRCLE_CRENEL[diam][y][diam - x - 1] = (x + crenel_adj + diam + 1) % 2;
-			}
-		}
-		for (int y = diam / 2; y < diam; y++)
-			SPHERE_SHAPE[diam][y - diam / 2] = (2 * (diam / 2 - xheight[y]) + (diam % 2 == 0 ? 0 : 1));
 	}
 
 	private static boolean isSolidBlock(Block blockID) {
