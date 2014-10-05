@@ -57,5 +57,5 @@ From Olivier's reply email:
 I have already rebased Olivier's git commits from onto the point in Noah's SVN
 repository where Olivier forked it in order to gain a complete version control
 history of the source code. More recently, Noah added new SVN commits to update
-the licensing after my request. I will merge in those new commits as part of my
-effort to update the documentation of the licensing.
+the licensing after my request. I have also merged in those new commits as part
+of my effort to update the documentation of the licensing.
