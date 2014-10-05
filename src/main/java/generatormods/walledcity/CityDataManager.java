@@ -155,12 +155,41 @@ public class CityDataManager {
         cityLocations.get(world).add( new int[] { x, z, cityType });
     }
 
-    public void addBuildingToDoorList(int buildingId) {
-        cityDoors.put(buildingId, new ArrayList<VillageDoorInfo>());
+    private List<VillageDoorInfo> getBuildingList(int buildingId) {
+        // TODO: Why do we look for a building whose ID is 3 less or 3 more
+        // than the one we are looking up? Not sure what that does for us,
+        // although I think it means that ultimately only building IDs close to
+        // the the first constructed building will have their doors added to
+        // the village door list.
+        //
+        // When building a city, the city gets a base ID, and then buildings
+        // get IDs that add onto that ID. A few IDs would fall into this range,
+        // but many of them do not.
+        //
+        // Perhaps a better approach is for there to be a City object, and a
+        // data manager object. The city object is passed to the building and
+        // the building gives its city its doors. The city object would then be
+        // given to the city data manager in order to give the data to
+        // minecraft and to store city locations.
+        Set<Integer> keys = getDoorListKnownBuildingIds();
+        for (int id = buildingId - 3; id < buildingId + 4; id++) {
+            if (keys.contains(id)) {
+                buildingId = id;
+                break;
+            }
+        }
+
+        List<VillageDoorInfo> doorList = cityDoors.get(buildingId);
+        if(doorList == null) {
+            doorList = new ArrayList<VillageDoorInfo>();
+            cityDoors.put(buildingId, doorList);
+        }
+        return doorList;
     }
 
     public void addDoor(int buildingId, int par1, int par2, int par3, int par4, int par5, int par6) {
-        cityDoors.get(buildingId).add(new VillageDoorInfo(par1, par2, par3, par4, par5, par6));
+        List<VillageDoorInfo> doorList = getBuildingList(buildingId);
+        doorList.add(new VillageDoorInfo(par1, par2, par3, par4, par5, par6));
     }
 
     public Set<Integer> getDoorListKnownBuildingIds() {
