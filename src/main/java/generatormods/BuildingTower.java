@@ -18,6 +18,7 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
 import generatormods.common.Shape;
 
 import net.minecraft.block.Block;
@@ -330,10 +331,10 @@ public class BuildingTower extends Building {
 		TemplateRule doubleStepRule = (stepMeta == 2) ? new TemplateRule(Blocks.planks, 0, roofRule.chance) : new TemplateRule(Blocks.double_stone_slab, stepMeta, roofRule.chance);
 		TemplateRule trimRule = roofStyle == ROOF_TRIM ? new TemplateRule(bRule.primaryBlock.get() == Blocks.cobblestone ? Blocks.log : Blocks.cobblestone, 0, roofRule.chance) : stepRule;
         Block roof = roofRule.primaryBlock.toStair();
-        TemplateRule northStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META[DIR_NORTH], roofRule.chance);
-		TemplateRule southStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META[DIR_SOUTH], roofRule.chance);
-		TemplateRule eastStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META[DIR_EAST], roofRule.chance);
-		TemplateRule westStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META[DIR_WEST], roofRule.chance);
+        TemplateRule northStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.NORTH), roofRule.chance);
+		TemplateRule southStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.SOUTH), roofRule.chance);
+		TemplateRule eastStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.EAST), roofRule.chance);
+		TemplateRule westStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.WEST), roofRule.chance);
 		//======================================== build it! ================================================
 		if (roofStyle == ROOF_CRENEL) { //crenelated
 			if (circular) {
@@ -533,9 +534,9 @@ public class BuildingTower extends Building {
 	private void populateBookshelves(int z) {
 		int x1 = random.nextInt(bWidth - 2) + 1;
 		int y1 = random.nextInt(bLength - 2) + 1;
-		int dir = random.nextInt(4);
-		int xinc = DIR_TO_X[dir];
-		int yinc = DIR_TO_Y[dir];
+		Dir dir = Dir.randomDir(random);
+		int xinc = dir.x;
+		int yinc = dir.y;
 		//find a wall
 		while (true) {
 			if (x1 < 1 || x1 >= bWidth - 1 || y1 < 1 || y1 >= bLength - 1 || !isFloor(x1, z, y1))
@@ -553,8 +554,8 @@ public class BuildingTower extends Building {
 					break;
 				setBlockLocal(x1, z1, y1, Blocks.bookshelf);
 			}
-			x1 += DIR_TO_X[(dir + 1) % 4];
-			y1 += DIR_TO_Y[(dir + 1) % 4];
+			x1 += dir.rotate(1).x;
+			y1 += dir.rotate(1).y;
 			if (!isFloor(x1, z, y1))
 				break;
 		}
@@ -598,7 +599,7 @@ public class BuildingTower extends Building {
 	private int[][] circle_shape;
 	private TemplateRule roofRule, SpawnerRule, ChestRule;
 
-	public BuildingTower(int ID_, Building parent, boolean circular_, int roofStyle_, int dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
+	public BuildingTower(int ID_, Building parent, boolean circular_, int roofStyle_, Dir dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
 		super(ID_, parent.wgt, parent.bRule, dir_, axXHand_, centerAligned_, new int[] { TWidth_, THeight_, TLength_ }, sourcePt);
 		baseHeight = 0;
 		roofStyle = roofStyle_;
@@ -635,7 +636,7 @@ public class BuildingTower extends Building {
 	// -            -  baseHeight==ws.WalkHeight
 	// --------------  baseHeight-1 (floor)
 	//
-	public BuildingTower(int ID_, BuildingWall wall, int dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
+	public BuildingTower(int ID_, BuildingWall wall, Dir dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
 		super(ID_, wall.wgt, wall.towerRule, dir_, axXHand_, centerAligned_, new int[] { TWidth_, THeight_, TLength_ }, sourcePt);
 		baseHeight = wall.WalkHeight;
 		roofStyle = wall.roofStyle;
@@ -679,14 +680,38 @@ public class BuildingTower extends Building {
 	}
 
 	//****************************************  FUNCTIONS  - populators *************************************************************************************//
+
+    /**
+     * Creates a bed at the specified local z level. Beds are made of 2 blocks:
+     * the head of the bed and the foot of the bed. Bed metadata meanings (from
+     * <a href="http://minecraft.gamepedia.com/Data_values#Beds">Minecraft
+     * Wiki</a>):
+     *
+     * <table>
+     * <tr><th>Value</th><th>Meaning</th></tr>
+     * <tr><td>0x0</td><td>Head is pointing South</td></tr>
+     * <tr><td>0x1</td><td>Head is pointing West</td></tr>
+     * <tr><td>0x2</td><td>Head is pointing North</td></tr>
+     * <tr><td>0x3</td><td>Head is pointing East</td></tr>
+     * <tr><td>+0x4 (bit)</td><td>Bed is occupied</td></tr>
+     * <tr><td>+0x8 (bit)</td><td>Head of the bed</td></tr>
+     * </table>
+     *
+     * TODO: The logic in this method appears to create invalid beds. The
+     * direction chosen here, and the "y" value of the Dir (which is inverted
+     * for north-south/z-axis only) don't seem to agree. Should probably be
+     * fixed, but want to try to unit test as much as possible first.
+     * BED_DIR_TO_META might also be useful here.
+     */
 	private void populateBeds(int z) {
-		int dir = random.nextInt(4);
+        Dir dir = Dir.randomDir(random);
 		int x1 = random.nextInt(bWidth - 2) + 1;
 		int y1 = random.nextInt(bLength - 2) + 1;
-		int x2 = x1 + DIR_TO_X[dir], y2 = y1 + DIR_TO_Y[dir];
+        int x2 = x1 + dir.x;
+        int y2 = y1 + dir.y;
 		if (isFloor(x1, z, y1) && hasNoDoorway(x1, z, y1) && isFloor(x2, z, y2) && hasNoDoorway(x2, z, y2)) {
-			setBlockLocal(x1, z, y1, Blocks.bed, dir + 8);
-			setBlockLocal(x2, z, y2, Blocks.bed, dir);
+            setBlockLocal(x1, z, y1, Blocks.bed, dir.ordinal() + 8); //head of the bed?
+            setBlockLocal(x2, z, y2, Blocks.bed, dir.ordinal());
 		}
 	}
 

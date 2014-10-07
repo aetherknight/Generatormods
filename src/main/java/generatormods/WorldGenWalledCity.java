@@ -18,6 +18,7 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
@@ -26,7 +27,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -50,7 +53,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	private TemplateWall ows, sws;
 	private BuildingWall[] walls;
 	private int axXHand;
-	private int[] dir = null;
+    private Dir[] dir = null;
 	private int Lmean, jmean;
 	private final int cityType;
 	private int corner1[], corner2[], mincorner[];
@@ -253,8 +256,10 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 			} else {
 				//no gateway on this city side, try just building an interior avenue from midpoint
 				w.setCursor(startScan);
-				BuildingWall radialAvenue = new BuildingWall(0, this, sws, Building.rotDir(w.bDir, -axXHand), radialAvenueHand, ows.MaxL, false, w.getSurfaceIJKPt(-1, 0, Building.WORLD_MAX_Y, false,
-						Building.IGNORE_WATER));
+                BuildingWall radialAvenue =
+                        new BuildingWall(0, this, sws, w.bDir.rotate(-axXHand), radialAvenueHand,
+                                ows.MaxL, false, w.getSurfaceIJKPt(-1, 0, Building.WORLD_MAX_Y,
+                                        false, Building.IGNORE_WATER));
 				radialAvenue.setTarget(cityCenter);
 				radialAvenue.plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
 				if (radialAvenue.bLength > 20) {
@@ -299,7 +304,10 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		for (BuildingWall radialAvenue : radialAvenues) {
 			for (int n = radialAvenue.bLength - avInterval; n >= 20; n -= avInterval) {
 				radialAvenue.setCursor(n);
-				BuildingDoubleWall crossAvenue = new BuildingDoubleWall(ID, this, sws, Building.rotDir(radialAvenue.bDir, Building.ROT_R), Building.R_HAND, radialAvenue.getIJKPt(0, 0, 0));
+                BuildingDoubleWall crossAvenue =
+                        new BuildingDoubleWall(ID, this, sws,
+                                radialAvenue.bDir.rotate(Building.ROT_R), Building.R_HAND,
+                                radialAvenue.getIJKPt(0, 0, 0));
 				if (crossAvenue.plan())
 					crossAvenues.add(crossAvenue);
 			}
@@ -315,7 +323,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 				sws = TemplateWall.pickBiomeWeightedWallStyle(ows.streets, world, i0, k0, world.rand, true);
 				if (pt[1] != -1) {
 					//streets
-					BuildingDoubleWall street = new BuildingDoubleWall(ID + tries, this, sws, random.nextInt(4), Building.R_HAND, pt);
+                    BuildingDoubleWall street =
+                            new BuildingDoubleWall(ID + tries, this, sws, Dir.randomDir(random),
+                                    Building.R_HAND, pt);
 					if (street.plan()) {
 						plannedStreets.add(street);
 					}
@@ -401,24 +411,24 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 
 	//****************************************  FUNCTION - chooseDirection *************************************************************************************//
 	private void chooseDirection(int chunkI, int chunkK) {
-		boolean[] exploredChunk = new boolean[4];
-		exploredChunk[0] = world.blockExists(chunkI << 4, 0, (chunkK - 1) << 4); //North
-		exploredChunk[1] = world.blockExists((chunkI + 1) << 4, 0, chunkK << 4); //East
-		exploredChunk[2] = world.blockExists(chunkI << 4, 0, (chunkK + 1) << 4); //South
-		exploredChunk[3] = world.blockExists((chunkI - 1) << 4, 0, chunkK << 4); //West
+        Map<Dir, Boolean> exploredChunk = new HashMap<Dir, Boolean>();
+        exploredChunk.put(Dir.NORTH, world.blockExists(chunkI << 4, 0, (chunkK - 1) << 4));
+        exploredChunk.put(Dir.EAST,  world.blockExists((chunkI + 1) << 4, 0, chunkK << 4));
+        exploredChunk.put(Dir.SOUTH, world.blockExists(chunkI << 4, 0, (chunkK + 1) << 4));
+        exploredChunk.put(Dir.WEST,  world.blockExists((chunkI - 1) << 4, 0, chunkK << 4));
 		//pick an explored direction if it exists
-		dir = new int[4];
-		int randDir = random.nextInt(4);
-		for (dir[0] = (randDir + 1) % 4; dir[0] != randDir; dir[0] = (dir[0] + 1) % 4)
-			if (exploredChunk[dir[0]])
+        dir = new Dir[4];
+        Dir randDir = Dir.randomDir(random);
+        for (dir[0] = randDir.rotate(1); dir[0] != randDir; dir[0] = dir[0].rotate(1))
+            if (exploredChunk.get(dir[0]))
 				break; //this chunk has been explored so we want to go in this direction
 		//Choose axXHand (careful it is opposite the turn direction of the square).
 		//if RH direction explored, then turn RH; else turn LH;
 		//axXHand=2*random.nextInt(2)-1;
-		axXHand = exploredChunk[(dir[0] + 1) % 4] ? -1 : 1;
-		dir[1] = (dir[0] - axXHand + 4) % 4;
-		dir[2] = (dir[1] - axXHand + 4) % 4;
-		dir[3] = (dir[2] - axXHand + 4) % 4;
+        axXHand = exploredChunk.get((dir[0].rotate(1))) ? -1 : 1;
+        dir[1] = dir[0].rotate(false, axXHand);
+        dir[2] = dir[1].rotate(false, axXHand);
+        dir[3] = dir[2].rotate(false, axXHand);
 	}
 
 	//****************************************  FUNCTION - levelCity  *************************************************************************************//

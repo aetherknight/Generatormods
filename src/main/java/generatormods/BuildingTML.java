@@ -18,6 +18,8 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -28,7 +30,7 @@ public class BuildingTML extends Building {
 	final TemplateTML tmlt;
 
 	//****************************************  CONSTRUCTOR - BuildingTML  *************************************************************************************//
-	public BuildingTML(int ID_, WorldGeneratorThread wgt, int bDir_, int axXHand_, boolean centerAligned_, TemplateTML tmlt_, int[] sourcePt) {
+	public BuildingTML(int ID_, WorldGeneratorThread wgt, Dir bDir_, int axXHand_, boolean centerAligned_, TemplateTML tmlt_, int[] sourcePt) {
 		super(ID_, wgt, null, bDir_, axXHand_, centerAligned_, new int[] { tmlt_.width, tmlt_.height, tmlt_.length }, sourcePt);
 		tmlt = tmlt_;
 		j0 -= tmlt.embed;

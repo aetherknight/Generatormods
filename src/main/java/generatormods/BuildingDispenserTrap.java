@@ -18,6 +18,8 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
+
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -28,13 +30,13 @@ import net.minecraft.tileentity.TileEntityDispenser;
  */
 public class BuildingDispenserTrap extends Building {
 	public final static int ARROW_MISSILE = 0, DAMAGE_POTION_MISSILE = 1;
-	private static BlockAndMeta[] CODE_TO_BLOCK = new BlockAndMeta[] { PRESERVE_BLOCK, null, new BlockAndMeta(Blocks.air, 0), new BlockAndMeta(Blocks.redstone_wire, 0), new BlockAndMeta(Blocks.redstone_torch, BUTTON_DIR_TO_META[DIR_NORTH]),
-            new BlockAndMeta(Blocks.unlit_redstone_torch, BUTTON_DIR_TO_META[DIR_SOUTH]), new BlockAndMeta(Blocks.redstone_torch, 5) };
+	private static BlockAndMeta[] CODE_TO_BLOCK = new BlockAndMeta[] { PRESERVE_BLOCK, null, new BlockAndMeta(Blocks.air, 0), new BlockAndMeta(Blocks.redstone_wire, 0), new BlockAndMeta(Blocks.redstone_torch, BUTTON_DIR_TO_META.get(Dir.NORTH)),
+            new BlockAndMeta(Blocks.unlit_redstone_torch, BUTTON_DIR_TO_META.get(Dir.SOUTH)), new BlockAndMeta(Blocks.redstone_torch, 5) };
 	private static int[][][] MECHANISM = new int[][][] { { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 } }, { { 0, 0, 0 }, { 1, 1, 1 }, { 1, 4, 1 }, { 1, 1, 1 } },
 			{ { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 5, 1 } }, { { 0, 1, 0 }, { 1, 1, 1 }, { 1, 3, 1 }, { 1, 1, 1 } }, { { 0, 1, 0 }, { 1, 6, 1 }, { 1, 0, 1 }, { 1, 2, 1 } },
 			{ { 0, 1, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, };
 
-	public BuildingDispenserTrap(WorldGeneratorThread wgt_, TemplateRule bRule_, int bDir_, int plateSeparation, int[] sourcePt) {
+	public BuildingDispenserTrap(WorldGeneratorThread wgt_, TemplateRule bRule_, Dir bDir_, int plateSeparation, int[] sourcePt) {
 		super(0, wgt_, bRule_, bDir_, 1, true, new int[] { 3, 6, plateSeparation }, sourcePt);
 	}
 
@@ -71,7 +73,7 @@ public class BuildingDispenserTrap extends Building {
 		setBlockLocal(1, 0, 0, Blocks.stone_pressure_plate);
         flushDelayed();
 		ItemStack itemstack = missileType == ARROW_MISSILE ? new ItemStack(Items.arrow, 30 + random.nextInt(10), 0) : new ItemStack(Items.potionitem, 30 + random.nextInt(10), 12 | 0x4000);
-		setItemDispenser(1, 1, bLength + 1, DIR_SOUTH, itemstack);
+		setItemDispenser(1, 1, bLength + 1, Dir.SOUTH, itemstack);
 	}
 
 	public boolean queryCanBuild(int minLength) {
@@ -95,10 +97,10 @@ public class BuildingDispenserTrap extends Building {
 		return false;
 	}
 
-	private void setItemDispenser(int x, int z, int y, int metaDir, ItemStack itemstack) {
+	private void setItemDispenser(int x, int z, int y, Dir metaDir, ItemStack itemstack) {
 		int[] pt = getIJKPt(x, z, y);
 		world.setBlock(pt[0], pt[1], pt[2], Blocks.dispenser, 0, 2);
-		world.setBlockMetadataWithNotify(pt[0], pt[1], pt[2], LADDER_DIR_TO_META[orientDirToBDir(metaDir)], 3);
+		world.setBlockMetadataWithNotify(pt[0], pt[1], pt[2], LADDER_DIR_TO_META.get(orientDirToBDir(metaDir)), 3);
 		try {
 			TileEntityDispenser tileentitychest = (TileEntityDispenser) world.getTileEntity(pt[0], pt[1], pt[2]);
 			if (itemstack != null && tileentitychest != null)

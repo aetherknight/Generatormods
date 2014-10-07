@@ -18,6 +18,8 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -31,7 +33,7 @@ public class BuildingUndergroundEntranceway extends Building {
 	private final Block stairsID;
 
 	//****************************************  CONSTRUCTOR - BuildingUndergroundEntraceway  *************************************************************************************//
-	public BuildingUndergroundEntranceway(int ID_, WorldGeneratorThread wgt_, TemplateWall ws_, int dir_, int[] sourcePt) {
+	public BuildingUndergroundEntranceway(int ID_, WorldGeneratorThread wgt_, TemplateWall ws_, Dir dir_, int[] sourcePt) {
 		super(ID_, wgt_, ws_.TowerRule, dir_, 1, false, new int[] { PASSAGE_WIDTH, PASSAGE_HEIGHT, 0 }, sourcePt);
 		ws = ws_;
 		stairsID = ws.rules[ws.template[0][0][ws.WWidth / 2]].primaryBlock.toStair();
@@ -65,7 +67,7 @@ public class BuildingUndergroundEntranceway extends Building {
 				}
 			}
 			for (int x = 0; x < PASSAGE_WIDTH; x++) {
-				setBlockLocal(x, z, z, random.nextInt(100) < bRule.chance ? stairsID : Blocks.air, STAIRS_DIR_TO_META[DIR_NORTH]);
+				setBlockLocal(x, z, z, random.nextInt(100) < bRule.chance ? stairsID : Blocks.air, STAIRS_DIR_TO_META.get(Dir.NORTH));
 				buildDown(x, z - 1, z, TemplateRule.STONE_RULE, 20, 0, 3);
 			}
             flushDelayed();
@@ -95,7 +97,7 @@ public class BuildingUndergroundEntranceway extends Building {
 		}
 		//for(int x=0; x<PASSAGE_WIDTH; x++) buildDown(x, bLength-1, bLength, bRule,20,4,3);
         flushDelayed();
-		street = new BuildingWall(bID, wgt, ws, flipDir(bDir), -bHand, ws.MaxL, true, getIJKPt((PASSAGE_WIDTH - ws.WWidth) / 2, 0, -1));
+		street = new BuildingWall(bID, wgt, ws, bDir.opposite(), -bHand, ws.MaxL, true, getIJKPt((PASSAGE_WIDTH - ws.WWidth) / 2, 0, -1));
 		street.plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
 		return true;
 	}

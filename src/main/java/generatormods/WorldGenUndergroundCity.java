@@ -18,6 +18,7 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
 import generatormods.common.Shape;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
@@ -100,10 +101,21 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		for (int attempts = 0; attempts < Math.min(20, hollows.size()); attempts++) {
 			int[] hollow = getFarthestHollowFromPt(pole);
             int diam = Shape.SPHERE_SHAPE[hollow[3]][hollow[3] / 3];
-			int axDir = Math.abs(center[0] - hollow[0]) > Math.abs(center[2] - hollow[2]) ? hollow[0] > center[0] ? Building.DIR_SOUTH : Building.DIR_NORTH : hollow[2] > center[2] ? Building.DIR_WEST
-					: Building.DIR_EAST;
-			int[] pt = new int[] { hollow[0] + (Math.abs(axDir) == 1 ? hollow[3] / 2 : (axDir == Building.DIR_SOUTH ? (hollow[3] + diam) / 2 : (hollow[3] - diam) / 2 + 1)), hollow[1] - hollow[3] / 3,
-					hollow[2] + (Math.abs(axDir) == 2 ? hollow[3] / 2 : (axDir == Building.DIR_WEST ? (hollow[3] + diam) / 2 : (hollow[3] - diam) / 2 + 1)) };
+            Dir axDir =
+                    Math.abs(center[0] - hollow[0]) > Math.abs(center[2] - hollow[2]) ? hollow[0] > center[0] ? Dir.SOUTH
+                            : Dir.NORTH
+                            : hollow[2] > center[2] ? Dir.WEST : Dir.EAST;
+            int[] pt =
+                    new int[] {
+                            hollow[0]
+                                    + (axDir == Dir.EAST ? hollow[3] / 2
+                                            : (axDir == Dir.SOUTH ? (hollow[3] + diam) / 2
+                                                    : (hollow[3] - diam) / 2 + 1)),
+                            hollow[1] - hollow[3] / 3,
+                            hollow[2]
+                                    + (axDir == Dir.SOUTH ? hollow[3] / 2
+                                            : (axDir == Dir.WEST ? (hollow[3] + diam) / 2
+                                                    : (hollow[3] - diam) / 2 + 1))};
 			boolean separated = true;
 			for (BuildingUndergroundEntranceway entranceway : entranceways)
 				if (Building.distance(entranceway.getIJKPt(0, 0, 0), pt) < 400)
@@ -136,7 +148,9 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 				pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], hollow[1] - (hollow[3] + 1) / 2, false, Building.IGNORE_WATER) + 1;
 				TemplateWall sws = TemplateWall.pickBiomeWeightedWallStyle(pws.streets, world, pt[0], pt[2], world.rand, true);
 				sws.MergeWalls = true;
-				BuildingDoubleWall street = new BuildingDoubleWall(tries, this, sws, random.nextInt(4), Building.R_HAND, pt);
+                BuildingDoubleWall street =
+                        new BuildingDoubleWall(tries, this, sws, Dir.randomDir(random),
+                                Building.R_HAND, pt);
 				if (street.plan()) {
 					street.build(LAYOUT_CODE_NOCODE);
 					streets.add(street);

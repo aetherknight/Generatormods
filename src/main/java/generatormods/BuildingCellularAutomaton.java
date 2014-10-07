@@ -18,11 +18,14 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
 import generatormods.common.config.ChestType;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -49,7 +52,7 @@ public class BuildingCellularAutomaton extends Building {
 	int[][] fBB;
 	int zGround = 0;
 
-	public BuildingCellularAutomaton(WorldGeneratorThread wgt_, TemplateRule bRule_, int bDir_, int axXHand_, boolean centerAligned_, int width, int height, int length, byte[][] seed_,
+	public BuildingCellularAutomaton(WorldGeneratorThread wgt_, TemplateRule bRule_, Dir bDir_, int axXHand_, boolean centerAligned_, int width, int height, int length, byte[][] seed_,
 			byte[][] caRule_, TemplateRule[] spawnerRules, int[] sourcePt) {
 		super(0, wgt_, bRule_, bDir_, axXHand_, centerAligned_, new int[] { width, height, length }, sourcePt);
 		seed = seed_;
@@ -65,10 +68,12 @@ public class BuildingCellularAutomaton extends Building {
 
 	public void build(boolean SmoothWithStairs, boolean makeFloors) {
 		Block stairsBlock = SmoothWithStairs ? bRule.primaryBlock.toStair() : Blocks.air;
-		TemplateRule[] stairs = new TemplateRule[] { new TemplateRule(stairsBlock, STAIRS_DIR_TO_META[DIR_NORTH], bRule.chance),
-				new TemplateRule(stairsBlock, STAIRS_DIR_TO_META[DIR_EAST], bRule.chance), new TemplateRule(stairsBlock, STAIRS_DIR_TO_META[DIR_SOUTH], bRule.chance),
-				new TemplateRule(stairsBlock, STAIRS_DIR_TO_META[DIR_WEST], bRule.chance) };
-		int[] floorBlockCounts = new int[bHeight];
+        Map<Dir, TemplateRule> stairs = new HashMap<Dir, TemplateRule>();
+        stairs.put(Dir.NORTH, new TemplateRule(stairsBlock, STAIRS_DIR_TO_META.get(Dir.NORTH), bRule.chance));
+        stairs.put(Dir.EAST, new TemplateRule(stairsBlock, STAIRS_DIR_TO_META.get(Dir.EAST), bRule.chance));
+        stairs.put(Dir.SOUTH, new TemplateRule(stairsBlock, STAIRS_DIR_TO_META.get(Dir.SOUTH), bRule.chance));
+        stairs.put(Dir.WEST, new TemplateRule(stairsBlock, STAIRS_DIR_TO_META.get(Dir.WEST), bRule.chance));
+        int[] floorBlockCounts = new int[bHeight];
 		ArrayList<ArrayList<int[]>> floorBlocks = new ArrayList<ArrayList<int[]>>();
 		for (int m = 0; m < bHeight; m++) {
 			floorBlockCounts[m] = 0;
@@ -107,22 +112,22 @@ public class BuildingCellularAutomaton extends Building {
 									(layers[z][x][y - 1] != ALIVE //y-1 empty and..
 									&& (x + 1 == bWidth || !(layers[z][x + 1][y] != ALIVE && layers[z][x + 1][y - 1] == ALIVE)) //not obstructing gaps to the sides
 									&& (x - 1 < 0 || !(layers[z][x - 1][y] != ALIVE && layers[z][x - 1][y - 1] == ALIVE))) && random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs[DIR_NORTH]);
+								setBlockLocal(x, z, y, stairs.get(Dir.NORTH));
 							else if (y - 1 >= 0
 									&& layers[z][x][y - 1] == ALIVE
 									&& (y + 1 == bLength || (layers[z][x][y + 1] != ALIVE && (x + 1 == bWidth || !(layers[z][x + 1][y] != ALIVE && layers[z][x + 1][y + 1] == ALIVE)) && (x - 1 < 0 || !(layers[z][x - 1][y] != ALIVE && layers[z][x - 1][y + 1] == ALIVE)))
 									&& random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs[DIR_SOUTH]);
+								setBlockLocal(x, z, y, stairs.get(Dir.SOUTH));
 							else if (x + 1 < bWidth
 									&& layers[z][x + 1][y] == ALIVE
 									&& (x - 1 < 0 || (layers[z][x - 1][y] != ALIVE && (y + 1 == bLength || !(layers[z][x][y + 1] != ALIVE && layers[z][x - 1][y + 1] == ALIVE)) && (y - 1 < 0 || !(layers[z][x][y - 1] != ALIVE && layers[z][x - 1][y - 1] == ALIVE)))
 											&& random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs[DIR_EAST]);
+								setBlockLocal(x, z, y, stairs.get(Dir.EAST));
 							else if (x - 1 >= 0
 									&& layers[z][x - 1][y] == ALIVE
 									&& (x + 1 == bWidth || (layers[z][x + 1][y] != ALIVE && (y + 1 == bLength || !(layers[z][x][y + 1] != ALIVE && layers[z][x + 1][y + 1] == ALIVE)) && (y - 1 < 0 || !(layers[z][x][y - 1] != ALIVE && layers[z][x + 1][y - 1] == ALIVE)))
 									&& random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs[DIR_WEST]);
+								setBlockLocal(x, z, y, stairs.get(Dir.WEST));
 						}
 					}
 				}
@@ -183,11 +188,11 @@ public class BuildingCellularAutomaton extends Building {
             flushDelayed();
 		}
 		//populate
-		Collections.sort(floors, new Comparator() {
+		Collections.sort(floors, new Comparator<int[]>() {
 			@Override
-			public int compare(Object o1, Object o2) {
-				int a = ((int[]) o1)[0];
-				int b = ((int[]) o2)[0];
+			public int compare(int[] o1, int[] o2) {
+				int a = o1[0];
+				int b = o2[0];
 				return a < b ? -1 : a == b ? 0 : 1;
 			}
 		});
@@ -485,7 +490,7 @@ public class BuildingCellularAutomaton extends Building {
 		if (spawnerSelection == null || random.nextBoolean()) {
 			for (int tries = 0; tries < 10; tries++) {
 				int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
-				BuildingDispenserTrap bdt = new BuildingDispenserTrap(wgt, bRule, random.nextInt(4), 1, getIJKPt(x, z, y));
+				BuildingDispenserTrap bdt = new BuildingDispenserTrap(wgt, bRule, Dir.randomDir(random), 1, getIJKPt(x, z, y));
 				if (bdt.queryCanBuild(2)) {
 					bdt.build(random.nextBoolean() ? BuildingDispenserTrap.ARROW_MISSILE : BuildingDispenserTrap.DAMAGE_POTION_MISSILE, true);
 					break;
@@ -502,14 +507,14 @@ public class BuildingCellularAutomaton extends Building {
 		for (int tries = 0; tries < 8; tries++) {
 			int x = random.nextInt(fWidth) + fBB[0][z2], y = random.nextInt(fLength) + fBB[2][z2];
 			if (isFloor(x, z2, y)) {
-				int dir = random.nextInt(4);
+				Dir dir = Dir.randomDir(random);
 				if (buildStairs && (bss = new BuildingSpiralStaircase(wgt, bRule, dir, 1, false, z1 - z2 + 1, getIJKPt(x, z2 - 1, y))).bottomIsFloor()) {
 					bss.build(0, 0);
 				} else if (isFloor(x, z1, y)) {
 					//ladder
 					for (int z = z1; z < z2; z++) {
-						setBlockLocal(x + DIR_TO_X[dir], z, y + DIR_TO_Y[dir], bRule);
-						setBlockLocal(x, z, y, Blocks.ladder, LADDER_DIR_TO_META[flipDir(dir)]);
+						setBlockLocal(x + dir.x, z, y + dir.y, bRule);
+						setBlockLocal(x, z, y, Blocks.ladder, LADDER_DIR_TO_META.get(dir.opposite()));
 					}
 				}
 				return;

@@ -18,6 +18,7 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
 import generatormods.greatwall.config.GreatWallConfig;
 
 import java.util.Random;
@@ -43,7 +44,9 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 		TemplateWall ws = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorGreatWall) master).wallStyles, world, i0, k0, world.rand, false);
 		if (ws == null)
 			return false;
-		BuildingDoubleWall dw = new BuildingDoubleWall(10 * (random.nextInt(9000) + 1000), this, ws, random.nextInt(4), 1, new int[] { i0, j0, k0 });
+        BuildingDoubleWall dw =
+                new BuildingDoubleWall(10 * (random.nextInt(9000) + 1000), this, ws,
+                        Dir.randomDir(random), 1, new int[] {i0, j0, k0});
 		if (!dw.plan())
 			return false;
         logger.info("Building GreatWall at ("+i0+","+j0+","+k0+")");

@@ -27,6 +27,7 @@ import generatormods.caruins.seeds.CruciformSeed;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.LinearSeed;
 import generatormods.caruins.seeds.SymmetricSeed;
+import generatormods.common.Dir;
 
 import java.util.Random;
 
@@ -63,7 +64,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
         //bss.bottomIsFloor();
         //return true;
         BuildingCellularAutomaton bca =
-                new BuildingCellularAutomaton(this, blockRule, random.nextInt(4), 1, false,
+                new BuildingCellularAutomaton(this, blockRule, Dir.randomDir(random), 1, false,
                         ContainerWidth, th, ContainerLength, seed.makeSeed(world.rand),
                         caRule.toBytes(), null, new int[] {i0, j0, k0});
 		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {

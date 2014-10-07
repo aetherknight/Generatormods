@@ -18,12 +18,16 @@
  */
 package generatormods;
 
+import generatormods.common.Dir;
 import generatormods.common.PickWeighted;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.block.*;
@@ -38,15 +42,26 @@ import net.minecraft.world.World;
 
 import org.apache.logging.log4j.Logger;
 
-/*
+/**
  * Building is a general class for buildings. Classes can inherit from Building
  * to build from a local frame of reference.
- * 
- *  Local frame of reference variables:
- *     i,j,k are coordinate inputs for global frame of reference functions.
- *     x,z,y are coordinate inputs for local frame of reference functions.
- *     bHand =-1,1 determines whether X-axis points left or right respectively when facing along Y-axis.
+ * <p>
+ * Note: Building currently swaps the terminology of Y and Z as Minecraft
+ * uses them. In minecraft, y is up(+)-down(-), and z is south(+)-north(-).
+ * Building and subclasses use z to refer to the Y axis, and y to refer to the
+ * Z axis. So Minecraft's coordinate tuple is <code>(X, Y, Z)</code>, while
+ * Generatormods uses <code>(X, Z, Y)</code>. Note that the order of the axes
+ * is correct in Generatormods' Arrays and method arguments, just the
+ * terminology is swapped for variable and method names.
+ * <p>
+ * Local frame of reference variables:
+ * <ul>
+ *   <li>i,j,k are coordinate inputs for global frame of reference functions.</li>
+ *   <li>x,z,y are coordinate inputs for local frame of reference functions.</li>
+ *   <li>bHand =-1,1 determines whether X-axis points left or right respectively when facing along Y-axis.</li>
+ * </ul>
  *
+ * <pre>
  *               (dir=0)
  *                (-k)
  *                 n
@@ -56,12 +71,16 @@ import org.apache.logging.log4j.Logger;
  *                 s
  *                (+k)
  *               (dir=2)
+ * </pre>
  */
 public class Building {
-	public final static int HIT_WATER = -666; // , HIT_SWAMP=-667;
-	public final static int DIR_NORTH = 0, DIR_EAST = 1, DIR_SOUTH = 2, DIR_WEST = 3;
-	public final static int ROT_R = 1, R_HAND = 1, L_HAND = -1;
-	public final static int SEA_LEVEL = 63, WORLD_MAX_Y = 255;
+    public final static int HIT_WATER = -666;
+    public final static int ROT_R = 1;
+    public final static int R_HAND = 1;
+    public final static int L_HAND = -1;
+    public final static int SEA_LEVEL = 63;
+    public final static int WORLD_MAX_Y = 255;
+
 	// **** WORKING VARIABLES ****
 	protected final World world;
 	protected final Random random;
@@ -76,13 +95,17 @@ public class Building {
 	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
 	private int xI, yI, xK, yK; //
 	protected int bHand; // hand of secondary axis. Takes values of 1 for right-handed, -1 for left-handed.
-	protected int bDir; // Direction code of primary axis. Takes values of DIR_NORTH=0,DIR_EAST=1,DIR_SOUTH=2,DIR_WEST=3.
-	// **************************************** CONSTRUCTOR - findSurfaceJ
-	// *************************************************************************************//
-	// Finds a surface block.
-	// Depending on the value of waterIsSurface and wallIsSurface will treat
-	// liquid and wall blocks as either solid or air.
+
+    /**
+     * Direction code of the building's primary axis.
+     */
+    protected Dir bDir;
+
+    /**
+     * Special value to ignore water depth when looking for surface blocks.
+     */
 	public final static int IGNORE_WATER = -1;
+
 	// Special Blocks
 	public final static int PAINTING_BLOCK_OFFSET = 3;
 	public final static String[] SPAWNERS = new String[]{
@@ -91,24 +114,183 @@ public class Building {
             "Silverfish", "EnderDragon", "Ozelot", "VillagerGolem", "WitherBoss", "Bat", "Witch"
     };
 	// maps block metadata to a dir
-	public final static int[] BED_META_TO_DIR = new int[] { DIR_SOUTH, DIR_WEST, DIR_NORTH, DIR_EAST }, STAIRS_META_TO_DIR = new int[] { DIR_EAST, DIR_WEST, DIR_SOUTH, DIR_NORTH },
-			LADDER_META_TO_DIR = new int[] { DIR_NORTH, DIR_SOUTH, DIR_WEST, DIR_EAST }, TRAPDOOR_META_TO_DIR = new int[] { DIR_SOUTH, DIR_NORTH, DIR_EAST, DIR_WEST }, VINES_META_TO_DIR = new int[] {
-					0, DIR_SOUTH, DIR_WEST, 0, DIR_NORTH, 0, 0, 0, DIR_EAST }, DOOR_META_TO_DIR = new int[] { DIR_WEST, DIR_NORTH, DIR_EAST, DIR_SOUTH };
-	// inverse map should be {North_inv,East_inv,dummy,West_inv,South_inv}
-	// inverse map should be {North_inv,East_inv,South_inv, West_inv}
-	public final static int[] BED_DIR_TO_META = new int[] { 2, 3, 0, 1 }, BUTTON_DIR_TO_META = new int[] { 4, 1, 3, 2 }, STAIRS_DIR_TO_META = new int[] { 3, 0, 2, 1 }, LADDER_DIR_TO_META = new int[] {
-			2, 5, 3, 4 }, TRAPDOOR_DIR_TO_META = new int[] { 1, 2, 0, 3 }, VINES_DIR_TO_META = new int[] { 4, 8, 1, 2 }, DOOR_DIR_TO_META = new int[] { 3, 0, 1, 2 },
-			PAINTING_DIR_TO_FACEDIR = new int[] { 0, 3, 2, 1 };
-	public final static int[] DIR_TO_I = new int[] { 0, 1, 0, -1 }, DIR_TO_K = new int[] { -1, 0, 1, 0 };
-	// for use in local orientation
-	public final static int[] DIR_TO_X = new int[] { 0, 1, 0, -1 }, DIR_TO_Y = new int[] { 1, 0, -1, 0 };
+    public final static Dir[] BED_META_TO_DIR = new Dir[] { Dir.SOUTH, Dir.WEST, Dir.NORTH, Dir.EAST };
+    public final static Dir[] STAIRS_META_TO_DIR = new Dir[] { Dir.EAST, Dir.WEST, Dir.SOUTH, Dir.NORTH };
+    public final static Dir[] LADDER_META_TO_DIR = new Dir[] { Dir.NORTH, Dir.SOUTH, Dir.WEST, Dir.EAST };
+    public final static Dir[] TRAPDOOR_META_TO_DIR = new Dir[] { Dir.SOUTH, Dir.NORTH, Dir.EAST, Dir.WEST };
+    // the bit is the direction, so metadatas 1, 2, 4, and 8 are the directions.
+    public final static Dir[] VINES_META_TO_DIR = new Dir[] { (Dir.NORTH), Dir.SOUTH, Dir.WEST, (Dir.NORTH), Dir.NORTH, (Dir.NORTH), (Dir.NORTH), (Dir.NORTH), Dir.EAST };
+    public final static Dir[] DOOR_META_TO_DIR = new Dir[] { Dir.WEST, Dir.NORTH, Dir.EAST, Dir.SOUTH };
+
+    // Minecraft Directions
+	public final static Map<Dir, Integer> BED_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        BED_DIR_TO_META.put(Dir.SOUTH, 0);
+        BED_DIR_TO_META.put(Dir.WEST, 1);
+        BED_DIR_TO_META.put(Dir.NORTH, 2);
+        BED_DIR_TO_META.put(Dir.EAST, 3);
+    }
+
+    /**
+     * Maps Directions to the button metadata. The "direction" here refers to
+     * which facing/side of the block the button is attached to. Button
+     * metadata meanings (from <a
+     * href="http://minecraft.gamepedia.com/Data_values#Buttons">Minecraft
+     * Wiki</a>):
+     *
+     * <table>
+     * <tr><th>Value</th><th>Meaning</th>                               </tr>
+     * <tr><td>0x0</td>  <td>Facing down (attached to ceiling)</td>     </tr>
+     * <tr><td>0x1</td>  <td>Facing East (attached to west block)</td>  </tr>
+     * <tr><td>0x2</td>  <td>Facing West (attached to east block)</td>  </tr>
+     * <tr><td>0x3</td>  <td>Facing South (attached to north block)</td></tr>
+     * <tr><td>0x4</td>  <td>Facing North (attached to south block)</td></tr>
+     * <tr><td>0x5</td>  <td>Facing up (attached to block below)</td>   </tr>
+     * <tr><td>+0x8 </td><td>Button is pressed</td>                     </tr>
+     * </table>
+     */
+    public final static Map<Dir, Integer> BUTTON_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        // facing down is 0
+        BUTTON_DIR_TO_META.put(Dir.EAST, 1);
+        BUTTON_DIR_TO_META.put(Dir.WEST, 2);
+        BUTTON_DIR_TO_META.put(Dir.SOUTH, 3);
+        BUTTON_DIR_TO_META.put(Dir.NORTH, 4);
+        // facing up is 5
+    }
+
+    /**
+     * Maps directions to Stair metadata. Stair metadata meanings (from <a
+     * href="http://minecraft.gamepedia.com/Data_values#Buttons">Minecraft
+     * Wiki</a>):
+     *
+     * <table>
+     * <tr><th>Value</th><th>Meaning</th>                           </tr>
+     * <tr><td>0x0</td>  <td>Full block side facing East</td>       </tr>
+     * <tr><td>0x1</td>  <td>Full block side facing West</td>       </tr>
+     * <tr><td>0x2</td>  <td>Full block side facing South</td>      </tr>
+     * <tr><td>0x3</td>  <td>Full block side facing North</td>      </tr>
+     * <tr><td>+0x4</td> <td>Whether the stairs are upside down</td></tr>
+     * </table>
+     */
+    public final static Map<Dir, Integer> STAIRS_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        STAIRS_DIR_TO_META.put(Dir.NORTH, 3);
+        STAIRS_DIR_TO_META.put(Dir.EAST, 0);
+        STAIRS_DIR_TO_META.put(Dir.SOUTH, 2);
+        STAIRS_DIR_TO_META.put(Dir.WEST, 1);
+    }
+
+    /**
+     * Maps directions to Ladder metadata. Ladder metadata values are based
+     * upon Facing values, instead of Direction values. The "direction" here
+     * specifies which side of the block it is attached to. Ladder metadata
+     * meanings (from <a
+     * href="http://minecraft.gamepedia.com/Data_values#Ladders.2C_Wall_Signs.2C_Furnaces.2C_Chests.2C_and_Wall_Banners">Minecraft
+     * Wiki</a>):
+     * 
+     * <table>
+     * <tr><th>Value</th><th>Meaning</th>                              </tr>
+     * <tr><td>0x2</td>  <td>Attached to the North side of a block</td></tr>
+     * <tr><td>0x3</td>  <td>Attached to the South side of a block</td></tr>
+     * <tr><td>0x4</td>  <td>Attached to the West side of a block</td> </tr>
+     * <tr><td>0x5</td>  <td>Attached to the East side of a block</td> </tr>
+     * </table>
+     */
+    public final static Map<Dir, Integer> LADDER_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        LADDER_DIR_TO_META.put(Dir.NORTH, 2);
+        LADDER_DIR_TO_META.put(Dir.SOUTH, 3);
+        LADDER_DIR_TO_META.put(Dir.WEST, 4);
+        LADDER_DIR_TO_META.put(Dir.EAST, 5);
+    }
+
+    /**
+     * Maps Directions to trapdoor metadata. Trapdoor metadata determines which
+     * wall the trapdoor is attached to. Trapdoor metadata meanings (from <a
+     * href="http://minecraft.gamepedia.com/Data_values#Trapdoors">Minecraft
+     * Wiki</a>):
+     *
+     * <table>
+     * <tr><th>Value</th><th>Meaning</th>                   </tr>
+     * <tr><td>0x0</td>  <td>Attached to the South wall</td></tr>
+     * <tr><td>0x1</td>  <td>Attached to the North wall</td></tr>
+     * <tr><td>0x2</td>  <td>Attached to the East wall</td> </tr>
+     * <tr><td>0x3</td>  <td>Attached to the West wall</td> </tr>
+     * <tr><td>+0x4</td> <td>Whether the trapdoor is swung open</td> </tr>
+     * <tr><td>+0x8</td> <td>Whether it is attached to the bottom or top of the block</td> </tr>
+     * </table>
+     */
+    public final static Map<Dir, Integer> TRAPDOOR_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        TRAPDOOR_DIR_TO_META.put(Dir.SOUTH, 0);
+        TRAPDOOR_DIR_TO_META.put(Dir.NORTH, 1);
+        TRAPDOOR_DIR_TO_META.put(Dir.EAST, 2);
+        TRAPDOOR_DIR_TO_META.put(Dir.WEST, 3);
+    }
+
+    /**
+     * Maps directions to vine metadata. The directions refer to which face the
+     * vine is anchored. Possible values (from <a
+     * href="http://minecraft.gamepedia.com/Data_values#Vines">Minecraft
+     * Wiki</a>):
+     *
+     * <table>
+     * <tr><th>Value</th><th>Meaning</th>              </tr>
+     * <tr><td>0x1</td>  <td>Attached to the south</td></tr>
+     * <tr><td>0x2</td>  <td>Attached to the west</td> </tr>
+     * <tr><td>0x4</td>  <td>Attached to the north</td></tr>
+     * <tr><td>0x8</td>  <td>Attached to the east</td> </tr>
+     * </table>
+     */
+    public final static Map<Dir, Integer> VINES_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        VINES_DIR_TO_META.put(Dir.NORTH, 4);
+        VINES_DIR_TO_META.put(Dir.EAST, 8);
+        VINES_DIR_TO_META.put(Dir.SOUTH, 1);
+        VINES_DIR_TO_META.put(Dir.WEST, 2);
+    }
+
+    /**
+     * Maps directions to the possible directions a door could face while
+     * closed. Note that the directions here are interpreted as the opposite to
+     * how the <a
+     * href="http://minecraft.gamepedia.com/Data_values#Door">Minecraft
+     * Wiki</a> interpretes which direction a door faces.
+     */
+    public final static Map<Dir, Integer> DOOR_DIR_TO_META = new HashMap<Dir, Integer>();
+    static {
+        DOOR_DIR_TO_META.put(Dir.EAST, 0);
+        DOOR_DIR_TO_META.put(Dir.SOUTH, 1);
+        DOOR_DIR_TO_META.put(Dir.WEST, 2);
+        DOOR_DIR_TO_META.put(Dir.NORTH, 3);
+    }
+
+    /**
+     * Maps directions to the direction a painting is facing. Paintings are
+     * tile entities and not blocks.
+     */
+	public final static Map<Dir, Integer> PAINTING_DIR_TO_FACEDIR = new HashMap<Dir, Integer>();
+    static {
+        PAINTING_DIR_TO_FACEDIR.put(Dir.NORTH, 0);
+        PAINTING_DIR_TO_FACEDIR.put(Dir.WEST, 1);
+        PAINTING_DIR_TO_FACEDIR.put(Dir.SOUTH, 2);
+        PAINTING_DIR_TO_FACEDIR.put(Dir.EAST, 3);
+    }
+
 	// some prebuilt directional blocks
-	public final static BlockAndMeta WEST_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_WEST]), EAST_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_EAST]),
-			NORTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_NORTH]), SOUTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_SOUTH]),
-			EAST_FACE_LADDER_BLOCK = new BlockAndMeta(Blocks.ladder, LADDER_DIR_TO_META[DIR_EAST]), HOLE_BLOCK_LIGHTING = new BlockAndMeta(Blocks.air, 0), HOLE_BLOCK_NO_LIGHTING = new BlockAndMeta(Blocks.air, 1),
-			PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, "PRESERVE"),
-			TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString()), HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString()),
-			GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
+    public final static BlockAndMeta WEST_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.WEST));
+    public final static BlockAndMeta EAST_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.EAST));
+    public final static BlockAndMeta NORTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.NORTH));
+    public final static BlockAndMeta SOUTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.SOUTH));
+    public final static BlockAndMeta EAST_FACE_LADDER_BLOCK = new BlockAndMeta(Blocks.ladder, LADDER_DIR_TO_META.get(Dir.EAST));
+    public final static BlockAndMeta HOLE_BLOCK_LIGHTING = new BlockAndMeta(Blocks.air, 0);
+    public final static BlockAndMeta HOLE_BLOCK_NO_LIGHTING = new BlockAndMeta(Blocks.air, 1);
+    public final static BlockAndMeta PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, "PRESERVE");
+    public final static BlockAndMeta TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString());
+    public final static BlockAndMeta HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString());
+    public final static BlockAndMeta GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
+
 	private final static int LIGHTING_INVERSE_DENSITY = 10;
 	private final static boolean[] randLightingHash = new boolean[512];
 	static {
@@ -117,9 +299,7 @@ public class Building {
 			randLightingHash[m] = rand.nextInt(LIGHTING_INVERSE_DENSITY) == 0;
 	}
 
-    // **************************** CONSTRUCTORS - Building
-    // *************************************************************************************//
-    public Building(int ID_, WorldGeneratorThread wgt_, TemplateRule buildingRule_, int dir_, int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
+    public Building(int ID_, WorldGeneratorThread wgt_, TemplateRule buildingRule_, Dir dir_, int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
         bID = ID_;
         wgt = wgt_;
         logger = wgt_.logger;
@@ -142,6 +322,7 @@ public class Building {
         }
         delayedBuildQueue = new LinkedList<PlacedBlock>();
     }
+
 	// ******************** LOCAL COORDINATE FUNCTIONS - ACCESSORS
 	// *************************************************************************************************************//
 	// Use these instead of World.java functions when to build from a local
@@ -190,12 +371,18 @@ public class Building {
 		return "(" + pt[0] + "," + pt[1] + "," + pt[2] + ")";
 	}
 
-	// outputs dir rotated to this Building's orientation and handedness
-	// dir input should be the direction desired if bDir==DIR_NORTH and
-	// bHand=R_HAND
-	public int orientDirToBDir(int dir) {
-		return bHand < 0 && dir % 2 == 1 ? (bDir + dir + 2) & 0x3 : (bDir + dir) & 0x3;
-	}
+    /**
+     * Reorients dir in relation to this Building's orientation and handedness.
+     *
+     * @param dir The direction to reorient, in relation to the building's bDir and bHand.
+     * @return The newly computed direction. If bHand were R_HAND, then it
+     * essentially treats bDir as if it were the relative north and adjusts dir
+     * accordingly to get a new absolute direction. If bHand is set to L_HAND,
+     * then it would mirror dir the other way.
+     */
+    public Dir orientDirToBDir(Dir dir) {
+        return bDir.reorient(bHand > 0, dir);
+    }
 
 	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setPainting
 	// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
@@ -203,47 +390,52 @@ public class Building {
 		// painting uses same orientation meta as ladders.
 		// Have to adjust ijk since unlike ladders the entity exists at the
 		// block it is hung on.
-		int dir = orientDirToBDir(LADDER_META_TO_DIR[metadata]);
-		pt[0] -= DIR_TO_I[dir];
-		pt[2] -= DIR_TO_K[dir];
-		if (dir == DIR_NORTH)
-			pt[2]++;
-		else if (dir == DIR_SOUTH)
-			pt[2]--;
-		else if (dir == DIR_WEST)
-			pt[0]++;
-		else
-			pt[0]--;
-		EntityPainting entitypainting = new EntityPainting(world, pt[0], pt[1], pt[2], PAINTING_DIR_TO_FACEDIR[dir]);
+        Dir dir = orientDirToBDir(LADDER_META_TO_DIR[metadata]);
+        pt[0] -= dir.i;
+        pt[2] -= dir.k;
+        switch (dir) {
+            case NORTH:
+                pt[2]++;
+                break;
+            case SOUTH:
+                pt[2]--;
+                break;
+            case WEST:
+                pt[0]++;
+                break;
+            default:
+                pt[0]--;
+        }
+        EntityPainting entitypainting = new EntityPainting(world, pt[0], pt[1], pt[2], PAINTING_DIR_TO_FACEDIR.get(dir));
 		if (!world.isRemote && entitypainting.onValidSurface())
 			world.spawnEntityInWorld(entitypainting);
 	}
 
 	// ******************** ORIENTATION FUNCTIONS
 	// *************************************************************************************************************//
-	public void setPrimaryAx(int dir_) {
+    public void setPrimaryAx(Dir dir_) {
 		bDir = dir_;
 		// changes of basis
-		switch (bDir) {
-		case DIR_NORTH:
+        switch (bDir) {
+        case NORTH:
 			xI = bHand;
 			yI = 0;
 			xK = 0;
 			yK = -1;
 			break;
-		case DIR_EAST:
+        case EAST:
 			xI = 0;
 			yI = 1;
 			xK = bHand;
 			yK = 0;
 			break;
-		case DIR_SOUTH:
+        case SOUTH:
 			xI = -bHand;
 			yI = 0;
 			xK = 0;
 			yK = 1;
 			break;
-		case DIR_WEST:
+        case WEST:
 			xI = 0;
 			yI = -1;
 			xK = -bHand;
@@ -299,13 +491,13 @@ public class Building {
 	protected final String IDString() {
         String str = this.getClass().toString() + "<ID="+ bID + " axes(Y,X)=";
 		switch (bDir) {
-            case DIR_SOUTH:
+            case SOUTH:
                 return str + "(S," + (bHand > 0 ? "W" : "E") + ")>";
-            case DIR_NORTH:
+            case NORTH:
                 return str + "(N," + (bHand > 0 ? "E" : "W") + ")>";
-            case DIR_WEST:
+            case WEST:
                 return str + "(W," + (bHand > 0 ? "N" : "S") + ")>";
-            case DIR_EAST:
+            case EAST:
                 return str + "(E," + (bHand > 0 ? "S" : "N") + ")>";
             default:
                 return str + "(bad dir value: " + bDir + ")>";
@@ -404,20 +596,20 @@ public class Building {
 			if (block[3] == 0 && !isSolidBlock(world.getBlock(block[0], block[1] + 1, block[2])))
 				block[3] = 1;
 			if (block[3] != 0) {
-				int dir = VINES_META_TO_DIR[block[3]];
+                Dir dir = VINES_META_TO_DIR[block[3]];
 				while (true) {
-					if (isSolidBlock(world.getBlock(block[0] + DIR_TO_I[dir], block[1], block[2] + DIR_TO_K[dir])))
+                    if (isSolidBlock(world.getBlock(block[0] + dir.i, block[1], block[2] + dir.k)))
 						break;
-					dir = (dir + 1) % 4;
-					if (dir == VINES_META_TO_DIR[block[3]]) { // we've looped through everything
+                    dir = dir.rotate(1);
+                    if (dir == VINES_META_TO_DIR[block[3]]) { // we've looped through everything
 						if (isSolidBlock(world.getBlock(block[0], block[1] + 1, block[2]))) {
-							dir = -1;
+                            dir = null;
 							break;
 						}
 						return; // did not find a surface we can attach to
 					}
 				}
-				block[4] = dir == -1 ? 0 : VINES_DIR_TO_META[dir];
+                block[4] = dir == null ? 0 : VINES_DIR_TO_META.get(dir);
 			}
 		}
 		// It seems Minecraft orients torches automatically, so I shouldn't have to do anything...
@@ -442,8 +634,8 @@ public class Building {
 
     protected BlockAndMeta getDelayedStair(Block blc, int...block){
         // if stairs are running into ground. replace them with a solid block
-        int dirX = block[0] - DIR_TO_I[STAIRS_META_TO_DIR[block[3] % 4]];
-        int dirZ = block[2] - DIR_TO_K[STAIRS_META_TO_DIR[block[3] % 4]];
+        int dirX = block[0] - STAIRS_META_TO_DIR[block[3] % 4].i;
+        int dirZ = block[2] - STAIRS_META_TO_DIR[block[3] % 4].k;
         if(world.getHeightValue(dirX, dirZ)>block[1]) {
             Block adjId = world.getBlock(dirX, block[1], dirZ);
             Block aboveID = world.getBlock(block[0], block[1] + 1, block[2]);
@@ -655,7 +847,7 @@ public class Building {
 				tempdata += 4;
 				metadata -= 4;
 			}
-			return STAIRS_DIR_TO_META[orientDirToBDir(STAIRS_META_TO_DIR[metadata])] + tempdata;
+            return STAIRS_DIR_TO_META.get(orientDirToBDir(STAIRS_META_TO_DIR[metadata])) + tempdata;
 		}
 		if (BlockProperties.get(blockID).isDoor) {
 			// think of door metas applying to doors with hinges on the left
@@ -669,7 +861,7 @@ public class Building {
 				// >=4:the door is open
 				tempdata += 4;
 			}
-			return DOOR_DIR_TO_META[orientDirToBDir(DOOR_META_TO_DIR[metadata % 4])] + tempdata;
+            return DOOR_DIR_TO_META.get(orientDirToBDir(DOOR_META_TO_DIR[metadata % 4])) + tempdata;
 		}
 		if(blockID==Blocks.lever||blockID==Blocks.stone_button||blockID==Blocks.wooden_button){
 			// check to see if this is flagged as thrown
@@ -679,12 +871,12 @@ public class Building {
 			}
 			if (metadata == 0 || (blockID==Blocks.lever && metadata >= 5))
 				return metadata + tempdata;
-			return BUTTON_DIR_TO_META[orientDirToBDir(STAIRS_META_TO_DIR[metadata - 1])] + tempdata;
+            return BUTTON_DIR_TO_META.get(orientDirToBDir(STAIRS_META_TO_DIR[metadata - 1])) + tempdata;
         }else if(blockID==Blocks.torch||blockID==Blocks.redstone_torch||blockID==Blocks.unlit_redstone_torch){
 			if (metadata == 0 || metadata >= 5) {
 				return metadata;
 			}
-			return BUTTON_DIR_TO_META[orientDirToBDir(STAIRS_META_TO_DIR[metadata - 1])];
+            return BUTTON_DIR_TO_META.get(orientDirToBDir(STAIRS_META_TO_DIR[metadata - 1]));
         }else if(blockID==Blocks.ladder||blockID==Blocks.dispenser||blockID==Blocks.furnace||blockID==Blocks.lit_furnace||blockID==Blocks.wall_sign||blockID==Blocks.piston||blockID==Blocks.piston_extension||blockID==Blocks.chest||blockID==Blocks.hopper||blockID==Blocks.dropper){
 			if (blockID==Blocks.piston|| blockID==Blocks.piston_extension) {
 				if (metadata - 8 >= 0) {
@@ -695,10 +887,10 @@ public class Building {
 			}
 			if (metadata <= 1)
 				return metadata + tempdata;
-			return LADDER_DIR_TO_META[orientDirToBDir(LADDER_META_TO_DIR[metadata - 2])] + tempdata;
+            return LADDER_DIR_TO_META.get(orientDirToBDir(LADDER_META_TO_DIR[metadata - 2])) + tempdata;
         }else if(blockID==Blocks.rail||blockID==Blocks.golden_rail||blockID==Blocks.detector_rail||blockID==Blocks.activator_rail){
-			switch (bDir) {
-			case DIR_NORTH:
+            switch (bDir) {
+            case NORTH:
 				// flat tracks
 				if (metadata == 0) {
 					return 0;
@@ -732,7 +924,7 @@ public class Building {
 				if (metadata == 9) {
 					return bHand == 1 ? 9 : 6;
 				}
-			case DIR_EAST:
+            case EAST:
 				// flat tracks
 				if (metadata == 0) {
 					return 1;
@@ -766,7 +958,7 @@ public class Building {
 				if (metadata == 9) {
 					return bHand == 1 ? 6 : 7;
 				}
-			case DIR_SOUTH:
+            case SOUTH:
 				// flat tracks
 				if (metadata == 0) {
 					return 0;
@@ -800,7 +992,7 @@ public class Building {
 				if (metadata == 9) {
 					return bHand == 1 ? 7 : 8;
 				}
-			case DIR_WEST:
+            case WEST:
 				// flat tracks
 				if (metadata == 0) {
 					return 1;
@@ -841,21 +1033,21 @@ public class Building {
                 metadata -= 4;
 			}
 			if (blockID==Blocks.trapdoor)
-				return TRAPDOOR_DIR_TO_META[orientDirToBDir(TRAPDOOR_META_TO_DIR[metadata])] + tempdata;
+                return TRAPDOOR_DIR_TO_META.get(orientDirToBDir(TRAPDOOR_META_TO_DIR[metadata])) + tempdata;
 			else
-				return BED_DIR_TO_META[orientDirToBDir(BED_META_TO_DIR[metadata])] + tempdata;
+                return BED_DIR_TO_META.get(orientDirToBDir(BED_META_TO_DIR[metadata])) + tempdata;
         }else if(blockID==Blocks.vine){
 			if (metadata == 0)
 				return 0;
 			else if (metadata == 1 || metadata == 2 || metadata == 4 || metadata == 8)
-				return VINES_DIR_TO_META[(bDir + VINES_META_TO_DIR[metadata]) % 4];
+                return VINES_DIR_TO_META.get(bDir.reorient(true, VINES_META_TO_DIR[metadata]));
 			else
 				return 1; // default case since vine do not have to have correct
 			// metadata
         }else if(blockID==Blocks.standing_sign){
 			// sign posts
-			switch (bDir) {
-			case DIR_NORTH:
+            switch (bDir) {
+            case NORTH:
 				if (metadata == 0) {
 					return bHand == 1 ? 0 : 8;
 				}
@@ -904,7 +1096,7 @@ public class Building {
 				if (metadata == 15) {
 					return bHand == 1 ? 15 : 9;
 				}
-			case DIR_EAST:
+            case EAST:
 				if (metadata == 0) {
 					return bHand == 1 ? 4 : 12;
 				}
@@ -953,7 +1145,7 @@ public class Building {
 				if (metadata == 15) {
 					return bHand == 1 ? 3 : 13;
 				}
-			case DIR_SOUTH:
+            case SOUTH:
 				if (metadata == 0) {
 					return bHand == 1 ? 8 : 0;
 				}
@@ -1002,7 +1194,7 @@ public class Building {
 				if (metadata == 15) {
 					return bHand == 1 ? 7 : 1;
 				}
-			case DIR_WEST:
+            case WEST:
 				if (metadata == 0) {
 					return bHand == 1 ? 12 : 4;
 				}
@@ -1109,7 +1301,20 @@ public class Building {
 		return (int) Math.sqrt((pt1[0] - pt2[0]) * (pt1[0] - pt2[0]) + (pt1[1] - pt2[1]) * (pt1[1] - pt2[1]) + (pt1[2] - pt2[2]) * (pt1[2] - pt2[2]));
 	}
 
-	public static int findSurfaceJ(World world, int i, int k, int jinit, boolean wallIsSurface, int waterSurfaceBuffer) {
+    /**
+     * Finds a surface block. Depending on the value of waterIsSurface and
+     * wallIsSurface will treat liquid and wall blocks as either solid or air.
+     *
+     * @param world The world we are checking
+     * @param i X-coordinate of world to check
+     * @param k Z-coordinate of world to check
+     * @param jinit Initial Y-coordinate to begin checking down from to find the surface Y value.
+     * @param wallIsSurface ???
+     * @param waterSurfaceBuffer The number of vertical blocks of water we permit.
+     * @return The Y coordinate of the surface. However, if there is more water
+     * than waterSurfaceBuffer, then it will return HIT_WATER instead.
+     */
+    public static int findSurfaceJ(World world, int i, int k, int jinit, boolean wallIsSurface, int waterSurfaceBuffer) {
 		Block blockId;
 		//if(world.getChunkProvider().chunkExists(i>>4, k>>4))
 		{
@@ -1142,10 +1347,6 @@ public class Building {
 			}
 		}
 		return -1;
-	}
-
-	public static int flipDir(int dir) {
-		return (dir + 2) % 4;
 	}
 
 	public static String metaValueCheck(Block blockID, int metadata) {
