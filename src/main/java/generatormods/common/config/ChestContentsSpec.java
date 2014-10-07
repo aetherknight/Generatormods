@@ -21,18 +21,21 @@ package generatormods.common.config;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChestContentsConfig {
+/**
+ * Specifies the contents of a particular type of chest.
+ */
+public class ChestContentsSpec {
     private ChestType chestType;
     private int tries;
     private List<ChestItemSpec> chestItems;
 
-    public ChestContentsConfig(ChestType type, int tries, List<ChestItemSpec> chestItems) {
+    public ChestContentsSpec(ChestType type, int tries, List<ChestItemSpec> chestItems) {
         this.chestType = type;
         this.tries = tries;
         this.chestItems = chestItems;
     }
 
-    public ChestContentsConfig(ChestType type, int tries, String[] chestItemStrings) {
+    public ChestContentsSpec(ChestType type, int tries, String[] chestItemStrings) {
         this.chestType = type;
         this.tries = tries;
         this.chestItems = new ArrayList<ChestItemSpec>();
@@ -63,7 +66,7 @@ public class ChestContentsConfig {
     }
 
     public String toString() {
-        String str = "ChestContentsConfig(" + chestType + ", " + tries + ", {";
+        String str = "ChestContentsSpec(" + chestType + ", " + tries + ", {";
         for (ChestItemSpec chestItem : chestItems) {
             str += "{" + chestItem.toSpecString() + "}, ";
         }

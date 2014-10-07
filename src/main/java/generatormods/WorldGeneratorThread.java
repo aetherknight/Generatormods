@@ -18,7 +18,7 @@
  */
 package generatormods;
 
-import generatormods.common.config.ChestContentsConfig;
+import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 
 import java.util.Map;
@@ -58,7 +58,7 @@ public abstract class WorldGeneratorThread {
 	public final double chunkTryProb;
 	private int min_spawn_height = 0, max_spawn_height = 127;
 	public boolean spawn_surface = true;
-	Map<ChestType, ChestContentsConfig> chestItems = null;
+	Map<ChestType, ChestContentsSpec> chestItems = null;
 	//public int ConcaveSmoothingScale=10, ConvexSmoothingScale=20, 
 	//All WorldGeneratorThreads will have these, even if not used.
 	public int backtrackLength = 9;

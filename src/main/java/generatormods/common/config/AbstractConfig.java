@@ -21,7 +21,6 @@ package generatormods.common.config;
 import java.io.File;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractConfig {
     protected File configFile;
+    protected File configDir;
     protected Logger logger;
 
     // Defaults to the Nether and the Overworld
@@ -41,7 +41,7 @@ public abstract class AbstractConfig {
     public int triesPerChunk;
     public List<Integer> allowedDimensions;
 
-    public Map<ChestType, ChestContentsConfig> chestConfigs;
+    public Map<ChestType, ChestContentsSpec> chestConfigs;
 
     // sharedConfig provides a common way to provide type-safe access to the
     // global configs across all 3 mods without having to pass the mod
@@ -49,6 +49,7 @@ public abstract class AbstractConfig {
     public SharedConfig sharedConfig;
 
     public AbstractConfig(File configDir, String configName, Logger logger) {
+        this.configDir = configDir;
         configFile = new File(configDir + "/" + configName + ".cfg");
         this.logger = logger;
     }
@@ -82,40 +83,16 @@ public abstract class AbstractConfig {
             allowedDimensions.add(dimensionInt);
         }
 
-        initChestConfigs(config, section);
+        initChestConfigs();
 
         sharedConfig =
                 new SharedConfig(globalFrequency, triesPerChunk, allowedDimensions, chestConfigs,
                         logger);
     }
 
-    private void initChestConfigs(Configuration config, String baseSection) {
-        // Chest contents. Grouped by chest type.
-        chestConfigs = new HashMap<ChestType, ChestContentsConfig>();
-        for (ChestType chestType : ChestType.values()) {
-            String section = baseSection + ".ChestContents." + chestType;
-
-            String[] defaultChestItems = new String[chestType.getDefaultChestItems().size()];
-            for (int i = 0; i < defaultChestItems.length; i++) {
-                defaultChestItems[i] = chestType.getDefaultChestItems().get(i).toSpecString();
-            }
-
-            int chestTries =
-                    config.get(section, "Tries", chestType.getDefaultChestTries(),
-                            "The number of selections that will be made for this chest type.", 0,
-                            100).getInt();
-            String[] rawChestItemArray =
-                    config.get(
-                            section,
-                            "Chest Contents",
-                            defaultChestItems,
-                            "Format for each item is:\n\n    <item name>-<metadata>,<selection weight>,<min stack size>,<max stack size>\n\nE.g.:\n\n    minecraft:arrow-0,2,1,12\n\nMeans a stack of between 1 and 12 arrows, with a selection weight of 2.")
-                            .getStringList();
-
-            // Create a list of ChestItemSpecs from the config
-            ChestContentsConfig chestConfig =
-                    new ChestContentsConfig(chestType, chestTries, rawChestItemArray);
-            chestConfigs.put(chestType, chestConfig);
-        }
+    private void initChestConfigs() {
+        ChestsConfig cc = new ChestsConfig(configDir, logger);
+        cc.initialize();
+        chestConfigs = cc.chestConfigs;
     }
 }

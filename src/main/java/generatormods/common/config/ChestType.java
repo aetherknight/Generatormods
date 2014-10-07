@@ -134,8 +134,8 @@ public enum ChestType {
         return defaultChestItems;
     }
 
-    public ChestContentsConfig getDefaultChestContentsConfig() {
-        return new ChestContentsConfig(this, getDefaultChestTries(), getDefaultChestItems());
+    public ChestContentsSpec getDefaultChestContentsConfig() {
+        return new ChestContentsSpec(this, getDefaultChestTries(), getDefaultChestItems());
     }
 
     public static List<ChestItemSpec> makeChestItemsFromArray(Object[][] rawChestItems) {

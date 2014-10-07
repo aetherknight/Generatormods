@@ -37,10 +37,10 @@ public class SharedConfig {
     public int triesPerChunk;
     public List<Integer> allowedDimensions;
 
-    public Map<ChestType, ChestContentsConfig> chestConfigs;
+    public Map<ChestType, ChestContentsSpec> chestConfigs;
 
     public SharedConfig(float globalFrequency, int triesPerChunk, List<Integer> allowedDimensions,
-            Map<ChestType, ChestContentsConfig> chestConfigs, Logger logger) {
+            Map<ChestType, ChestContentsSpec> chestConfigs, Logger logger) {
         this.globalFrequency = globalFrequency;
         this.triesPerChunk = triesPerChunk;
         this.allowedDimensions = allowedDimensions;
