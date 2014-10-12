@@ -18,12 +18,12 @@
  */
 package generatormods;
 
+import generatormods.common.PickWeighted;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.*;
@@ -635,7 +635,7 @@ public class Building {
 			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
 		}
 		Object[][] itempool = wgt.chestItems.get(chestType).getChestItemsObjectArray();
-		int idx = pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
+		int idx = PickWeighted.pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
         Object obj = itempool[1][idx];
         if(obj == null){
             return null;
@@ -1172,36 +1172,6 @@ public class Building {
 			return metadata > 0 && metadata < 7 ? null : fail + " 1 and 6";
 		}
 		return null;
-	}
-
-    public static int pickWeightedOption(Random random, List<Object> weights, List<Object> options){
-        int[] w = new int[weights.size()];
-        int[] o = new int[options.size()];
-        for (int i= 0; i < w.length; i++)
-            w[i]= ((Integer)weights.get(i));
-        for (int i= 0; i < o.length; i++)
-            o[i]= ((Integer)options.get(i));
-        return pickWeightedOption(random, w, o);
-    }
-
-	public static int pickWeightedOption(Random random, int[] weights, int[] options) {
-		int sum = 0, n;
-		for (n = 0; n < weights.length; n++)
-			sum += weights[n];
-		if (sum <= 0) {
-			System.err.println("Error selecting options, weightsum not positive!");
-			return options[0]; // default to returning first option
-		}
-		int s = random.nextInt(sum);
-		sum = 0;
-		n = 0;
-		while (n < weights.length) {
-			sum += weights[n];
-			if (sum > s)
-				return options[n];
-			n++;
-		}
-		return options[options.length - 1];
 	}
 
 	public static int rotDir(int dir, int rotation) {

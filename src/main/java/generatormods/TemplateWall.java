@@ -18,6 +18,7 @@
  */
 package generatormods;
 
+import generatormods.common.PickWeighted;
 import generatormods.common.Util;
 
 import generatormods.common.BiomeNames;
@@ -302,7 +303,7 @@ public class TemplateWall extends TemplateTML {
 
 	//****************************************  FUNCTIONS - tower accessors *************************************************************************************//
 	public int pickRoofStyle(boolean circular, Random random) {
-		return circular ? Building.pickWeightedOption(random, CircRoofStyles, BuildingTower.ROOF_STYLE_IDS) : Building.pickWeightedOption(random, SqrRoofStyles, BuildingTower.ROOF_STYLE_IDS);
+		return circular ? PickWeighted.pickWeightedOption(random, CircRoofStyles, BuildingTower.ROOF_STYLE_IDS) : PickWeighted.pickWeightedOption(random, SqrRoofStyles, BuildingTower.ROOF_STYLE_IDS);
 	}
 
 	public int getTMinWidth(boolean circular) {
