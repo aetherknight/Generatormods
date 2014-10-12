@@ -18,8 +18,15 @@
  */
 package generatormods;
 
+import generatormods.caruins.seeds.ISeed;
+import generatormods.caruins.seeds.SymmetricSeed;
+import generatormods.common.PickWeighted;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ChunkCoordinates;
+
+import org.apache.logging.log4j.Logger;
 
 /*
  * BuildingWall plans and builds a wall that flows along Minecraft's terrain.
@@ -91,22 +98,23 @@ public class BuildingWall extends Building {
 		}
 	}
 
-	//****************************************  FUNCTION - buildFromTML*************************************************************************************//
-	//Builds a planned wall from a template
+    /**
+     * Builds a planned wall from a template.
+     */
 	public void buildFromTML() {
 		if (ws == null) {
-			System.err.println("Tried to build wall from template but no template was given!");
+            logger.error("Tried to build wall from template but no template was given!");
 			return;
 		}
 		setCursor(0);
-		if (bLength > 0)
-			if (DEBUG)
-				System.out.println("**** Built " + ws.name + " wall " + IDString() + ", length " + (bLength) + " from " + localCoordString(xArray[0], zArray[0], 0) + " to "
-						+ localCoordString(xArray[bLength - 1], zArray[bLength - 1], bLength - 1) + " ****");
-			else if (DEBUG)
-				System.out.println("**** Wall too short to build! " + IDString() + "length=" + bLength + " at " + localCoordString(0, 0, 0) + " ****");
-		if (DEBUG)
-			System.out.println("Wall planning was terminated due to: " + failString() + "\n");
+        if (bLength > 0) {
+            logger.debug("Built " + ws.name + " wall " + IDString() + ", length " + (bLength) + " from " + localCoordString(xArray[0], zArray[0], 0) + " to "
+                    + localCoordString(xArray[bLength - 1], zArray[bLength - 1], bLength - 1));
+        } else {
+            logger.warn("Wall too short to build! " + IDString() + "length=" + bLength + " at " + localCoordString(0, 0, 0));
+        }
+        // TODO: ??? why are we checking this here?
+        logger.debug("Wall planning was terminated due to: " + failString());
 		int lN = 0;
 		BlockAndMeta idAndMeta;
 		int layer[][];
@@ -202,21 +210,25 @@ public class BuildingWall extends Building {
 		setCursor(0);
 	}
 
-	//****************************  FUNCTION  - buildGateway  *************************************************************************************//
-	//Builds a gateway and road on one side of gateway. Call after build() and before buildTowers().
-	//
-	//PARAMETERS:
-	//startScan,endScan - bounds of where to look to place gateway
-	//gateHeight, gateWidth - dimensions of the gateway in the wall
-	//rs - wall style of avenues
-	//flankTHand - the hand to build flanking towers on. 0 => n0 flanking towers.
-	//XMaxLen, antiXMaxLen - maximum length of avenues for the +X and -X side avenues
-	//XTarget, antiXTarget - the target point for the +X and -X side avenues
-	//XHand, antiXHand - the internal handedness of the +X and -X side avenues.
-	//
-	//RETURNS:
-	//y-position where gateway was build or -1 if no gateways was built
-	//
+    /**
+     * Builds a gateway and road on one side of gateway. Call after build() and before buildTowers().
+	 *
+     * startScan,endScan - bounds of where to look to place gateway
+     * @param scanWindow
+     * @param scanStart Bounds of where to look to place gateway?
+     * @param gateHeight Height of the gateway in the wall
+     * @param gateWidth Width of the gateway in the wall
+     * @param rs Wall style of avenues
+     * @param flankTHand The hand to build flanking towers on. 0 =&gt; n0 flanking towers.
+     * @param XMaxLen Maximum length of avenues for the +X side avenues
+     * @param XTarget The target point fo the +X side avenues
+     * @param XHand The internal handedness of the +X side avenues
+     * @param antiXMaxLen Maximum length of avenues for the -X side avenues
+     * @param antiXTarget The target point fo the -X side avenues
+     * @param antiXHand The internal handedness of the -X side avenues
+     *
+     * @return y-position where gateway was built or -1 if not gateway was built.
+     */
 	public BuildingWall[] buildGateway(int[] scanWindow, int scanStart, int gateHeight, int gateWidth, TemplateWall rs, int flankTHand, int XMaxLen, int[] XTarget, int XHand, int antiXMaxLen,
 			int[] antiXTarget, int antiXHand) {
 		BuildingWall[] avenues = null;
@@ -367,7 +379,7 @@ public class BuildingWall extends Building {
 	//****************************************  FUNCTION - makeBuildings *************************************************************************************//
 	public void makeBuildings(boolean buildOnL, boolean buildOnR, boolean makeGatehouseTowers, boolean overlapTowers, boolean isAvenue) {
 		if (ws == null) {
-			System.err.println("Tried to build towers but wall style was null!");
+			logger.error("Tried to build towers but wall style was null!");
 			return;
 		}
 		if (!ws.MakeBuildings)
@@ -409,7 +421,7 @@ public class BuildingWall extends Building {
 				}
 			} else if ((buildOnL && clearSide == L_HAND) || (buildOnR && clearSide == R_HAND)) { //side towers
 				//FMLLog.getLogger().info("Building side tower for "+IDString()+" at n="+n0+" "+globalCoordString(0,0,0)+" with clearSide="+clearSide+" width "+tw);
-				TemplateTML template = ws.buildings.get(Building.pickWeightedOption(world.rand, ws.buildingWeights[0], ws.buildingWeights[1]));
+				TemplateTML template = ws.buildings.get(PickWeighted.pickWeightedOption(world.rand, ws.buildingWeights[0], ws.buildingWeights[1]));
 				int ybuffer = -ws.TowerXOffset + (isAvenue ? 0 : 1);
 				int[] pt = getIJKPtAtN(nMid, clearSide == bHand ? (bWidth - ybuffer) : ybuffer - 1, 0, 0);
 				if (makeBuilding(template, tw, ybuffer, overlapTowers, rotDir(bDir, clearSide), pt))
@@ -427,25 +439,39 @@ public class BuildingWall extends Building {
 		}
 	}
 
-	//****************************************  FUNCTION  - plan *************************************************************************************//
-	//ASSUMPTIONS:
-	//xarray and zarray contain planned values up to startN-1 inclusive.
-	//RETURNS:
-	//Length of new wall planned.
-	//SIDE EFFECTS:
-	//planL set to total length now planned.
-	//xarry and zarry are filled up to planL.
-	//hitMaxDepth true if planning was terminated due to depth==MAX_BACKTRACK_DEPTH.
-	//failString contains termination rationale.
+    /**
+     * Plans the wall.
+     * <p>
+     * <b>Assumptions</b>
+     * <p>
+     * xarray and zarray contain planned values up to startN-1 inclusive.
+     * <p>
+     * <b>Side Effects</b>
+     * <p>
+     * <ul>
+     *   <li>planL set to total length now planned.</li>
+     *   <li>xarry and zarry are filled up to planL.</li>
+     *   <li>hitMaxDepth true if planning was terminated due to depth==MAX_BACKTRACK_DEPTH.</li>
+     *   <li>failString contains termination rationale.</li>
+     * </ul>
+     *
+     * @param startN
+     * @param depth
+     * @param lookahead
+     * @param stopAtWall
+     *
+     * @return Length of the new wall planned.
+     */
 	public int plan(int startN, int depth, int lookahead, boolean stopAtWall) {
 		if (startN < 1 || startN >= maxLength) {
-			System.err.println("Error, bad start length at BuildingWall.plan:" + startN + ".");
+            logger.error("Bad start length at BuildingWall.plan:" + startN);
 			return 0;
 		}
 		int fails = 0;
 		setOriginLocal(i1, j1, k1, xArray[startN - 1], zArray[startN - 1], startN);
 		bLength = startN;
-		//if(DEBUG && depth > 0) FMLLog.getLogger().info("planWall "+IDString()+", depth="+depth+" n="+startN+" maxlLen="+maxLength+" at "+globalCoordString(i0,j0,k0));
+        logger.debug("planWall " + IDString() + ", depth=" + depth + " n=" + startN + " maxlLen="
+                + maxLength + " at " + (new ChunkCoordinates(i0, j0, k0)));
 		//int searchUp=Math.min(Math.max(MIN_SEARCHUP,WalkHeight+1),MAX_SEARCHUP);
 		int searchUp = MIN_SEARCHUP;
 		int obstructionHeight = WalkHeight > 4 ? WalkHeight + 1 : bHeight + 1;
@@ -512,7 +538,7 @@ public class BuildingWall extends Building {
 					hitMaxDepth = true; //may still be able to proceed, note this so we can do so from root
 					break; //loop termination condition 3
 				} else {
-					//if(DEBUG) FMLLog.getLogger().info("\nTrying branches for "+IDString()+", depth="+depth+" at n="+bLength+" x="+(xArray[bLength])+" z="+(zArray[bLength]));
+					logger.debug("\nTrying branches for "+IDString()+", depth="+depth+" at n="+bLength+" x="+(xArray[bLength])+" z="+(zArray[bLength]));
 					int improvement, bestImprovement = 0;
 					BuildingWall branch, bestBranch = null;
 					//String[] branchNames={"Down","Minus","Straight","Plus","Up"};
@@ -566,37 +592,34 @@ public class BuildingWall extends Building {
 		return bLength - startN;
 	}
 
-	//****************************************  FUNCTION  - printWall  *************************************************************************************//
-	//For precise debugging
 	public void printWall() {
-		if (DEBUG)
-			printWall(0);
+        printWall(0);
 	}
 
 	public void printWall(int start) {
-		if (DEBUG) {
-			System.out.println("Printing " + IDString() + " wall from n=" + start + " to n=" + (bLength - 1));
-			for (int m = start; m < bLength; m++) {
-				if (m % 10 == 0)
-					System.out.print("|");
-				if (m % 100 == 0)
-					System.out.print("||");
-				System.out.print(xArray[m] + ",");
-				if (m > 0 && Math.abs(xArray[m] - xArray[m - 1]) > 1)
-					System.out.print("(ERROR: X-slope>1 at n=" + m + ")");
-			}
-			System.out.print("\n");
-			for (int m = start; m < bLength; m++) {
-				if (m % 10 == 0)
-					System.out.print("|");
-				if (m % 100 == 0)
-					System.out.print("||");
-				System.out.print(zArray[m] + ",");
-				if (m > 0 && Math.abs(zArray[m] - zArray[m - 1]) > 1)
-					System.out.print("(ERROR: Z-slope>1 at n=" + m + ")");
-			}
-			System.out.println("\n");
-		}
+        logger.debug("Printing " + IDString() + " wall from n=" + start + " to n=" + (bLength - 1));
+        String temp = "";
+        for (int m = start; m < bLength; m++) {
+            if (m % 10 == 0)
+                temp += "|";
+            if (m % 100 == 0)
+                temp += "||";
+            temp += xArray[m] + ",";
+            if (m > 0 && Math.abs(xArray[m] - xArray[m - 1]) > 1)
+                temp += "(ERROR: X-slope>1 at n=" + m + ")";
+        }
+        logger.debug(temp);
+        temp = "";
+        for (int m = start; m < bLength; m++) {
+            if (m % 10 == 0)
+                temp += "|";
+            if (m % 100 == 0)
+                temp += "||";
+            temp += zArray[m] + ",";
+            if (m > 0 && Math.abs(zArray[m] - zArray[m - 1]) > 1)
+                temp += "(ERROR: Z-slope>1 at n=" + m + ")";
+        }
+        logger.debug(temp);
 	}
 
 	public boolean ptIsToXHand(int[] pt, int buffer) {
@@ -646,11 +669,16 @@ public class BuildingWall extends Building {
 		return this;
 	}
 
-	//****************************************  FUNCTION  - setTarget  *************************************************************************************//
-	//Sets a target coordinate that the plan function can use to path towards
-	//Will change EW and axY to reflect direction to target.
-	//RETURNS; true if target is acceptable and reachable.
+    /**
+     * Sets a target coordinate that the plan function can use to path towards.
+     *
+     * Will change EW and axY to reflect direction to target.
+     *
+     * @param targ An int array with the (x,y,z) of the target coordinate.
+     * @return True if target is acceptable and reachable, false otherwise.
+     */
 	public boolean setTarget(int[] targ) {
+        ChunkCoordinates localTarget = new ChunkCoordinates(targ[0], targ[1], targ[2]);
 		if (targ[1] > 20 && Math.abs(j1 - targ[1]) < Math.max(Math.abs(i1 - targ[0]), Math.abs(k1 - targ[2]))) {
 			target = true;
 			setPrimaryAx(Math.abs(i1 - targ[0]) > Math.abs(k1 - targ[2]) ? (targ[0] > i1 ? DIR_EAST : DIR_WEST) : (targ[2] > k1 ? DIR_SOUTH : DIR_NORTH));
@@ -658,9 +686,11 @@ public class BuildingWall extends Building {
 			x_targ = getX(targ);
 			z_targ = getZ(targ);
 			y_targ = getY(targ);
-			//if(DEBUG) FMLLog.getLogger().info("Set target for "+IDString()+"to "+localCoordString(x_targ,z_targ,y_targ)+"!");
-		}
-		//else if(DEBUG) FMLLog.getLogger().info("Could not set target for "+IDString()+", targ="+globalCoordString(targ)+" (i,j,k)="+globalCoordString(i1,j1,k1));
+            logger.debug("Set target for "+IDString()+"to "+localCoordString(x_targ,z_targ,y_targ)+"!");
+        } else {
+            logger.debug("Could not set target for " + IDString() + ", targ=" + localTarget
+                    + " (i,j,k)=" + (new ChunkCoordinates(i1, j1, k1)));
+        }
 		return target;
 	}
 
@@ -676,8 +706,8 @@ public class BuildingWall extends Building {
 
 	//****************************************  FUNCTION - smooth  *************************************************************************************//
 	public void smooth(int convexWindow, int concaveWindow, boolean flattenEnds) {
-		smooth(xArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
-		smooth(zArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
+		smooth(logger, xArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
+		smooth(logger, zArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
 	}
 
 	//****************************************  FUNCTION - clearTrees *************************************************************************************//
@@ -718,9 +748,13 @@ public class BuildingWall extends Building {
 		} else if (template == ws.makeCARuin) {
 			byte[][] caRule = ws.CARuinAutomataRules.get(random.nextInt(ws.CARuinAutomataRules.size()));
 			for (int tries = 0; tries < 10; tries++) {
-				byte[][] seed = BuildingCellularAutomaton.makeSymmetricSeed(ws.CARuinContainerWidth, 0.5F, world.rand);
-				BuildingCellularAutomaton bca = new BuildingCellularAutomaton(wgt, ws.CARuinRule, dir, 1, true, ws.CARuinContainerWidth, ws.CARuinMinHeight
-						+ random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight + 1), ws.CARuinContainerWidth, seed, caRule, null, pt);
+                ISeed seed = new SymmetricSeed(ws.CARuinContainerWidth, 0.5F);
+                BuildingCellularAutomaton bca =
+                        new BuildingCellularAutomaton(wgt, ws.CARuinRule, dir, 1, true,
+                                ws.CARuinContainerWidth, ws.CARuinMinHeight
+                                        + random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight
+                                                + 1), ws.CARuinContainerWidth,
+                                seed.makeSeed(world.rand), caRule, null, pt);
 				if (bca.plan(false, 12) && bca.queryCanBuild(ybuffer, ws.CARuinContainerWidth <= 15)) {
 					bca.build(true, true);
 					return true;
@@ -784,15 +818,14 @@ public class BuildingWall extends Building {
 			if (roofRule != TemplateRule.RULE_NOT_PROVIDED)
 				roofRule = roofRule.getFixedRule(world.rand);
 			if (endTowers && ws.MakeEndTowers) {
-				endBTemplate = ws.buildings.get(Building.pickWeightedOption(world.rand, ws.buildingWeights[0], ws.buildingWeights[1]));
+				endBTemplate = ws.buildings.get(PickWeighted.pickWeightedOption(world.rand, ws.buildingWeights[0], ws.buildingWeights[1]));
 				endBLength = endBTemplate == ws.makeDefaultTower ? ws.pickTWidth(circular, world.rand) + 1 //+1 allows some extra wiggle room for roof edges etc.
 						: (endBTemplate == ws.makeCARuin ? ws.CARuinContainerWidth : endBTemplate.length);
 			}
 		}
 	}
 
-	//smooth(int[] arry, int a, int b,int convexWindow, int concaveWindow)
-	public static void smooth(int[] arry, int a, int b, int convexWindow, int concaveWindow, boolean flattenEnds) {
+	public static void smooth(Logger logger, int[] arry, int a, int b, int convexWindow, int concaveWindow, boolean flattenEnds) {
 		int n, smoothStart, leadSlope, shorterWinStart = a, longerWinStart = a;
 		int shorterWinInitEnd = a + Math.min(concaveWindow, convexWindow), longerWinInitEnd = a + Math.max(concaveWindow, convexWindow);
 		for (int winEnd = a + 2; winEnd <= b; winEnd++) {
@@ -810,14 +843,12 @@ public class BuildingWall extends Building {
 			else
 				smoothStart = -1;
 			if (smoothStart >= 0) {
-				if (DEBUG) {
-					System.out.print("smoothing: ");
-					for (int m = smoothStart; m <= winEnd; m++)
-						System.out.print(arry[m] + ",");
-				}
+                String smoothingdebugStr = "smoothing: ";
+                for (int m = smoothStart; m <= winEnd; m++)
+                    smoothingdebugStr += (arry[m] + ",");
+                logger.debug(smoothingdebugStr);
 				do {
-					if (DEBUG)
-						System.out.println("smoothing n=" + n + " " + arry[n - 1] + " " + arry[n] + " " + arry[winEnd]);
+                    logger.debug("smoothing n=" + n + " " + arry[n - 1] + " " + arry[n] + " " + arry[winEnd]);
 					arry[n] = arry[winEnd];
 					n--;
 				} while (n > smoothStart && arry[n] != arry[winEnd]);
@@ -836,15 +867,20 @@ public class BuildingWall extends Building {
 		}
 	}
 
-	//=====================================================  HELPER FUNCTIONS ==========================================================================================================//
-	//****************************************  FUNCTION  - curvature  *************************************************************************************//
-	//curvature(LinkedList ll, int a, int b, int c, int wiggle)
-	//wiggle allows for some leeway before slope is detected
-	//RETURNS: 0 if constant (000)
-	//         1 if concave up (+0+),(00+),(+00)
-	//        -1 if concave down (-0-),(-00),(00-)
-	//         2 if increasing (-0+)
-	//        -2 if decreasing (+0-)
+    /**
+     * @param a
+     * @param b
+     * @param c
+     * @param wiggle allows for some leeway before slope is detected
+     *
+     * @return <ul>
+     *   <li>0 if constant (000)</li>
+     *   <li>1 if concave up (+0+),(00+),(+00)</li>
+	 *   <li>-1 if concave down (-0-),(-00),(00-)</li>
+	 *   <li>2 if increasing (-0+)</li>
+	 *   <li>-2 if decreasing (+0-)</li>
+     * </ul>
+     */
 	private static int curvature(int a, int b, int c, int wiggle) {
 		int d1 = signum(a - b, wiggle);
 		int d2 = signum(c - b, wiggle);

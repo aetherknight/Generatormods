@@ -220,8 +220,7 @@ public class BuildingTower extends Building {
 		int rBuffer = (roofStyle == ROOF_CRENEL ? 1 : (roofStyle == ROOF_DOME || roofStyle == ROOF_CONE) ? 0 : -1);
 		int rHeight = (roofStyle == ROOF_CRENEL ? 2 : minHorizDim / 2);
 		if (isObstructedSolid(new int[] { rBuffer, bHeight, Math.max(rBuffer, ybuffer) }, new int[] { bWidth - 1 - rBuffer, bHeight + rHeight, bLength - 1 - rBuffer })) {
-			if (BuildingWall.DEBUG)
-				System.err.println("Cannot build Tower " + IDString() + ". Obstructed!");
+            logger.warn("Cannot build Tower " + IDString() + ". Obstructed!");
 			return true;
 		}
 		return false;

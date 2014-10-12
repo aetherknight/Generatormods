@@ -18,6 +18,9 @@
  */
 package generatormods;
 
+import generatormods.common.ModUpdateDetectorWrapper;
+import generatormods.greatwall.config.GreatWallConfig;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -45,121 +48,57 @@ import net.minecraft.world.World;
 public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Instance("GreatWallMod")
 	public static PopulatorGreatWall instance;
-	//USER MODIFIABLE PARAMETERS, values below are defaults
-	public float CurveBias = 0.5F;
-	public int LengthBiasNorm = 200;
-	public int BacktrackLength = 9;
 	//DATA VARIABLES
 	public ArrayList<TemplateWall> wallStyles = null;
 	public int[] placedCoords = null;
 	public World placedWorld = null;
 
+    public GreatWallConfig config;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-		settingsFileName = "GreatWallSettings.txt";
 		templateFolderName = "greatwall";
-        if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
-            try {
-                Class.forName("mods.mud.ModUpdateDetector").getDeclaredMethod("registerMod", ModContainer.class, String.class, String.class).invoke(null,
-                        FMLCommonHandler.instance().findContainerFor(this),
-                        "https://raw.github.com/GotoLink/Generatormods/master/update.xml",
-                        "https://raw.github.com/GotoLink/Generatormods/master/changelog.md"
-                );
-            } catch (Throwable e) {
-            }
-        }
+        ModUpdateDetectorWrapper.checkForUpdates(this, event);
 	}
 
-	//****************************  FUNCTION - loadDataFiles *************************************************************************************//
-	@Override
-	public final void loadDataFiles() {
+    @EventHandler
+    public void modsLoaded(FMLPostInitializationEvent event) {
+        loadConfiguration();
+        if (!errFlag) {
+            GameRegistry.registerWorldGenerator(this, 1);
+        }
+    }
+
+    public final void loadConfiguration() {
 		try {
-			initializeLogging("Loading options and templates for the Great Wall Mod.");
-			//read and check values from file
-			getGlobalOptions();
+            logger.info("Loading options and templates for the Great Wall Mod.");
+
+            config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
+            config.initialize();
+            sharedConfig = config.sharedConfig;
+
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
-			wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, this);
-			finalizeLoading(true, "wall");
+            wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
+            logger.info("Template loading complete.");
+
+            logger.info("Probability of wall generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
-			logOrPrint("There was a problem loading the great wall mod: " + e.getMessage(), "SEVERE");
-			lw.println("There was a problem loading the great wall mod: " + e.getMessage());
-			e.printStackTrace();
-		} finally {
-			if (lw != null)
-				lw.close();
+            logger.fatal("There was a problem loading the great wall mod", e);
 		}
-		if (GlobalFrequency < 0.000001)
+		if (config.globalFrequency < 0.000001)
 			errFlag = true;
-		dataFilesLoaded = true;
 	}
 
-	//****************************  FUNCTION - generate *************************************************************************************//
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
-		if (random.nextFloat() < GlobalFrequency)
-			(new WorldGenGreatWall(this, world, random, i, k, TriesPerChunk, GlobalFrequency)).run();
-	}
-
-	//****************************  FUNCTION - getGlobalOptions  *************************************************************************************//
-	@Override
-	public void loadGlobalOptions(BufferedReader br) {
-		try {
-			for (String read = br.readLine(); read != null; read = br.readLine()) {
-				readGlobalOptions(lw, read);
-				if (read.startsWith("CurveBias"))
-					CurveBias = readFloatParam(lw, CurveBias, ":", read);
-				if (read.startsWith("LengthBiasNorm"))
-					LengthBiasNorm = readIntParam(lw, LengthBiasNorm, ":", read);
-				if (read.startsWith("BacktrackLength"))
-					BacktrackLength = readIntParam(lw, BacktrackLength, ":", read);
-				readChestItemsList(lw, read, br);
-			}
-			if (TriesPerChunk > MAX_TRIES_PER_CHUNK)
-				TriesPerChunk = MAX_TRIES_PER_CHUNK;
-			if (CurveBias < 0.0)
-				CurveBias = 0.0F;
-			if (CurveBias > 1.0)
-				CurveBias = 1.0F;
-		} catch (IOException e) {
-			lw.println(e.getMessage());
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-
-	@Override
-	public void writeGlobalOptions(PrintWriter pw) {
-		printGlobalOptions(pw, true);
-		pw.println();
-		pw.println("<-BacktrackLength - length of backtracking for wall planning if a dead end is hit->");
-		pw.println("<-CurveBias - strength of the bias towards curvier walls. Value should be between 0.0 and 1.0.->");
-		pw.println("<-LengthBiasNorm - wall length at which there is no penalty for generation>");
-		pw.println("BacktrackLength:" + BacktrackLength);
-		pw.println("CurveBias:" + CurveBias);
-		pw.println("LengthBiasNorm:" + LengthBiasNorm);
-		pw.println();
-		printDefaultChestItems(pw);
-		if (pw != null)
-			pw.close();
+		if (random.nextFloat() < config.globalFrequency)
+			(new WorldGenGreatWall(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
 	}
 
 	@Override
 	public String toString() {
 		return "GreatWallMod";
-	}
-
-	@EventHandler
-	public void modsLoaded(FMLPostInitializationEvent event) {
-		if (!dataFilesLoaded)
-			loadDataFiles();
-		if (!errFlag) {
-			GameRegistry.registerWorldGenerator(this, 1);
-		}
 	}
 }

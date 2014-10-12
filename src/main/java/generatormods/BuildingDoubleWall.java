@@ -40,8 +40,8 @@ public class BuildingDoubleWall extends Building {
 		int a = wall1.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		int b = wall2.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		if (b + a - 1 < ws.MinL) {
-			if (BuildingWall.DEBUG)
-				System.out.println("Abandoning wall " + wall1.IDString() + "length=" + (b + a - 1) + ", reason 1)" + wall1.failString() + ". 2)" + wall2.failString() + ".");
+            logger.debug("Abandoning wall " + wall1.IDString() + "length=" + (b + a - 1)
+                    + ", reason 1)" + wall1.failString() + ". 2)" + wall2.failString() + ".");
 			return false;
 		}
 		wall1.printWall();
@@ -63,12 +63,12 @@ public class BuildingDoubleWall extends Building {
 			tempx[m + b] = wall1.xArray[m];
 			tempz[m + b] = wall1.zArray[m];
 		}
-		if (BuildingWall.DEBUG)
-			System.out.println("\nSMOOTHING X");
-		BuildingWall.smooth(tempx, 0, a + b - 1, ws.LateralSmoothingScale, ws.LateralSmoothingScale, true);
-		if (BuildingWall.DEBUG)
-			System.out.println("\nSMOOTHING Z");
-		BuildingWall.smooth(tempz, 0, a + b - 1, ws.ConcaveDownSmoothingScale, ws.ConcaveUpSmoothingScale, true);
+        logger.debug("SMOOTHING X");
+        BuildingWall.smooth(logger, tempx, 0, a + b - 1, ws.LateralSmoothingScale,
+                ws.LateralSmoothingScale, true);
+        logger.debug("SMOOTHING Z");
+        BuildingWall.smooth(logger, tempz, 0, a + b - 1, ws.ConcaveDownSmoothingScale,
+                ws.ConcaveUpSmoothingScale, true);
 		for (int m = 0; m < b; m++) {
 			wall2.xArray[b - m - 1] = tempx[m];
 			wall2.zArray[b - m - 1] = tempz[m];

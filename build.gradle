@@ -58,3 +58,9 @@ jar {
     //Append with minecraft version
     archiveName = archivesBaseName + "-" + minecraft.version + "-" + version + "." + extension
 }
+
+compileJava {
+            //options.compilerArgs << "-Werror"
+            options.compilerArgs << "-Xlint:deprecation"
+            //options.compilerArgs << "-Xlint:unchecked"
+}

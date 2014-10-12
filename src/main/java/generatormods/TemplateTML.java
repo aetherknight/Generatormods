@@ -18,6 +18,8 @@
  */
 package generatormods;
 
+import generatormods.common.Util;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,6 +31,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.logging.log4j.Logger;
 
 /*
  * TemplateTML reads in a .tml file and defines a template.
@@ -45,7 +49,6 @@ public class TemplateTML {
 	public boolean buildOverStreets = false;
 	public HashMap<String, int[][]> namedLayers = null;
 	public HashMap<String, String> extraOptions = null;
-	public BuildingExplorationHandler explorationHandler = null;
 	public String name = "";
 	protected boolean readInWaterHeight = false;
 	public int templateTypeCode = TML_CODE;
@@ -53,14 +56,14 @@ public class TemplateTML {
 	//public int[] targets;
 	//public int overhang = 0, primary=4, w_off=0, l_off=0, lbuffer =0;
 	//public boolean preserveWater = false, preserveLava = false, preservePlants = false, unique = false;
-	PrintWriter lw;
 
-	public TemplateTML(File file, BuildingExplorationHandler beh) throws Exception {
+    protected Logger logger;
+
+    public TemplateTML(File file, Logger logger) throws Exception {
 		// load in the given file as a template
-		explorationHandler = beh;
 		BufferedReader br;
 		name = file.getName();
-		lw = beh.lw;
+        this.logger = logger;
 		ArrayList<String> lines = new ArrayList<String>();
 		br = new BufferedReader(new FileReader(file));
 		try {
@@ -70,7 +73,7 @@ public class TemplateTML {
 		} catch (IOException io) {
 		}
 		parseFile(lines);
-		lw.println("Successfully loaded template " + name + " with weight " + weight + ".");
+        logger.debug("Successfully loaded template " + name + " with weight " + weight + ".");
 	}
 
 	//a dummy constructor for use by TemplateWall for default towers/ CARuins
@@ -108,7 +111,7 @@ public class TemplateTML {
 					try {
 						parseLayer(itr, layers.get(layers.size() - 1), true);
 					} catch (Exception e) {
-						throw new Exception("Error reading layer " + layerN + ": " + e.toString());
+						throw new Exception("Error reading layer " + layerN, e);
 					}
 					layerN++;
 				} else if (layerData.length == 2) {
@@ -116,37 +119,37 @@ public class TemplateTML {
 					try {
 						parseLayer(itr, namedLayers.get(layerData[1]), false);
 					} catch (Exception e) {
-						throw new Exception("Error reading layer \"" + layerData[1] + "\": " + e.toString());
+						throw new Exception("Error reading layer \"" + layerData[1] + "\"", e);
 					}
 				}
 			} else if (line.startsWith("rule")) {
 				String[] parts = line.split("=");
 				rulesArrayList.add(new TemplateRule(parts[1], true));
 			} else if (line.startsWith("dimensions")) {
-				Integer[] dim = BuildingExplorationHandler.readIntList(lw, null, "=", line);
+				Integer[] dim = Util.readIntList(logger, null, "=", line);
 				if (dim == null || dim.length != 3)
 					throw new Exception("Bad dimension input!" + line);
 				height = dim[0];
 				length = dim[1];
 				width = dim[2];
 			}
-			//else if(line.startsWith("acceptable_target_blocks" )) targets=BuildingExplorationHandler.readIntList(lw,targets,"=",line);
+			//else if(line.startsWith("acceptable_target_blocks" )) targets=Util.readIntList(logger,targets,"=",line);
 			else if (line.startsWith("weight")) {
-				weight = BuildingExplorationHandler.readIntParam(lw, weight, "=", line);
+				weight = Util.readIntParam(logger, weight, "=", line);
 				if (weight <= 0)
 					throw ZERO_WEIGHT_EXCEPTION;
 			} else if (line.startsWith("embed_into_distance"))
-				embed = BuildingExplorationHandler.readIntParam(lw, embed, "=", line);
+				embed = Util.readIntParam(logger, embed, "=", line);
 			else if (line.startsWith("max_cut_in"))
-				cutIn = BuildingExplorationHandler.readIntParam(lw, cutIn, "=", line);
+				cutIn = Util.readIntParam(logger, cutIn, "=", line);
 			else if (line.startsWith("max_leveling"))
-				leveling = BuildingExplorationHandler.readIntParam(lw, leveling, "=", line);
+				leveling = Util.readIntParam(logger, leveling, "=", line);
 			else if (line.startsWith("water_height")) {
 				readInWaterHeight = true;
 				if (line.contains(NO_WATER_CHECK_STR))
 					waterHeight = NO_WATER_CHECK;
 				else
-					waterHeight = BuildingExplorationHandler.readIntParam(lw, waterHeight, "=", line);
+					waterHeight = Util.readIntParam(logger, waterHeight, "=", line);
 			} else if (line.length() > 0) {
 				String[] spl = line.split("=");
 				if (spl.length == 2 && !spl[0].equals("") && !spl[1].equals(""))
@@ -157,7 +160,7 @@ public class TemplateTML {
 		if (layers.size() == 0)
 			throw new Exception("No layers provided!");
 		if (layers.size() != height) {
-			lw.println("\nWarning, number of layers provided " + layers.size() + " did not equal height=" + height + ".");
+			logger.warn("Warning, number of layers provided " + layers.size() + " did not equal height=" + height + ".");
 			height = layers.size();
 		}
 		template = new int[height][length][width];
@@ -225,16 +228,17 @@ public class TemplateTML {
 		return weightsAndIndex;
 	}
 
-	//****************************  FUNCTION - printTemplate*************************************************************************************//
-	public void printTemplate() {
-		explorationHandler.logOrPrint("TEMPLATE - " + name, "CONFIG");
+    // currently unused
+    public String printableString() {
+        String temp = "TEMPLATE - " + name;
 		for (int z = 0; z < height; z++) {
 			for (int y = 0; y < length; y++) {
 				for (int x = 0; x < width; x++) {
-					explorationHandler.logOrPrint(template[z][x][length - y - 1] + ",", "CONFIG");
+					temp += template[z][x][length - y - 1] + ",";
 				}
 			}
-			explorationHandler.logOrPrint("endlayer\n", "CONFIG");
+			temp += "endlayer";
 		}
-	}
+        return temp;
+    }
 }

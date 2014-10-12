@@ -18,24 +18,25 @@
  */
 package generatormods;
 
+import generatormods.common.PickWeighted;
+import generatormods.common.config.ChestType;
+import generatormods.walledcity.CityDataManager;
+
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import net.minecraft.block.*;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.village.VillageDoorInfo;
 import net.minecraft.world.World;
+
+import org.apache.logging.log4j.Logger;
 
 /*
  * Building is a general class for buildings. Classes can inherit from Building
@@ -58,7 +59,6 @@ import net.minecraft.world.World;
  */
 public class Building {
 	public final static int HIT_WATER = -666; // , HIT_SWAMP=-667;
-	public final static String EASY_CHEST = "EASY", MEDIUM_CHEST = "MEDIUM", HARD_CHEST = "HARD", TOWER_CHEST = "TOWER";
 	public final static int DIR_NORTH = 0, DIR_EAST = 1, DIR_SOUTH = 2, DIR_WEST = 3;
 	public final static int ROT_R = 1, R_HAND = 1, L_HAND = -1;
 	public final static int SEA_LEVEL = 63, WORLD_MAX_Y = 255;
@@ -70,6 +70,8 @@ public class Building {
 	public final int bID; // Building ID number
     private final LinkedList<PlacedBlock> delayedBuildQueue;
 	protected final WorldGeneratorThread wgt;
+    protected final Logger logger;
+
 	protected boolean centerAligned; // if true, alignPt x is the central axis of the building if false, alignPt is the origin
 	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
 	private int xI, yI, xK, yK; //
@@ -105,7 +107,7 @@ public class Building {
 			NORTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_NORTH]), SOUTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META[DIR_SOUTH]),
 			EAST_FACE_LADDER_BLOCK = new BlockAndMeta(Blocks.ladder, LADDER_DIR_TO_META[DIR_EAST]), HOLE_BLOCK_LIGHTING = new BlockAndMeta(Blocks.air, 0), HOLE_BLOCK_NO_LIGHTING = new BlockAndMeta(Blocks.air, 1),
 			PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, "PRESERVE"),
-			TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, TOWER_CHEST), HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, HARD_CHEST),
+			TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString()), HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString()),
 			GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
 	public final static int MAX_SPHERE_DIAM = 40;
 	public final static int[][] SPHERE_SHAPE = new int[MAX_SPHERE_DIAM + 1][];
@@ -125,45 +127,13 @@ public class Building {
 		for (int m = 0; m < randLightingHash.length; m++)
 			randLightingHash[m] = rand.nextInt(LIGHTING_INVERSE_DENSITY) == 0;
 	}
-	public final static String[] CHEST_TYPE_LABELS = new String[] { "EASY", "MEDIUM", "HARD", "TOWER" };
-	public final static int[] DEFAULT_CHEST_TRIES = new int[] { 4, 6, 6, 6 };
-	// chest items[n] format is array of 6 arrays
-	// 0array - idx
-	// 1array - blockId
-	// 2array - block damage/meta
-	// 3array - block weight
-	// 4array - block min stacksize
-	// 5array - block max stacksize
-	public final static Object[][][] DEFAULT_CHEST_ITEMS = new Object[][][] { { // Easy
-			{ 0, Items.arrow, 0, 2, 1, 12 }, { 1, Items.iron_sword, 0, 2, 1, 1 }, { 2, Items.leather_leggings, 0, 1, 1, 1 }, { 3, Items.iron_shovel, 0, 1, 1, 1 },
-					{ 4, Items.string, 0, 1, 1, 1 }, { 5, Items.iron_pickaxe, 0, 2, 1, 1 }, { 6, Items.leather_boots, 0, 1, 1, 1 }, { 7, Items.bucket, 0, 1, 1, 1 },
-					{ 8, Items.leather_helmet, 0, 1, 1, 1 }, { 9, Items.wheat_seeds, 0, 1, 10, 15 }, { 10, Items.gold_nugget, 0, 2, 3, 8 }, { 11, Items.potionitem, 5, 2, 1, 1 }, // healing I
-					{ 12, Items.potionitem, 4, 1, 1, 1 } }, // poison, hehe
-			{ // Medium
-			{ 0, Items.golden_sword, 0, 2, 1, 1 }, { 1, Items.milk_bucket, 0, 2, 1, 1 }, { 2, Blocks.web, 0, 1, 8, 16 }, { 3, Items.golden_shovel, 0, 1, 1, 1 },
-					{ 4, Items.golden_hoe, 0, 1, 0, 1 }, { 5, Items.clock, 0, 1, 1, 1 }, { 6, Items.iron_axe, 0, 3, 1, 1 }, { 7, Items.map, 0, 1, 1, 1 },
-					{ 8, Items.apple, 0, 2, 2, 3 }, { 9, Items.compass, 0, 1, 1, 1 }, { 10, Items.iron_ingot, 0, 1, 5, 8 }, { 11, Items.slime_ball, 0, 1, 1, 3 },
-					{ 12, Blocks.obsidian, 0, 1, 1, 4 }, { 13, Items.bread, 0, 2, 8, 15 }, { 14, Items.potionitem, 2, 1, 1, 1 }, { 15, Items.potionitem, 37, 3, 1, 1 }, // healing II
-					{ 16, Items.potionitem, 34, 1, 1, 1 }, // swiftness II
-					{ 17, Items.potionitem, 9, 1, 1, 1 } }, // strength
-			{ // Hard
-			{ 0, Blocks.sticky_piston, 0, 2, 6, 12 }, { 1, Blocks.web, 0, 1, 8, 24 }, { 2, Items.cookie, 0, 2, 8, 18 }, { 3, Items.diamond_axe, 0, 1, 1, 1 },
-					{ 4, Items.minecart, 0, 1, 12, 24 }, { 5, Items.redstone, 0, 2, 12, 24 }, { 6, Items.lava_bucket, 0, 2, 1, 1 }, { 7, Items.ender_pearl, 0, 1, 1, 1 },
-					{ 8, Blocks.mob_spawner, 0, 1, 2, 4 }, { 9, Items.record_13, 0, 1, 1, 1 }, { 10, Items.golden_apple, 0, 1, 4, 8 }, { 11, Blocks.tnt, 0, 2, 8, 20 },
-					{ 12, Items.diamond, 0, 2, 1, 4 }, { 13, Items.gold_ingot, 0, 2, 30, 64 }, { 14, Items.potionitem, 37, 3, 1, 1 }, // healing II
-					{ 15, Items.potionitem, 49, 2, 1, 1 }, // regeneration II
-					{ 16, Items.potionitem, 3, 2, 1, 1 } }, // fire resistance
-			{ // Tower
-			{ 0, Items.arrow, 0, 1, 1, 12 }, { 1, Items.fish, 0, 2, 1, 1 }, { 2, Items.golden_helmet, 0, 1, 1, 1 }, { 3, Blocks.web, 0, 1, 1, 12 },
-					{ 4, Items.iron_ingot, 0, 1, 2, 3 }, { 5, Items.stone_sword, 0, 1, 1, 1 }, { 6, Items.iron_axe, 0, 1, 1, 1 }, { 7, Items.egg, 0, 2, 8, 16 },
-					{ 8, Items.saddle, 0, 1, 1, 1 }, { 9, Items.wheat, 0, 2, 3, 6 }, { 10, Items.gunpowder, 0, 1, 2, 4 }, { 11, Items.leather_chestplate, 0, 1, 1, 1 },
-					{ 12, Blocks.pumpkin, 0, 1, 1, 5 }, { 13, Items.gold_nugget, 0, 2, 1, 3 } } };
 
     // **************************** CONSTRUCTORS - Building
     // *************************************************************************************//
     public Building(int ID_, WorldGeneratorThread wgt_, TemplateRule buildingRule_, int dir_, int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
         bID = ID_;
         wgt = wgt_;
+        logger = wgt_.logger;
         world = wgt.world;
         bRule = buildingRule_;
         if (bRule == null)
@@ -331,20 +301,26 @@ public class Building {
 		return world.getBlockMetadata(i0 + yI * y + xI * x, j0 + z, k0 + yK * y + xK * x);
 	}
 
-	// replaces orientationString
+    /**
+     * Describes the building in terms of its building ID and orientation.
+     *
+     * @return A string describing the building. The ID is the building ID, and
+     * the axes describe the building's local "North" and handedness.
+     */
 	protected final String IDString() {
-		String str = "ID=" + bID + " axes(Y,X)=";
+        String str = this.getClass().toString() + "<ID="+ bID + " axes(Y,X)=";
 		switch (bDir) {
-		case DIR_SOUTH:
-			return str + "(S," + (bHand > 0 ? "W)" : "E)");
-		case DIR_NORTH:
-			return str + "(N," + (bHand > 0 ? "E)" : "W)");
-		case DIR_WEST:
-			return str + "(W," + (bHand > 0 ? "N)" : "S)");
-		case DIR_EAST:
-			return str + "(E," + (bHand > 0 ? "S)" : "N)");
+            case DIR_SOUTH:
+                return str + "(S," + (bHand > 0 ? "W" : "E") + ")>";
+            case DIR_NORTH:
+                return str + "(N," + (bHand > 0 ? "E" : "W") + ")>";
+            case DIR_WEST:
+                return str + "(W," + (bHand > 0 ? "N" : "S") + ")>";
+            case DIR_EAST:
+                return str + "(E," + (bHand > 0 ? "S" : "N") + ")>";
+            default:
+                return str + "(bad dir value: " + bDir + ")>";
 		}
-		return "Error - bad dir value for ID=" + bID;
 	}
 
 	protected final boolean isArtificialWallBlock(int x, int z, int y) {
@@ -618,11 +594,7 @@ public class Building {
 		if (!(this.wgt instanceof WorldGenWalledCity)) {
 			return;
 		}
-		int id = getKnownBuilding();
-		if (id == -1) {
-			((PopulatorWalledCity) this.wgt.master).cityDoors.put(bID, new ArrayList<VillageDoorInfo>());
-			id = bID;
-		}
+        CityDataManager cityDataManager = ((WorldGenWalledCity) this.wgt).cityDataManager;
 		int l = ((BlockDoor) Blocks.wooden_door).func_150013_e(this.world, par1, par2, par3);
 		int i1;
 		if (l != 0 && l != 2) {
@@ -638,7 +610,7 @@ public class Building {
 				}
 			}
 			if (i1 != 0) {
-				((PopulatorWalledCity) this.wgt.master).cityDoors.get(id).add(new VillageDoorInfo(par1, par2, par3, 0, i1 > 0 ? -2 : 2, 0));
+                cityDataManager.addDoor(bID, par1, par2, par3, 0, i1 > 0 ? -2 : 2, 0);
 			}
 		} else {
 			i1 = 0;
@@ -653,7 +625,7 @@ public class Building {
 				}
 			}
 			if (i1 != 0) {
-				((PopulatorWalledCity) this.wgt.master).cityDoors.get(id).add(new VillageDoorInfo(par1, par2, par3, i1 > 0 ? -2 : 2, 0, 0));
+                cityDataManager.addDoor(bID, par1, par2, par3, i1 > 0 ? -2 : 2, 0, 0);
 			}
 		}
 	}
@@ -670,11 +642,11 @@ public class Building {
 	}
 
 	private ItemStack getChestItemstack(String chestType) {
-		if (chestType.equals(TOWER_CHEST) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
+		if (chestType.equals(ChestType.TOWER) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
 			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
 		}
-		Object[][] itempool = wgt.chestItems.get(chestType);
-		int idx = pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
+		Object[][] itempool = wgt.chestItems.get(chestType).getChestItemsObjectArray();
+		int idx = PickWeighted.pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
         Object obj = itempool[1][idx];
         if(obj == null){
             return null;
@@ -685,15 +657,6 @@ public class Building {
             obj = Item.getItemFromBlock((Block)obj);
         }
 		return new ItemStack((Item)obj, Integer.class.cast(itempool[4][idx]) + random.nextInt(Integer.class.cast(itempool[5][idx]) - Integer.class.cast(itempool[4][idx]) + 1), Integer.class.cast(itempool[2][idx]));
-	}
-
-	private int getKnownBuilding() {
-		Set<?> keys = ((PopulatorWalledCity) this.wgt.master).cityDoors.keySet();
-		for (int id = bID - 3; id < bID + 4; id++) {
-			if (keys.contains(id))
-				return id;
-		}
-		return -1;
 	}
 
 	private int rotateMetadata(Block blockID, int metadata) {
@@ -1109,8 +1072,8 @@ public class Building {
 	private void setLootChest(int[] pt, Block chestBlock, int meta, String chestType) {
 		if (world.setBlock(pt[0], pt[1], pt[2], chestBlock, meta, 2)) {
 			TileEntityChest chest = (TileEntityChest) world.getTileEntity(pt[0], pt[1], pt[2]);
-			if (wgt.chestTries != null && wgt.chestTries.containsKey(chestType)) {
-				for (int m = 0; m < wgt.chestTries.get(chestType); m++) {
+			if (wgt.chestItems != null && wgt.chestItems.containsKey(chestType)) {
+				for (int m = 0; m < wgt.chestItems.get(chestType).getTries(); m++) {
 					if (random.nextBoolean()) {
 						ItemStack itemstack = getChestItemstack(chestType);
 						if (itemstack != null && chest != null)
@@ -1220,36 +1183,6 @@ public class Building {
 			return metadata > 0 && metadata < 7 ? null : fail + " 1 and 6";
 		}
 		return null;
-	}
-
-    public static int pickWeightedOption(Random random, List<Object> weights, List<Object> options){
-        int[] w = new int[weights.size()];
-        int[] o = new int[options.size()];
-        for (int i= 0; i < w.length; i++)
-            w[i]= ((Integer)weights.get(i));
-        for (int i= 0; i < o.length; i++)
-            o[i]= ((Integer)options.get(i));
-        return pickWeightedOption(random, w, o);
-    }
-
-	public static int pickWeightedOption(Random random, int[] weights, int[] options) {
-		int sum = 0, n;
-		for (n = 0; n < weights.length; n++)
-			sum += weights[n];
-		if (sum <= 0) {
-			System.err.println("Error selecting options, weightsum not positive!");
-			return options[0]; // default to returning first option
-		}
-		int s = random.nextInt(sum);
-		sum = 0;
-		n = 0;
-		while (n < weights.length) {
-			sum += weights[n];
-			if (sum > s)
-				return options[n];
-			n++;
-		}
-		return options[options.length - 1];
 	}
 
 	public static int rotDir(int dir, int rotation) {
