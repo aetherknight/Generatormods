@@ -36,6 +36,8 @@ import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.world.World;
 
+import org.apache.logging.log4j.Logger;
+
 /*
  * Building is a general class for buildings. Classes can inherit from Building
  * to build from a local frame of reference.
@@ -68,6 +70,8 @@ public class Building {
 	public final int bID; // Building ID number
     private final LinkedList<PlacedBlock> delayedBuildQueue;
 	protected final WorldGeneratorThread wgt;
+    protected final Logger logger;
+
 	protected boolean centerAligned; // if true, alignPt x is the central axis of the building if false, alignPt is the origin
 	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
 	private int xI, yI, xK, yK; //
@@ -129,6 +133,7 @@ public class Building {
     public Building(int ID_, WorldGeneratorThread wgt_, TemplateRule buildingRule_, int dir_, int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
         bID = ID_;
         wgt = wgt_;
+        logger = wgt_.logger;
         world = wgt.world;
         bRule = buildingRule_;
         if (bRule == null)
@@ -296,20 +301,26 @@ public class Building {
 		return world.getBlockMetadata(i0 + yI * y + xI * x, j0 + z, k0 + yK * y + xK * x);
 	}
 
-	// replaces orientationString
+    /**
+     * Describes the building in terms of its building ID and orientation.
+     *
+     * @return A string describing the building. The ID is the building ID, and
+     * the axes describe the building's local "North" and handedness.
+     */
 	protected final String IDString() {
-		String str = "ID=" + bID + " axes(Y,X)=";
+        String str = this.getClass().toString() + "<ID="+ bID + " axes(Y,X)=";
 		switch (bDir) {
-		case DIR_SOUTH:
-			return str + "(S," + (bHand > 0 ? "W)" : "E)");
-		case DIR_NORTH:
-			return str + "(N," + (bHand > 0 ? "E)" : "W)");
-		case DIR_WEST:
-			return str + "(W," + (bHand > 0 ? "N)" : "S)");
-		case DIR_EAST:
-			return str + "(E," + (bHand > 0 ? "S)" : "N)");
+            case DIR_SOUTH:
+                return str + "(S," + (bHand > 0 ? "W" : "E") + ")>";
+            case DIR_NORTH:
+                return str + "(N," + (bHand > 0 ? "E" : "W") + ")>";
+            case DIR_WEST:
+                return str + "(W," + (bHand > 0 ? "N" : "S") + ")>";
+            case DIR_EAST:
+                return str + "(E," + (bHand > 0 ? "S" : "N") + ")>";
+            default:
+                return str + "(bad dir value: " + bDir + ")>";
 		}
-		return "Error - bad dir value for ID=" + bID;
 	}
 
 	protected final boolean isArtificialWallBlock(int x, int z, int y) {

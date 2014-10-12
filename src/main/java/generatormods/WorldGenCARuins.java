@@ -45,6 +45,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
+        logger.debug("Attempting to generate CARuins near ("+i0+","+j0+","+k0+")");
         int ContainerWidth = config.containerWidth;
         int ContainerLength = config.containerLength;
 
@@ -66,13 +67,16 @@ public class WorldGenCARuins extends WorldGeneratorThread {
                         ContainerWidth, th, ContainerLength, seed.makeSeed(world.rand),
                         caRule.toBytes(), null, new int[] {i0, j0, k0});
 		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
+            logger.info("Building CARuin at ("+i0+","+j0+","+k0+")");
 			bca.build(config.smoothWithStairs, config.makeFloors);
 			if (config.globalFrequency < 0.05 && random.nextInt(2) != 0) {
 				for (int tries = 0; tries < 10; tries++) {
 					int[] pt = new int[] { i0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)), 0,
 							k0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)) };
 					pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], Building.WORLD_MAX_Y, true, 3) + 1;
+                    logger.debug("Recursing");
 					if (generate(pt[0], pt[1], pt[2])) {
+                        logger.debug("Successfully Recursed");
 						break;
 					}
 				}

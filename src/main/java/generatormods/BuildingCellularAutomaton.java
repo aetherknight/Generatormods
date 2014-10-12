@@ -256,24 +256,32 @@ public class BuildingCellularAutomaton extends Building {
 				}
 			}
 			if (!layerIsAlive) {
-				if (z <= MinHeightBeforeOscillation)
+                if (z <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer "+z+" is not alive and is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
 					return false;
+                }
 				bHeight = z;
 				break;
 			}
 			if (layerIsFixed) {
-				if (z - 1 <= MinHeightBeforeOscillation)
+                if (z - 1 <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer "+z+" is fixed and layer "+(z-1)+" is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
 					return false;
+                }
 				crystallizationHeight = z - 1;
 			}
 			if (layerIsPeriod2) {
-				if (z - 2 <= MinHeightBeforeOscillation)
+                if (z - 2 <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer "+z+" is period2 and layer "+(z-2)+" is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
 					return false;
+                }
 				crystallizationHeight = z - 2;
 			}
 			if (layerIsPeriod3) {
-				if (z - 3 <= MinHeightBeforeOscillation)
+                if (z - 3 <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer "+z+" is period3 and layer "+(z-3)+" is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
 					return false;
+                }
 				crystallizationHeight = z - 3;
 			}
 			if (crystallizationHeight > UNREACHED && z > 2 * crystallizationHeight) {
@@ -301,8 +309,11 @@ public class BuildingCellularAutomaton extends Building {
 		int minX = minOrMax(BB[0], true), maxX = minOrMax(BB[1], false), minY = minOrMax(BB[2], true), maxY = minOrMax(BB[3], false);
 		bWidth = maxX - minX + 1;
 		bLength = maxY - minY + 1;
-		if (!shiftBuidlingJDown(15)) //do a height check to see we are not at the edge of a cliff etc.
-			return false;
+        //do a height check to see we are not at the edge of a cliff etc.
+        if (!shiftBuidlingJDown(15)) {
+            logger.debug("Rejecting because the surface below the building varies by more than 15 meters");
+            return false;
+        }
 		boolean hitWater = false;
 		if (caRule[0][2] != ALIVE) { //if not a 2-rule
 			int[] heights = new int[] { findSurfaceJ(world, getI(bWidth - 1, 0), getK(bWidth - 1, 0), j0 + 10, false, 0),
@@ -346,11 +357,15 @@ public class BuildingCellularAutomaton extends Building {
 		if (wgt.isLayoutGenerator()) {
 			if (wgt.layoutIsClear(getIJKPt(0, 0, ybuffer), getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode))
 				wgt.setLayoutCode(getIJKPt(0, 0, ybuffer), getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode);
-			else
+            else {
+                logger.debug("Cannot build because layout is not clear");
 				return false;
+            }
 		} else if (nonLayoutFrameCheck) {
-			if (isObstructedFrame(0, ybuffer))
+            if (isObstructedFrame(0, ybuffer)) {
+                logger.debug("Cannot build because the frame is obstructed");
 				return false;
+            }
 		}
 		return true;
 	}

@@ -70,14 +70,17 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	//****************************************  FUNCTION - generate  *************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
+        logger.debug("Attempting to generate WalledCity near ("+i0+","+j0+","+k0+")");
 		ows = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorWalledCity) master).cityStyles, world, i0, k0, world.rand, false);
 		if (ows == null)
 			return false;
 		sws = TemplateWall.pickBiomeWeightedWallStyle(ows.streets, world, i0, k0, world.rand, false);
 		if (sws == null)
 			return false;
-        if (!cityDataManager.isCitySeparated(world, i0, k0, cityType))
+        if (!cityDataManager.isCitySeparated(world, i0, k0, cityType)) {
+            logger.debug("Too close to another WalledCity");
 			return false;
+        }
 		int ID = (random.nextInt(9000) + 1000) * 100;
 		int minJ = ows.LevelInterior ? Building.SEA_LEVEL - 1 : BuildingWall.NO_MIN_J;
 		//boolean circular=random.nextFloat() < ows.CircularProb;
@@ -90,46 +93,60 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		//plan walls[0]
 		walls[0] = new BuildingWall(ID, this, ows, dir[0], axXHand, ows.MinL + random.nextInt(ows.MaxL - ows.MinL), false, i0, j0, k0).setMinJ(minJ);
 		walls[0].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
-		if (walls[0].bLength < ows.MinL)
+        if (walls[0].bLength < ows.MinL) {
+            logger.debug("Abandoning because wall[0]: " + walls[0].IDString() + " planned length " + walls[0].bLength + " is less than targeted length "+ ows.MinL + ". Reason: " + walls[2].failString());
 			return false;
+        }
 		//plan walls[1]
 		walls[0].setCursor(walls[0].bLength - 1);
 		walls[1] = new BuildingWall(ID + 1, this, ows, dir[1], axXHand, ows.MinL + random.nextInt(ows.MaxL - ows.MinL), false, walls[0].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset))
 				.setTowers(walls[0]).setMinJ(minJ);
-		if (!cityDataManager.isCitySeparated(world, walls[1].i1, walls[1].k1, cityType))
+		if (!cityDataManager.isCitySeparated(world, walls[1].i1, walls[1].k1, cityType)) {
+            logger.debug("wall[1] is too close to another WalledCity");
 			return false;
+        }
 		walls[1].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
-		if (walls[1].bLength < ows.MinL)
+        if (walls[1].bLength < ows.MinL) {
+            logger.debug("Abandoning because wall[1]: " + walls[1].IDString() + " planned length " + walls[1].bLength + " is less than targeted length "+ ows.MinL + ". Reason: " + walls[2].failString());
 			return false;
+        }
 		//plan walls[2]
 		walls[1].setCursor(walls[1].bLength - 1);
 		int distToTarget = walls[0].bLength + walls[1].xArray[walls[1].bLength - 1];
-		if (distToTarget < MIN_SIDE_LENGTH)
+        if (distToTarget < MIN_SIDE_LENGTH) {
+            logger.debug("Rejecting because distToTarget " + distToTarget + " for wall[2] is less than " + MIN_SIDE_LENGTH);
 			return false;
+        }
 		walls[2] = new BuildingWall(ID + 2, this, ows, dir[2], axXHand, distToTarget + 2, false, walls[1].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset)).setTowers(walls[0]).setMinJ(minJ);
-        if (!cityDataManager.isCitySeparated(world, walls[2].i1, walls[2].k1, cityType))
+        if (!cityDataManager.isCitySeparated(world, walls[2].i1, walls[2].k1, cityType)) {
+            logger.debug("wall[2] is too close to another WalledCity");
 			return false;
+        }
 		walls[2].setCursor(0);
 		walls[2].setTarget(walls[2].getIJKPt(0, 0, distToTarget));
 		walls[2].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
 		if (walls[2].bLength < walls[2].y_targ) {
-			//if(BuildingWall.DEBUG) FMLLog.getLogger().info("Abandoning on 3rd wall "+walls[2].IDString()+" planned length "+walls[2].bLength+" less than targeted length "+walls[2].y_targ+". Reason: "+walls[2].failString());
+            logger.debug("Abandoning because wall[2]: " + walls[2].IDString() + " planned length " + walls[2].bLength + " is less than targeted length "+ walls[2].y_targ + ". Reason: " + walls[2].failString());
 			return false;
 		}
 		//plan walls[3]
 		walls[2].setCursor(walls[2].bLength - 1);
 		distToTarget = walls[1].bLength - walls[0].xArray[walls[0].bLength - 1] + walls[1].xArray[walls[1].bLength - 1];
-		if (distToTarget < MIN_SIDE_LENGTH)
+        if (distToTarget < MIN_SIDE_LENGTH) {
+            logger.debug("Rejecting because distToTarget " + distToTarget + " for wall[3] is less than " + MIN_SIDE_LENGTH);
 			return false;
+        }
 		walls[3] = new BuildingWall(ID + 3, this, ows, dir[3], axXHand, distToTarget + 2, false, walls[2].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset)).setTowers(walls[0]).setMinJ(minJ);
-        if (!cityDataManager.isCitySeparated(world, walls[3].i1, walls[3].k1, cityType))
+        if (!cityDataManager.isCitySeparated(world, walls[3].i1, walls[3].k1, cityType)) {
+            logger.debug("wall[3] is too close to another WalledCity");
 			return false;
+        }
 		walls[0].setCursor(0);
 		walls[3].setCursor(0);
 		walls[3].setTarget(walls[0].getIJKPt(-1 - ows.TowerXOffset, 0, -1 - ows.TowerXOffset));
 		walls[3].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
 		if (walls[3].bLength < walls[3].y_targ) {
-			//if(BuildingWall.DEBUG)  FMLLog.getLogger().info("Abandoning on 4th wall "+walls[3].IDString()+" planned length "+walls[3].bLength+" less than targeted "+walls[3].y_targ+". Reason: "+walls[3].failString());
+            logger.debug("Abandoning because wall[3]: " + walls[3].IDString() + " planned length " + walls[3].bLength + " is less than targeted length "+ walls[3].y_targ + ". Reason: " + walls[3].failString());
 			return false;
 		}
 		//if(BuildingWall.DEBUG) FMLLog.getLogger().info("smoothingwalls");
@@ -159,7 +176,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		jmean /= (Lmean * 4);
 		for (BuildingWall w : walls) {
 			if (Math.abs(w.j1 - jmean) > w.bLength / JMEAN_DEVIATION_SLOPE) {
-				logger.info("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".");
+				logger.debug("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".");
 				return false;
 			}
 		}
@@ -177,20 +194,20 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					if (j2 == Building.HIT_WATER)
 						waterArea++;
 					if (((PopulatorWalledCity) master).config.rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
-						logger.warn("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
+						logger.debug("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
 						return false;
 					}
 				}
 			}
 		}
 		if (!ows.LevelInterior && (float) waterArea / (float) cityArea > MAX_WATER_PERCENTAGE) {
-			logger.info("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!");
+			logger.debug("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!");
 			return false;
 		}
 		//query the exploration handler again to see if we've built nearby cities in the meanwhile
 		for (BuildingWall w : walls) {
             if (!cityDataManager.isCitySeparated(world, w.i1, w.k1, cityType)) {
-				logger.warn("Rejected city " + ID + " nearby city was built during planning!");
+				logger.debug("Rejected city " + ID + " nearby city was built during planning!");
 				return false;
 			}
 		}

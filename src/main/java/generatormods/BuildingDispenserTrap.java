@@ -104,8 +104,7 @@ public class BuildingDispenserTrap extends Building {
 			if (itemstack != null && tileentitychest != null)
 				tileentitychest.setInventorySlotContents(random.nextInt(tileentitychest.getSizeInventory()), itemstack);
 		} catch (Exception e) {
-			System.err.println("Error filling dispenser: " + e.toString());
-			e.printStackTrace();
+            logger.error("Error filling dispenser", e);
 		}
 	}
 }

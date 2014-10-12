@@ -59,18 +59,21 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 	//****************************  FUNCTION - generate*************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
+        logger.debug("Attempting to generate UndergroundCity near ("+i0+","+j0+","+k0+")");
 		pws = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorWalledCity) master).undergroundCityStyles, world, i0, k0, world.rand, true);
 		if (pws == null)
 			return false;
-        if (!cityDataManager.isCitySeparated(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND))
+        if (!cityDataManager.isCitySeparated(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND)) {
+            logger.debug("Too close to another UndergroundCity");
 			return false;
+        }
 		//make hollows recursively
 		hollow(i0, j0, k0, MAX_DIAM);
 		if (hollows.size() == 0)
 			return false;
         cityDataManager.addCity(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND);
         cityDataManager.saveCityLocations(world);
-		logger.debug("Building " + pws.name + " city with " + hollows.size() + " hollows at (" + i0 + "," + j0 + "," + k0 + ")");
+		logger.debug("Building " + pws.name + " UndergroundCity with " + hollows.size() + " hollows at (" + i0 + "," + j0 + "," + k0 + ")");
 		List<BuildingUndergroundEntranceway> entranceways = buildEntranceways();
 		//build streets, towers
 		fillHollows();
