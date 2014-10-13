@@ -16,8 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.gen;
 
+import generatormods.PopulatorCARuins;
+import generatormods.buildings.Building;
+import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.caruins.config.CARuinsConfig;
 import generatormods.caruins.config.CARule;
 import generatormods.caruins.config.SeedType;
@@ -28,6 +31,7 @@ import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.LinearSeed;
 import generatormods.caruins.seeds.SymmetricSeed;
 import generatormods.common.Dir;
+import generatormods.common.TemplateRule;
 
 import java.util.Random;
 

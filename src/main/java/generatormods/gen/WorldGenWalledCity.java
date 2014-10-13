@@ -16,9 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.gen;
 
+import generatormods.PopulatorWalledCity;
+import generatormods.buildings.Building;
+import generatormods.buildings.BuildingDoubleWall;
+import generatormods.buildings.BuildingTower;
+import generatormods.buildings.BuildingWall;
+import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.TemplateWall;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
@@ -26,7 +33,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;

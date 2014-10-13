@@ -18,13 +18,12 @@
  */
 package generatormods.caruins.config;
 
-import generatormods.BuildingCellularAutomaton;
-import generatormods.TemplateRule;
+import generatormods.buildings.BuildingCellularAutomaton;
+import generatormods.common.TemplateRule;
 import generatormods.common.config.AbstractConfig;
 import generatormods.common.config.ParseError;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 

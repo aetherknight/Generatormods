@@ -16,10 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.buildings;
 
+import generatormods.common.BlockAndMeta;
+import generatormods.common.BlockExtended;
+import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.TemplateRule;
 import generatormods.common.config.ChestType;
+import generatormods.gen.WorldGeneratorThread;
 
 import java.util.ArrayList;
 import java.util.Collections;

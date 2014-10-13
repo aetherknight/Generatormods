@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.common;
 
 import cpw.mods.fml.common.registry.GameData;
+import generatormods.buildings.Building;
 
 import java.util.Random;
 

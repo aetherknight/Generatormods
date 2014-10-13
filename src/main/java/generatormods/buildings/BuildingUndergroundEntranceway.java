@@ -16,10 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.buildings;
 
+import generatormods.common.BlockAndMeta;
+import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
-
+import generatormods.common.TemplateRule;
+import generatormods.common.TemplateWall;
+import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 

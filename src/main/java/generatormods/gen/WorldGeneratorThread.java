@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.gen;
 
+import generatormods.BuildingExplorationHandler;
+import generatormods.buildings.Building;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 
@@ -51,14 +53,14 @@ public abstract class WorldGeneratorThread {
 		{ 0, 0, 0, 0, 0, 0 } }; //present template
 	public final static char[] LAYOUT_CODE_TO_CHAR = new char[] { ' ', '#', '=', '-', '@', '&' };
 	public final BuildingExplorationHandler master;
-    protected final Logger logger;
+    public final Logger logger;
 	public final World world;
 	public final Random random;
 	public final int chunkI, chunkK, triesPerChunk;
 	public final double chunkTryProb;
 	private int min_spawn_height = 0, max_spawn_height = 127;
 	public boolean spawn_surface = true;
-	Map<ChestType, ChestContentsSpec> chestItems = null;
+	public Map<ChestType, ChestContentsSpec> chestItems = null;
 	//public int ConcaveSmoothingScale=10, ConvexSmoothingScale=20, 
 	//All WorldGeneratorThreads will have these, even if not used.
 	public int backtrackLength = 9;

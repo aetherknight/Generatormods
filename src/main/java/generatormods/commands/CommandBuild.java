@@ -16,7 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.commands;
+
+import generatormods.PopulatorCARuins;
+import generatormods.PopulatorGreatWall;
+import generatormods.PopulatorWalledCity;
+import generatormods.buildings.Building;
+import generatormods.gen.WorldGenCARuins;
+import generatormods.gen.WorldGenGreatWall;
+import generatormods.gen.WorldGenUndergroundCity;
+import generatormods.gen.WorldGenWalledCity;
+import generatormods.gen.WorldGeneratorThread;
 
 import java.util.List;
 import java.util.Random;

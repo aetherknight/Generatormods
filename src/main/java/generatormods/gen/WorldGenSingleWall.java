@@ -16,9 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.gen;
 
+import generatormods.PopulatorGreatWall;
+import generatormods.buildings.Building;
+import generatormods.buildings.BuildingWall;
 import generatormods.common.Dir;
+import generatormods.common.TemplateWall;
 
 import java.util.Random;
 

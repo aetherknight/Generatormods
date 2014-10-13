@@ -16,15 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.common;
 
-import generatormods.common.BiomeNames;
-import generatormods.common.PickWeighted;
-import generatormods.common.Shape;
-import generatormods.common.Util;
+import generatormods.buildings.BuildingTower;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,7 +70,7 @@ public class TemplateWall extends TemplateTML {
 	public int CARuinContainerWidth = 15;
 	public int CARuinMinHeight = 20;
 	public int CARuinMaxHeight = 35;
-	List<byte[][]> CARuinAutomataRules = null;
+    public List<byte[][]> CARuinAutomataRules = null;
 
 	//****************************************  CONSTRUCTOR - WallStyle*************************************************************************************//
     public TemplateWall(File wallFile, HashMap<String, TemplateTML> buildingTemplateMap, Logger logger) throws Exception {

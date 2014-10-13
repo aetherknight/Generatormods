@@ -18,12 +18,10 @@
  */
 package generatormods.common;
 
-import generatormods.TemplateRule;
 import generatormods.caruins.config.CARule;
 import generatormods.common.config.ParseError;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 

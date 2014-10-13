@@ -18,7 +18,7 @@
  */
 package generatormods.caruins.config;
 
-import generatormods.BuildingCellularAutomaton;
+import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.common.config.ParseError;
 
 /**

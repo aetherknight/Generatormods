@@ -16,16 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
-
-import generatormods.common.Util;
+package generatormods.common;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

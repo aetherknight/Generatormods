@@ -18,7 +18,7 @@
  */
 package generatormods.caruins.seeds;
 
-import generatormods.BuildingCellularAutomaton;
+import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.common.Shape;
 
 import java.util.Random;

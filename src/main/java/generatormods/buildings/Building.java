@@ -16,11 +16,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.buildings;
 
+import generatormods.common.BlockAndMeta;
+import generatormods.common.BlockExtended;
+import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.PickWeighted;
+import generatormods.common.PlacedBlock;
+import generatormods.common.TemplateRule;
 import generatormods.common.config.ChestType;
+import generatormods.gen.WorldGenWalledCity;
+import generatormods.gen.WorldGeneratorThread;
 import generatormods.walledcity.CityDataManager;
 
 import java.util.Arrays;
@@ -94,12 +101,12 @@ public class Building {
 	protected boolean centerAligned; // if true, alignPt x is the central axis of the building if false, alignPt is the origin
 	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
 	private int xI, yI, xK, yK; //
-	protected int bHand; // hand of secondary axis. Takes values of 1 for right-handed, -1 for left-handed.
+    public int bHand; // hand of secondary axis. Takes values of 1 for right-handed, -1 for left-handed.
 
     /**
      * Direction code of the building's primary axis.
      */
-    protected Dir bDir;
+    public Dir bDir;
 
     /**
      * Special value to ignore water depth when looking for surface blocks.
@@ -488,7 +495,7 @@ public class Building {
      * @return A string describing the building. The ID is the building ID, and
      * the axes describe the building's local "North" and handedness.
      */
-	protected final String IDString() {
+	public final String IDString() {
         String str = this.getClass().toString() + "<ID="+ bID + " axes(Y,X)=";
 		switch (bDir) {
             case SOUTH:
@@ -1385,9 +1392,7 @@ public class Building {
 		world.getChunkFromChunkCoords(i >> 4, k >> 4).func_150807_a(i & 0xf, j, k & 0xf, blockId, meta);
 	}
 
-	// ******************** STATIC FUNCTIONS
-	// ******************************************************************************************************************************************//
-	protected static void fillDown(int[] lowPt, int jtop, World world) {
+    public static void fillDown(int[] lowPt, int jtop, World world) {
 		while (BlockProperties.get(world.getBlock(lowPt[0], lowPt[1], lowPt[2])).isArtificial)
 			lowPt[1]--;
 		Block oldSurfaceBlockId = world.getBlock(lowPt[0], lowPt[1], lowPt[2]);
@@ -1417,7 +1422,7 @@ public class Building {
 	}
 
 	// wiggle allows for some leeway before nonzero is detected
-	protected static int signum(int n, int wiggle) {
+    public static int signum(int n, int wiggle) {
 		if (n <= wiggle && -n <= wiggle)
 			return 0;
 		return n < 0 ? -1 : 1;

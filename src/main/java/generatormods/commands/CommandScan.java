@@ -16,16 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.commands;
 
 import cpw.mods.fml.common.registry.GameData;
+import generatormods.BuildingExplorationHandler;
+import generatormods.common.BlockAndMeta;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
