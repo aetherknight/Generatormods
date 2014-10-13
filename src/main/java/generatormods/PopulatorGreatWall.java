@@ -30,7 +30,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.world.World;
@@ -44,7 +44,7 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Instance("GreatWallMod")
 	public static PopulatorGreatWall instance;
 	//DATA VARIABLES
-	public ArrayList<TemplateWall> wallStyles = null;
+    public List<TemplateWall> wallStyles = null;
 	public int[] placedCoords = null;
 	public World placedWorld = null;
 
@@ -89,7 +89,9 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
 		if (random.nextFloat() < config.globalFrequency)
-			(new WorldGenGreatWall(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
+            (new WorldGenGreatWall(world, random, i, k, config.triesPerChunk,
+                    config.globalFrequency, logger, config.chestConfigs, wallStyles,
+                    config.curveBias)).run();
 	}
 
 	@Override

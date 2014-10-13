@@ -37,7 +37,7 @@ public abstract class AbstractConfig {
     private static final int[] DEFAULT_DIM_LIST = {-1, 0};
 
     // Config options common to all the mods
-    public float globalFrequency;
+    public double globalFrequency;
     public int triesPerChunk;
     public List<Integer> allowedDimensions;
 
@@ -58,12 +58,12 @@ public abstract class AbstractConfig {
         // TODO: turn this into an integer n where 1/n is the odds that a given chunk will attempt
         // to generate a structure.
         globalFrequency =
-                (float) config
-                        .get(section,
-                                "Global Frequency",
-                                0.025,
-                                "Controls how likely structures are to appear --- it is the probability for\ntrying to make a structure in a given chunk. Should be between 0.0 and 1.0.\nSmaller values make structures less common.",
-                                0.0, 1.0).getDouble();
+                config.get(
+                        section,
+                        "Global Frequency",
+                        0.025,
+                        "Controls how likely structures are to appear --- it is the probability for\ntrying to make a structure in a given chunk. Should be between 0.0 and 1.0.\nSmaller values make structures less common.",
+                        0.0, 1.0).getDouble();
         triesPerChunk =
                 config.get(
                         section,

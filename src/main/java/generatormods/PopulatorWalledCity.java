@@ -18,28 +18,25 @@
  */
 package generatormods;
 
-import generatormods.buildings.Building;
-import generatormods.common.ModUpdateDetectorWrapper;
-import generatormods.common.TemplateWall;
-import generatormods.gen.WorldGenUndergroundCity;
-import generatormods.gen.WorldGenWalledCity;
-import generatormods.gen.WorldGeneratorThread;
-import generatormods.walledcity.CityDataManager;
-import generatormods.walledcity.WalledCityChatHandler;
-import generatormods.walledcity.config.WalledCityConfig;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
-
+import generatormods.buildings.Building;
+import generatormods.common.ModUpdateDetectorWrapper;
+import generatormods.common.TemplateWall;
+import generatormods.gen.WorldGenUndergroundCity;
+import generatormods.gen.WorldGenWalledCity;
+import generatormods.walledcity.CityDataManager;
+import generatormods.walledcity.WalledCityChatHandler;
+import generatormods.walledcity.config.WalledCityConfig;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import net.minecraft.world.World;
 
 /*
@@ -88,14 +85,16 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
     public final void generate(World world, Random random, int i, int k) {
         if (cityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, world.provider.dimensionId)
                 && random.nextFloat() < config.globalFrequency) {
-            (new WorldGenWalledCity(this, world, random, i, k, config.triesPerChunk,
-                    config.globalFrequency)).run();
+            (new WorldGenWalledCity(world, random, i, k, config.triesPerChunk,
+                    config.globalFrequency, logger, config.chestConfigs, chatHandler,
+                    cityDataManager, cityStyles, config.rejectOnPreexistingArtifacts)).run();
         }
         if (undergroundCityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, CITY_TYPE_UNDERGROUND)
                 && random.nextFloat() < config.undergroundGlobalFrequency) {
-            WorldGeneratorThread wgt =
-                    new WorldGenUndergroundCity(this, world, random, i, k, 1,
-                            config.undergroundGlobalFrequency);
+            WorldGenUndergroundCity wgt =
+                    new WorldGenUndergroundCity(world, random, i, k, config.triesPerChunk,
+                            config.undergroundGlobalFrequency, logger, config.chestConfigs,
+                            chatHandler, cityDataManager, undergroundCityStyles);
             // 44 at sea level
             int maxSpawnHeight =
                     Building.findSurfaceJ(world, i, k, Building.WORLD_MAX_Y, false,

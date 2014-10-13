@@ -26,17 +26,19 @@ import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Shape;
 import generatormods.common.TemplateWall;
+import generatormods.common.config.ChestContentsSpec;
+import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.Logger;
 
 /*
  * WorldGenUndergroundCity generates a city in a large underground cavern. The
@@ -56,19 +58,22 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 
     private WalledCityChatHandler chatHandler;
     private CityDataManager cityDataManager;
+    private List<TemplateWall> undergroundCityStyles;
 
-	//****************************************  CONSTRUCTOR - WorldGenUndergroundCity   *************************************************************************************//
-	public WorldGenUndergroundCity(PopulatorWalledCity wc, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
-		super(wc, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
-        chatHandler = wc.chatHandler;
-        cityDataManager = wc.cityDataManager;
+    public WorldGenUndergroundCity(World world, Random random, int chunkI, int chunkK,
+            int triesPerChunk, double chunkTryProb, Logger logger,
+            Map<ChestType, ChestContentsSpec> chestConfigs, WalledCityChatHandler chatHandler,
+            CityDataManager cityDataManager, List<TemplateWall> undergroundCityStyles) {
+        super(world, random, chunkI, chunkK, triesPerChunk, chunkTryProb, logger, chestConfigs);
+        this.chatHandler = chatHandler;
+        this.cityDataManager = cityDataManager;
+        this.undergroundCityStyles = undergroundCityStyles;
 	}
 
-	//****************************  FUNCTION - generate*************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
         logger.debug("Attempting to generate UndergroundCity near ("+i0+","+j0+","+k0+")");
-		pws = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorWalledCity) master).undergroundCityStyles, world, i0, k0, world.rand, true);
+        pws = TemplateWall.pickBiomeWeightedWallStyle(undergroundCityStyles, world, i0, k0, world.rand, true);
 		if (pws == null)
 			return false;
         if (!cityDataManager.isCitySeparated(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND)) {

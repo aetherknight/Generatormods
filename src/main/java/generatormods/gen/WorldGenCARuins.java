@@ -18,7 +18,6 @@
  */
 package generatormods.gen;
 
-import generatormods.PopulatorCARuins;
 import generatormods.buildings.Building;
 import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.caruins.config.CARuinsConfig;
@@ -32,20 +31,19 @@ import generatormods.caruins.seeds.LinearSeed;
 import generatormods.caruins.seeds.SymmetricSeed;
 import generatormods.common.Dir;
 import generatormods.common.TemplateRule;
-
 import java.util.Random;
-
 import net.minecraft.world.World;
 import net.minecraft.util.WeightedRandom;
+import org.apache.logging.log4j.Logger;
 
 public class WorldGenCARuins extends WorldGeneratorThread {
 	private CARule caRule = null;
 
     private final CARuinsConfig config;
 
-	public WorldGenCARuins(PopulatorCARuins ca, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
-		super(ca, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
-        config = ca.config;
+	public WorldGenCARuins(World world, Random random, int chunkI, int chunkK, Logger logger, CARuinsConfig config) {
+        super(world, random, chunkI, chunkK, config.triesPerChunk, config.globalFrequency, logger, config.chestConfigs);
+        this.config = config;
 	}
 
 	@Override

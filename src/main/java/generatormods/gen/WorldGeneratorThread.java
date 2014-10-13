@@ -18,7 +18,6 @@
  */
 package generatormods.gen;
 
-import generatormods.BuildingExplorationHandler;
 import generatormods.buildings.Building;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
@@ -52,30 +51,37 @@ public abstract class WorldGeneratorThread {
 		{ 0, 0, 0, 0, 0, 0 }, //present tower
 		{ 0, 0, 0, 0, 0, 0 } }; //present template
 	public final static char[] LAYOUT_CODE_TO_CHAR = new char[] { ' ', '#', '=', '-', '@', '&' };
-	public final BuildingExplorationHandler master;
     public final Logger logger;
 	public final World world;
 	public final Random random;
-	public final int chunkI, chunkK, triesPerChunk;
+    /* An absolute X-coorindate in the chunk being generated. */
+    public final int chunkI;
+    /* An absolute Z-coorindate in the chunk being generated. */
+    public final int chunkK;
+    /* The number of tries for the current chunk. */
+    public final int triesPerChunk;
+    /**
+     * The probability that a particular try will attempt to generate. May
+     * still fail for other reasons though.
+     */
 	public final double chunkTryProb;
 	private int min_spawn_height = 0, max_spawn_height = 127;
 	public boolean spawn_surface = true;
-	public Map<ChestType, ChestContentsSpec> chestItems = null;
-	//public int ConcaveSmoothingScale=10, ConvexSmoothingScale=20, 
-	//All WorldGeneratorThreads will have these, even if not used.
+    public final Map<ChestType, ChestContentsSpec> chestItems;
+    /* All WorldGeneratorThreads will have these, even if not used. */
 	public int backtrackLength = 9;
 
-	//****************************  CONSTRUCTOR - WorldGeneratorThread *************************************************************************************//
-	public WorldGeneratorThread(BuildingExplorationHandler master, World world, Random random, int chunkI, int chunkK, int TriesPerChunk, double ChunkTryProb) {
-		this.master = master;
-        this.logger = master.logger;
-		this.chestItems = master.sharedConfig.chestConfigs;
-		this.world = world;
+    public WorldGeneratorThread(World world, Random random,
+            int chunkI, int chunkK, int TriesPerChunk, double ChunkTryProb, Logger logger,
+            Map<ChestType, ChestContentsSpec> chestItems) {
+        this.world = world;
 		this.random = random;
 		this.chunkI = chunkI;
 		this.chunkK = chunkK;
 		this.triesPerChunk = TriesPerChunk;
 		this.chunkTryProb = ChunkTryProb;
+        this.logger = logger;
+        this.chestItems = chestItems;
 		max_spawn_height = Building.WORLD_MAX_Y;
 	}
 

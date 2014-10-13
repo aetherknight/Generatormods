@@ -26,22 +26,24 @@ import generatormods.buildings.BuildingWall;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateWall;
+import generatormods.common.config.ChestContentsSpec;
+import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.World;
+import org.apache.logging.log4j.Logger;
 
 /*
  * WorldGenWalledCity generates walled cities in the Minecraft world. Walled
@@ -54,7 +56,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	private final static int LEVELLING_DEVIATION_SLOPE = 18;
 	private final static int MIN_SIDE_LENGTH = 10; //can be less than MIN_CITY_LENGTH due to squiggles
 	private final static float MAX_WATER_PERCENTAGE = 0.4f;
-	//private final static int[] DIR_GROUP_TO_DIR_CODE=new int[]{Building.DIR_NORTH,Building.DIR_EAST,Building.DIR_SOUTH,Building.DIR_WEST};
+
 	//**** WORKING VARIABLES **** 
 	private TemplateWall ows, sws;
 	private BuildingWall[] walls;
@@ -67,20 +69,28 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 
     private WalledCityChatHandler chatHandler;
     public CityDataManager cityDataManager;
+	private List<TemplateWall> cityStyles;
+    private boolean rejectOnPreexistingArtifacts;
 
-	//****************************************  CONSTRUCTOR - WorldGenWalledCity  *************************************************************************************//
-	public WorldGenWalledCity(PopulatorWalledCity wc, World world, Random random, int chunkI, int chunkK, int triesPerChunk, double chunkTryProb) {
-		super(wc, world, random, chunkI, chunkK, triesPerChunk, chunkTryProb);
+    public WorldGenWalledCity(World world, Random random, int chunkI, int chunkK,
+            int triesPerChunk, double chunkTryProb, Logger logger,
+            Map<ChestType, ChestContentsSpec> chestConfigs, WalledCityChatHandler chatHandler,
+            CityDataManager cityDataManager, List<TemplateWall> cityStyles,
+            boolean rejectOnPreexistingArtifacts) {
+		super(world, random, chunkI, chunkK, triesPerChunk, chunkTryProb, logger, chestConfigs);
+        this.chatHandler = chatHandler;
+        this.cityDataManager = cityDataManager;
+        this.cityStyles = cityStyles;
+        this.rejectOnPreexistingArtifacts = rejectOnPreexistingArtifacts;
+
 		cityType = world.provider.dimensionId;
-        chatHandler = wc.chatHandler;
-        cityDataManager = wc.cityDataManager;
 	}
 
 	//****************************************  FUNCTION - generate  *************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
         logger.debug("Attempting to generate WalledCity near ("+i0+","+j0+","+k0+")");
-		ows = TemplateWall.pickBiomeWeightedWallStyle(((PopulatorWalledCity) master).cityStyles, world, i0, k0, world.rand, false);
+        ows = TemplateWall.pickBiomeWeightedWallStyle(cityStyles, world, i0, k0, world.rand, false);
 		if (ows == null)
 			return false;
 		sws = TemplateWall.pickBiomeWeightedWallStyle(ows.streets, world, i0, k0, world.rand, false);
@@ -202,7 +212,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					cityArea++;
 					if (j2 == Building.HIT_WATER)
 						waterArea++;
-					if (((PopulatorWalledCity) master).config.rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
+                    if (rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
 						logger.debug("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
 						return false;
 					}

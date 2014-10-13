@@ -27,7 +27,7 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
 
 public class GreatWallConfig extends AbstractConfig {
-    public float curveBias = 0.5F;
+    public double curveBias = 0.5;
     public int lengthBiasNorm = 200;
     public int backtrackLength = 9;
 
@@ -53,12 +53,12 @@ public class GreatWallConfig extends AbstractConfig {
 
     private void initGreatWallConfig(Configuration config, String section) {
         curveBias =
-                (float) config
-                        .get(section,
-                                "Curve Bias",
-                                0.5,
-                                "Strength of the bias towards curvier walls. Value should be between 0.0 and\n1.0.",
-                                0.0, 1.0).getDouble();
+                config.get(
+                        section,
+                        "Curve Bias",
+                        0.5,
+                        "Strength of the bias towards curvier walls. Value should be between 0.0 and\n1.0.",
+                        0.0, 1.0).getDouble();
         lengthBiasNorm =
                 config.get(section, "Length Bias Norm", 200,
                         "Wall length at which there is no penalty for generation").getInt();

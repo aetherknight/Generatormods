@@ -33,13 +33,13 @@ public class SharedConfig {
     public static final int[] DEFAULT_DIM_LIST = {-1, 0};
 
     // Config options common to all the mods
-    public float globalFrequency;
+    public double globalFrequency;
     public int triesPerChunk;
     public List<Integer> allowedDimensions;
 
     public Map<ChestType, ChestContentsSpec> chestConfigs;
 
-    public SharedConfig(float globalFrequency, int triesPerChunk, List<Integer> allowedDimensions,
+    public SharedConfig(double globalFrequency, int triesPerChunk, List<Integer> allowedDimensions,
             Map<ChestType, ChestContentsSpec> chestConfigs, Logger logger) {
         this.globalFrequency = globalFrequency;
         this.triesPerChunk = triesPerChunk;

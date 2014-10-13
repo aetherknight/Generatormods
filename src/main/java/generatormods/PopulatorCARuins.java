@@ -86,7 +86,7 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
 		if (random.nextFloat() < config.globalFrequency)
-			(new WorldGenCARuins(this, world, random, i, k, config.triesPerChunk, config.globalFrequency)).run();
+            (new WorldGenCARuins(world, random, i, k, logger, config)).run();
 	}
 
 	@Override

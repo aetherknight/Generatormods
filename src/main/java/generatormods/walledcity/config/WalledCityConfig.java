@@ -27,7 +27,7 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
 
 public class WalledCityConfig extends AbstractConfig {
-    public float undergroundGlobalFrequency = 0.015F;
+    public double undergroundGlobalFrequency = 0.015;
     public int minCitySeparation = 500;
     public int undergroundMinCitySeparation = 500;
     public boolean cityBuiltMessage = false;
@@ -56,12 +56,12 @@ public class WalledCityConfig extends AbstractConfig {
 
     private void initWalledCityConfig(Configuration config, String section) {
         undergroundGlobalFrequency =
-                (float) config
-                        .get(section,
-                                "Underground City Global Frequency",
-                                0.015,
-                                "Controls how likely belowground cities are to appear. Should be between 0.0 and\n1.0. Lower to make less common.",
-                                0.0, 1.0).getDouble();
+                config.get(
+                        section,
+                        "Underground City Global Frequency",
+                        0.015,
+                        "Controls how likely belowground cities are to appear. Should be between 0.0 and\n1.0. Lower to make less common.",
+                        0.0, 1.0).getDouble();
         undergroundMinCitySeparation =
                 config.get(section, "Underground City Minimum Separation", 500,
                         "The minimum allowable separation, in blocks, between underground city spawns.")
