@@ -22,9 +22,12 @@ import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateTML;
+import generatormods.common.WorldHelper;
 import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+
+import static generatormods.common.WorldHelper.IGNORE_WATER;
 
 /*
  * BuildingTML generates a building from a .tml template.
@@ -49,7 +52,8 @@ public class BuildingTML extends Building {
 				if (base != null)
 					buildDown(x, -1, y, tmlt.rules[base[y][x]], tmlt.leveling, 0, 0);
 				else
-					fillDown(getSurfaceIJKPt(x, y, j0 - 1, true, IGNORE_WATER), j0 - 1, world);
+                    WorldHelper.fillDown(getSurfaceIJKPt(x, y, j0 - 1, true, IGNORE_WATER), j0 - 1,
+                            world);
 			}
 		//clear overhead
 		for (int z = bHeight; z < tmlt.cutIn + tmlt.embed; z++)

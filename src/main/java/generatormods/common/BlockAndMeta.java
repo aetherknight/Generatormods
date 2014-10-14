@@ -150,4 +150,45 @@ public class BlockAndMeta extends Tuple {
         }
         return new BlockAndMeta(block, meta);
     }
+
+    /**
+     * Sanity checks the meta value for a given block.
+     *
+     * @param blockID The block type being checked.
+     * @param metadata The metadata value being checked.
+     *
+     * @return null if valid, otherwise a string describing what is wrong with
+     * the metadata value.
+     */
+    public static String metaValueCheck(Block blockID, int metadata) {
+        if (metadata < 0 || metadata >= 16)
+            return "All Minecraft meta values should be between 0 and 15";
+        String fail = blockID.getUnlocalizedName() + " meta value should be between";
+        if (BlockProperties.get(blockID).isStair)
+            return metadata < 8 ? null : fail + " 0 and 7";
+        // orientation metas
+        if (blockID == Blocks.rail) {
+            return metadata < 10 ? null : fail + " 0 and 9";
+        } else if (blockID == Blocks.stone_button || blockID == Blocks.wooden_button) {
+            return metadata % 8 > 0 && metadata % 8 < 5 ? null : fail + " 1 and 4 or 9 and 12";
+        } else if (blockID == Blocks.ladder || blockID == Blocks.dispenser
+                || blockID == Blocks.furnace || blockID == Blocks.lit_furnace
+                || blockID == Blocks.wall_sign || blockID == Blocks.piston
+                || blockID == Blocks.piston_extension || blockID == Blocks.chest
+                || blockID == Blocks.hopper || blockID == Blocks.dropper
+                || blockID == Blocks.golden_rail || blockID == Blocks.detector_rail
+                || blockID == Blocks.activator_rail) {
+            return metadata % 8 < 6 ? null : fail + " 0 and 5 or 8 and 13";
+        } else if (blockID == Blocks.pumpkin || blockID == Blocks.lit_pumpkin) {
+            return metadata < 5 ? null : fail + " 0 and 4";
+        } else if (blockID == Blocks.fence_gate) {
+            return metadata < 8 ? null : fail + " 0 and 7";
+        } else if (blockID == Blocks.wooden_slab || blockID == Blocks.bed) {
+            return metadata % 8 < 4 ? null : fail + " 0 and 3 or 8 and 11";
+        } else if (blockID == Blocks.torch || blockID == Blocks.redstone_torch
+                || blockID == Blocks.unlit_redstone_torch) {
+            return metadata > 0 && metadata < 7 ? null : fail + " 1 and 6";
+        }
+        return null;
+    }
 }

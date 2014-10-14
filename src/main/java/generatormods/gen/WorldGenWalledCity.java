@@ -18,7 +18,6 @@
  */
 package generatormods.gen;
 
-import generatormods.PopulatorWalledCity;
 import generatormods.buildings.Building;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingTower;
@@ -26,6 +25,7 @@ import generatormods.buildings.BuildingWall;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateWall;
+import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
@@ -44,6 +44,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
+
+import static generatormods.PopulatorWalledCity.MIN_CITY_LENGTH;
+import static generatormods.common.WorldHelper.HIT_WATER;
+import static generatormods.common.WorldHelper.IGNORE_WATER;
+import static generatormods.common.WorldHelper.SEA_LEVEL;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 /*
  * WorldGenWalledCity generates walled cities in the Minecraft world. Walled
@@ -101,12 +108,12 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 			return false;
         }
 		int ID = (random.nextInt(9000) + 1000) * 100;
-		int minJ = ows.LevelInterior ? Building.SEA_LEVEL - 1 : BuildingWall.NO_MIN_J;
+        int minJ = ows.LevelInterior ? SEA_LEVEL - 1 : BuildingWall.NO_MIN_J;
 		//boolean circular=random.nextFloat() < ows.CircularProb;
 		chooseDirection(i0 >> 4, k0 >> 4);
 		//==========================      outer walls    ====================================================
-		if (ows.MinL < PopulatorWalledCity.MIN_CITY_LENGTH)
-			ows.MinL = PopulatorWalledCity.MIN_CITY_LENGTH;
+        if (ows.MinL < MIN_CITY_LENGTH)
+            ows.MinL = MIN_CITY_LENGTH;
 		walls = new BuildingWall[4];
 		ows.setFixedRules(world.rand);
 		//plan walls[0]
@@ -200,7 +207,8 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 			}
 		}
 		int cityArea = 0, waterArea = 0;
-		int incI = Building.signum(corner2[0] - corner1[0], 0), incK = Building.signum(corner2[2] - corner1[2], 0);
+        int incI = Integer.signum(corner2[0] - corner1[0]);
+        int incK = Integer.signum(corner2[2] - corner1[2]);
 		for (int i2 = corner1[0]; (corner2[0] - i2) * incI > 0; i2 += incI) {
 			for (int k2 = corner1[2]; (corner2[2] - k2) * incK > 0; k2 += incK) {
 				boolean enclosed = true;
@@ -208,9 +216,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					if (w.ptIsToXHand(new int[] { i2, 0, k2 }, 1))
 						enclosed = false;
 				if (enclosed) {
-					int j2 = Building.findSurfaceJ(world, i2, k2, Building.WORLD_MAX_Y, true, 3);
+                    int j2 = findSurfaceJ(world, i2, k2, WORLD_MAX_Y, true, 3);
 					cityArea++;
-					if (j2 == Building.HIT_WATER)
+					if (j2 == HIT_WATER)
 						waterArea++;
                     if (rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
 						logger.debug("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
@@ -233,7 +241,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		//We've passed all checks, register this city site
 		walls[0].setCursor(0);
 		int[] cityCenter = new int[] { (walls[0].i1 + walls[1].i1 + walls[2].i1 + walls[3].i1) / 4, 0, (walls[0].k1 + walls[1].k1 + walls[2].k1 + walls[3].k1) / 4 };
-		cityCenter[1] = Building.findSurfaceJ(world, cityCenter[0], cityCenter[1], Building.WORLD_MAX_Y, false, 3);
+        cityCenter[1] = findSurfaceJ(world, cityCenter[0], cityCenter[1], WORLD_MAX_Y, false, 3);
         cityDataManager.addCity(world, cityCenter[0], cityCenter[2], cityType);
         cityDataManager.saveCityLocations(world);
 		//=================================== Build it! =========================================
@@ -274,8 +282,8 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 				w.setCursor(startScan);
                 BuildingWall radialAvenue =
                         new BuildingWall(0, this, sws, w.bDir.rotate(-axXHand), radialAvenueHand,
-                                ows.MaxL, false, w.getSurfaceIJKPt(-1, 0, Building.WORLD_MAX_Y,
-                                        false, Building.IGNORE_WATER));
+                                ows.MaxL, false, w.getSurfaceIJKPt(-1, 0, WORLD_MAX_Y,
+                                        false, IGNORE_WATER));
 				radialAvenue.setTarget(cityCenter);
 				radialAvenue.plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
 				if (radialAvenue.bLength > 20) {
@@ -451,12 +459,14 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 	private void levelCity() {
 		for (BuildingWall w : walls)
 			w.setCursor(0);
-		int incI = Building.signum(corner2[0] - corner1[0], 0), incK = Building.signum(corner2[2] - corner1[2], 0);
+		int incI = Integer.signum(corner2[0] - corner1[0]);
+        int incK = Integer.signum(corner2[2] - corner1[2]);
 		int[] pt = new int[3];
-		int jmin = world.provider.isHellWorld ? jmean : Math.max(jmean, Building.SEA_LEVEL);
+        int jmin = world.provider.isHellWorld ? jmean : Math.max(jmean, SEA_LEVEL);
 		for (BuildingWall w : walls) {
 			for (int n = 0; n < w.bLength; n++)
-				if (w.zArray[n] + w.j1 + w.WalkHeight - 1 < jmin && (world.provider.isHellWorld || jmin >= Building.SEA_LEVEL))
+                if (w.zArray[n] + w.j1 + w.WalkHeight - 1 < jmin
+                        && (world.provider.isHellWorld || jmin >= SEA_LEVEL))
 					jmin = w.zArray[n] + w.j1 + w.WalkHeight - 1;
 		}
 		int jmax = Math.max(jmean + Lmean / LEVELLING_DEVIATION_SLOPE, jmin);
@@ -468,7 +478,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					if (w.ptIsToXHand(pt, 1))
 						enclosed = false;
 				if (enclosed) {
-					pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], Building.WORLD_MAX_Y, false, Building.IGNORE_WATER);
+                    pt[1] = findSurfaceJ(world, pt[0], pt[2], WORLD_MAX_Y, false, IGNORE_WATER);
 					Block oldSurfaceBlockId = world.getBlock(pt[0], pt[1], pt[2]);
 					if (pt[1] > jmax) {
 						while (!world.isAirBlock(pt[0], pt[1] + 1, pt[2]))
@@ -476,12 +486,14 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 						pt[1] += 10; //just to try to catch any overhanging blocks
 						for (; pt[1] > jmax; pt[1]--)
 							if (!world.isAirBlock(pt[0], pt[1], pt[2]))
-								Building.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], Blocks.air, 0);
+                                WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2],
+                                        Blocks.air, 0);
 						if (!world.isAirBlock(pt[0], jmax - 1, pt[2]))
-							Building.setBlockAndMetaNoLighting(world, pt[0], jmax, pt[2], oldSurfaceBlockId, 0);
+                            WorldHelper.setBlockAndMetaNoLighting(world, pt[0], jmax, pt[2],
+                                    oldSurfaceBlockId, 0);
 					}
 					if (pt[1] < jmin)
-						Building.fillDown(pt, jmin, world);
+                        WorldHelper.fillDown(pt, jmin, world);
 				}
 			}
 		}
@@ -524,7 +536,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		while (tries < 20) {
 			pt[0] = mincorner[0] + random.nextInt(Math.abs(corner1[0] - corner2[0]));
 			pt[2] = mincorner[2] + random.nextInt(Math.abs(corner1[2] - corner2[2]));
-			pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], Building.WORLD_MAX_Y, true, 3);
+            pt[1] = findSurfaceJ(world, pt[0], pt[2], WORLD_MAX_Y, true, 3);
 			boolean enclosed = true;
 			for (BuildingWall w : walls)
 				if (w.ptIsToXHand(pt, -sws.WWidth))

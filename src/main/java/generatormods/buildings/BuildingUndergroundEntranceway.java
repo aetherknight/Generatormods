@@ -27,6 +27,9 @@ import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
+import static generatormods.common.WorldHelper.SEA_LEVEL;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+
 /*
  * BuildingUndergroundEntranceway builds a passageway from an underground city to the surface.
  */
@@ -49,9 +52,12 @@ public class BuildingUndergroundEntranceway extends Building {
 		for (; bLength < WORLD_MAX_Y - j0; bLength++) {
 			if (BlockProperties.get(getBlockIdLocal(0, bLength + PASSAGE_HEIGHT, bLength)).isWater)
 				return false;
-			if (j0 + bLength > Building.SEA_LEVEL - 10 && isArtificialWallBlock(0, bLength + PASSAGE_HEIGHT, bLength))
+            if (j0 + bLength > SEA_LEVEL - 10
+                    && isArtificialWallBlock(0, bLength + PASSAGE_HEIGHT, bLength))
 				return false;
-			if (j0 + bLength > Building.SEA_LEVEL && (BlockProperties.get(getBlockIdLocal(0, bLength, bLength)).isWallable || BlockProperties.get(getBlockIdLocal(PASSAGE_WIDTH - 1, bLength, bLength)).isWallable)) {
+            if (j0 + bLength > SEA_LEVEL
+                    && (BlockProperties.get(getBlockIdLocal(0, bLength, bLength)).isWallable || BlockProperties
+                            .get(getBlockIdLocal(PASSAGE_WIDTH - 1, bLength, bLength)).isWallable)) {
 				bLength--;
 				break;
 			}

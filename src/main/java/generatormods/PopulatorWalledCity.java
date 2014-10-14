@@ -39,6 +39,10 @@ import java.util.List;
 import java.util.Random;
 import net.minecraft.world.World;
 
+import static generatormods.common.WorldHelper.IGNORE_WATER;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
+
 /*
  * PopulatorWalledCity is the main class that hooks into ModLoader for the
  * Walled City Mod. It reads the globalSettings file, keeps track of city
@@ -97,8 +101,8 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
                             chatHandler, cityDataManager, undergroundCityStyles);
             // 44 at sea level
             int maxSpawnHeight =
-                    Building.findSurfaceJ(world, i, k, Building.WORLD_MAX_Y, false,
-                            Building.IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5;
+                    findSurfaceJ(world, i, k, WORLD_MAX_Y, false, IGNORE_WATER)
+                            - WorldGenUndergroundCity.MAX_DIAM / 2 - 5;
             // 34, a pretty thin margin. Too thin for underocean cities?
             int minSpawnHeight = MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8;
             if (minSpawnHeight <= maxSpawnHeight)

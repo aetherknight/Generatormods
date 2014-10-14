@@ -26,6 +26,7 @@ import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Shape;
 import generatormods.common.TemplateWall;
+import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
@@ -39,6 +40,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
+
+import static generatormods.common.WorldHelper.IGNORE_WATER;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 /*
  * WorldGenUndergroundCity generates a city in a large underground cavern. The
@@ -106,7 +111,9 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 	private List<BuildingUndergroundEntranceway> buildEntranceways() {
 		if (!pws.MakeUndergroundEntranceways)
 			return new ArrayList<BuildingUndergroundEntranceway>();
-		int[] center = new int[] { (int) (cavernMass_i / cavernMass), Building.WORLD_MAX_Y + 1, (int) (cavernMass_k / cavernMass) };
+        int[] center =
+                new int[] {(int) (cavernMass_i / cavernMass), WORLD_MAX_Y + 1,
+                        (int) (cavernMass_k / cavernMass)};
 		int[] pole = new int[] { center[0] + 100, center[1], center[2] };
 		List<BuildingUndergroundEntranceway> entranceways = new ArrayList<BuildingUndergroundEntranceway>();
 		for (int attempts = 0; attempts < Math.min(20, hollows.size()); attempts++) {
@@ -129,7 +136,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
                                                     : (hollow[3] - diam) / 2 + 1))};
 			boolean separated = true;
 			for (BuildingUndergroundEntranceway entranceway : entranceways)
-				if (Building.distance(entranceway.getIJKPt(0, 0, 0), pt) < 400)
+                if (WorldHelper.distance(entranceway.getIJKPt(0, 0, 0), pt) < 400)
 					separated = false;
 			BuildingUndergroundEntranceway entranceway = new BuildingUndergroundEntranceway(attempts, this, pws, axDir, pt);
 			if (separated && entranceway.build()) {
@@ -156,7 +163,9 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
             if (Shape.CIRCLE_SHAPE[hollow[3]][pt[0]][pt[2]] == 0) {
 				pt[0] += hollow[0];
 				pt[2] += hollow[2];
-				pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], hollow[1] - (hollow[3] + 1) / 2, false, Building.IGNORE_WATER) + 1;
+                pt[1] =
+                        findSurfaceJ(world, pt[0], pt[2], hollow[1] - (hollow[3] + 1) / 2, false,
+                                IGNORE_WATER) + 1;
 				TemplateWall sws = TemplateWall.pickBiomeWeightedWallStyle(pws.streets, world, pt[0], pt[2], world.rand, true);
 				sws.MergeWalls = true;
                 BuildingDoubleWall street =
@@ -178,7 +187,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		int[] farthestHollow = null;
 		int maxDist = -1;
 		for (int[] h : hollows) {
-			int dist = Building.distance(pt, h);
+            int dist = WorldHelper.distance(pt, h);
 			if (dist > maxDist) {
 				maxDist = dist;
 				farthestHollow = h;
@@ -192,7 +201,9 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 	private boolean hollow(int i, int j, int k, int diam) {
 		if (diam < MIN_DIAM)
 			return false;
-		if (j - diam / 2 < 10 || j + diam / 2 > Building.findSurfaceJ(world, i + diam / 2, k + diam / 2, Building.WORLD_MAX_Y, false, Building.IGNORE_WATER) - 3)
+        if (j - diam / 2 < 10
+                || j + diam / 2 > findSurfaceJ(world, i + diam / 2, k + diam / 2, WORLD_MAX_Y,
+                        false, IGNORE_WATER) - 3)
 			return false;
 		hollows.add(new int[] { i, j, k, diam, 0 });
 		if (diam == MAX_DIAM) {
@@ -207,7 +218,8 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 			for (int y1 = 0; y1 < top_diam; y1++) {
 				for (int x1 = 0; x1 < top_diam; x1++) {
                     if (Shape.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
-						Building.setBlockAndMetaNoLighting(world, i + offset + x1, j + z1, k + offset + y1, Blocks.air, 0);
+                        WorldHelper.setBlockAndMetaNoLighting(world, i + offset + x1, j + z1, k
+                                + offset + y1, Blocks.air, 0);
                     }
 				}
 			}
@@ -229,7 +241,8 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 				for (int y1 = 0; y1 < bottom_diam; y1++) {
 					for (int x1 = 0; x1 < bottom_diam; x1++) {
                         if (Shape.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
-							Building.setBlockAndMetaNoLighting(world, i + offset + x1, j - z1, k + offset + y1, Blocks.air, 0);
+                            WorldHelper.setBlockAndMetaNoLighting(world, i + offset + x1, j - z1, k
+                                    + offset + y1, Blocks.air, 0);
                         }
 					}
 				}

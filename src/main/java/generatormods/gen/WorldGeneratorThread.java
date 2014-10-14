@@ -21,14 +21,15 @@ package generatormods.gen;
 import generatormods.buildings.Building;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
-
 import java.util.Map;
 import java.util.Random;
-
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-
 import org.apache.logging.log4j.Logger;
+
+import static generatormods.common.WorldHelper.HIT_WATER;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 /*
  * WorldGeneratorThread is a thread that generates structures in the Minecraft
@@ -82,7 +83,7 @@ public abstract class WorldGeneratorThread {
 		this.chunkTryProb = ChunkTryProb;
         this.logger = logger;
         this.chestItems = chestItems;
-		max_spawn_height = Building.WORLD_MAX_Y;
+		max_spawn_height = WORLD_MAX_Y;
 	}
 
 	//****************************  FUNCTION - abstract and stub functions  *************************************************************************************//
@@ -115,7 +116,7 @@ public abstract class WorldGeneratorThread {
 				i0 = chunkI + this.random.nextInt(16);
 				k0 = chunkK + this.random.nextInt(16);
 				if (spawn_surface) {
-					j0 = Building.findSurfaceJ(this.world, i0, k0, Building.WORLD_MAX_Y, true, 3) + 1;
+                    j0 = findSurfaceJ(this.world, i0, k0, WORLD_MAX_Y, true, 3) + 1;
 				} else {
 					j0 = min_spawn_height + this.random.nextInt(max_spawn_height - min_spawn_height + 1);
 				}
@@ -123,7 +124,7 @@ public abstract class WorldGeneratorThread {
 					success = generate(i0, j0, k0);
 			}
 			tries++;
-		} while (!success && tries < triesPerChunk && j0 != Building.HIT_WATER);
+        } while (!success && tries < triesPerChunk && j0 != HIT_WATER);
 	}
 
 	//****************************  FUNCTION - setSpawnHeight *************************************************************************************//

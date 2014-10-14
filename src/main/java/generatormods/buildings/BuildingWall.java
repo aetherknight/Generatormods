@@ -28,6 +28,7 @@ import generatormods.common.PickWeighted;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateTML;
 import generatormods.common.TemplateWall;
+import generatormods.common.Util;
 import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -420,7 +421,7 @@ public class BuildingWall extends Building {
 			//towers are built from n0-2 to n0-tw-1
 			//n0 and nBack used to calculat curvature are 2 further from nMid
 			int nMid = n0 - tw / 2 - 2, nBack = n0 - tw - 3;
-			int clearSide = -bHand * signum(curvature(xArray[nBack], xArray[nMid], xArray[n0], 0), 0);
+			int clearSide = -bHand * Integer.signum(curvature(xArray[nBack], xArray[nMid], xArray[n0], 0));
 			if (clearSide == 0) {
 				if (buildOnL && buildOnR)
 					clearSide = 2 * random.nextInt(2) - 1;
@@ -523,7 +524,7 @@ public class BuildingWall extends Building {
 				failCode = FailType.TOOSTEEPDOWN;
 			if (failCode == FailType.NOTHING && gradz > 4)
 				failCode = FailType.TOOSTEEPUP;
-			gradz = signum(gradz, 0);
+			gradz = Integer.signum(gradz);
 			if (minJ != NO_MIN_J && zArray[bLength - 1] + gradz + j1 < minJ)
 				gradz = 0; //don't go below minJ
 			if (gradz == 0) {
@@ -892,24 +893,29 @@ public class BuildingWall extends Building {
 	}
 
     /**
-     * @param a
-     * @param b
-     * @param c
+     * Determines the curvature of a curve based upon 3 sample points of the
+     * line. A curve can be straight (0), concave in the posive direction (1),
+     * concave in the negative direction (-1), have an increasing slope (2), or
+     * have a decreasing slope (-2).
+     *
+     * @param a An endpoint
+     * @param b Midpoint
+     * @param c Another endpoint
      * @param wiggle allows for some leeway before slope is detected
      *
      * @return <ul>
      *   <li>0 if constant (000)</li>
      *   <li>1 if concave up (+0+),(00+),(+00)</li>
-	 *   <li>-1 if concave down (-0-),(-00),(00-)</li>
-	 *   <li>2 if increasing (-0+)</li>
-	 *   <li>-2 if decreasing (+0-)</li>
+     *   <li>-1 if concave down (-0-),(-00),(00-)</li>
+     *   <li>2 if increasing (-0+)</li>
+     *   <li>-2 if decreasing (+0-)</li>
      * </ul>
      */
 	private static int curvature(int a, int b, int c, int wiggle) {
-		int d1 = signum(a - b, wiggle);
-		int d2 = signum(c - b, wiggle);
+        int d1 = Util.signum(a - b, wiggle);
+        int d2 = Util.signum(c - b, wiggle);
 		if (d1 * d2 < 0)
 			return 2 * d2;
-		return signum(d1 + d2, 0);
+        return Integer.signum(d1 + d2);
 	}
 }

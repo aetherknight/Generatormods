@@ -26,17 +26,18 @@ import generatormods.gen.WorldGenCARuins;
 import generatormods.gen.WorldGenGreatWall;
 import generatormods.gen.WorldGenUndergroundCity;
 import generatormods.gen.WorldGenWalledCity;
-import generatormods.gen.WorldGeneratorThread;
-
 import java.util.List;
 import java.util.Random;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+
+import static generatormods.common.WorldHelper.IGNORE_WATER;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 /**
  * Build command for players to try to build structures city/wall/ruin at the specified location
@@ -102,7 +103,7 @@ public class CommandBuild extends CommandBase {
                         new WorldGenUndergroundCity(world, new Random(), posX, posZ, 1, 1.0,
                                 cityMod.logger, cityMod.config.chestConfigs, cityMod.chatHandler,
                                 cityMod.cityDataManager, cityMod.undergroundCityStyles);
-				int maxSpawnHeight = Building.findSurfaceJ(world, posX, posZ, Building.WORLD_MAX_Y, false, Building.IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5; //44 at sea level
+                int maxSpawnHeight = findSurfaceJ(world, posX, posZ, WORLD_MAX_Y, false, IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5; //44 at sea level
 				int minSpawnHeight = PopulatorWalledCity.MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8; //34, a pretty thin margin. Too thin for underocean cities?
 				if (minSpawnHeight <= maxSpawnHeight)
 					wgt.setSpawnHeight(minSpawnHeight, maxSpawnHeight, false);

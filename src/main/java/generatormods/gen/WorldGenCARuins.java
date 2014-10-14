@@ -18,7 +18,6 @@
  */
 package generatormods.gen;
 
-import generatormods.buildings.Building;
 import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.caruins.config.CARuinsConfig;
 import generatormods.caruins.config.CARule;
@@ -35,6 +34,9 @@ import java.util.Random;
 import net.minecraft.world.World;
 import net.minecraft.util.WeightedRandom;
 import org.apache.logging.log4j.Logger;
+
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 public class WorldGenCARuins extends WorldGeneratorThread {
 	private CARule caRule = null;
@@ -76,7 +78,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 				for (int tries = 0; tries < 10; tries++) {
 					int[] pt = new int[] { i0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)), 0,
 							k0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)) };
-					pt[1] = Building.findSurfaceJ(world, pt[0], pt[2], Building.WORLD_MAX_Y, true, 3) + 1;
+					pt[1] = findSurfaceJ(world, pt[0], pt[2], WORLD_MAX_Y, true, 3) + 1;
                     logger.debug("Recursing");
 					if (generate(pt[0], pt[1], pt[2])) {
                         logger.debug("Successfully Recursed");

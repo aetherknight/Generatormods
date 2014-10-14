@@ -27,6 +27,9 @@ import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
+import static generatormods.common.WorldHelper.SEA_LEVEL;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+
 /*
  * BuildingTower builds a procedurally generated tower.
  */

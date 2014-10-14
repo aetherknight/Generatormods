@@ -25,18 +25,17 @@ import generatormods.common.Dir;
 import generatormods.common.PickWeighted;
 import generatormods.common.PlacedBlock;
 import generatormods.common.TemplateRule;
+import generatormods.common.WorldHelper;
+import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 import generatormods.gen.WorldGenWalledCity;
 import generatormods.gen.WorldGeneratorThread;
 import generatormods.walledcity.CityDataManager;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import net.minecraft.block.*;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.init.Blocks;
@@ -46,8 +45,9 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.world.World;
-
 import org.apache.logging.log4j.Logger;
+
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 /**
  * Building is a general class for buildings. Classes can inherit from Building
@@ -81,12 +81,9 @@ import org.apache.logging.log4j.Logger;
  * </pre>
  */
 public class Building {
-    public final static int HIT_WATER = -666;
     public final static int ROT_R = 1;
     public final static int R_HAND = 1;
     public final static int L_HAND = -1;
-    public final static int SEA_LEVEL = 63;
-    public final static int WORLD_MAX_Y = 255;
 
 	// **** WORKING VARIABLES ****
 	protected final World world;
@@ -107,11 +104,6 @@ public class Building {
      * Direction code of the building's primary axis.
      */
     public Dir bDir;
-
-    /**
-     * Special value to ignore water depth when looking for surface blocks.
-     */
-	public final static int IGNORE_WATER = -1;
 
 	// Special Blocks
 	public final static int PAINTING_BLOCK_OFFSET = 3;
@@ -635,7 +627,8 @@ public class Building {
             if((randLightingHash[(block[0] & 0x7) | (block[1] & 0x38) | (block[2] & 0x1c0)]))
                 world.setBlock(block[0], block[1], block[2], blc, block[3], 3);
             else
-                setBlockAndMetaNoLighting(world, block[0], block[1], block[2], blc, block[3]);
+                WorldHelper.setBlockAndMetaNoLighting(world, block[0], block[1], block[2], blc,
+                        block[3]);
         }
 	}
 
@@ -680,7 +673,8 @@ public class Building {
         }else if (randLightingHash[(x & 0x7) | (y & 0x38) | (z & 0x1c0)]) {
             world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 2);
         } else {
-            setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata));
+            WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
+                    rotateMetadata(blockID, metadata));
         }
         if (BlockProperties.get(blockID).isDoor) {
             addDoorToNewListIfAppropriate(pt[0], pt[1], pt[2]);
@@ -727,7 +721,8 @@ public class Building {
 		else if (lighting)
 			world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 3);
 		else
-			setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata));
+            WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
+                    rotateMetadata(blockID, metadata));
 		if (BlockProperties.get(blockID).isDoor) {
 			addDoorToNewListIfAppropriate(pt[0], pt[1], pt[2]);
 		}
@@ -1304,131 +1299,7 @@ public class Building {
         spawner.func_145881_a().setEntityName(mob);
     }
 
-	public static int distance(int[] pt1, int[] pt2) {
-		return (int) Math.sqrt((pt1[0] - pt2[0]) * (pt1[0] - pt2[0]) + (pt1[1] - pt2[1]) * (pt1[1] - pt2[1]) + (pt1[2] - pt2[2]) * (pt1[2] - pt2[2]));
-	}
-
-    /**
-     * Finds a surface block. Depending on the value of waterIsSurface and
-     * wallIsSurface will treat liquid and wall blocks as either solid or air.
-     *
-     * @param world The world we are checking
-     * @param i X-coordinate of world to check
-     * @param k Z-coordinate of world to check
-     * @param jinit Initial Y-coordinate to begin checking down from to find the surface Y value.
-     * @param wallIsSurface ???
-     * @param waterSurfaceBuffer The number of vertical blocks of water we permit.
-     * @return The Y coordinate of the surface. However, if there is more water
-     * than waterSurfaceBuffer, then it will return HIT_WATER instead.
-     */
-    public static int findSurfaceJ(World world, int i, int k, int jinit, boolean wallIsSurface, int waterSurfaceBuffer) {
-		Block blockId;
-		//if(world.getChunkProvider().chunkExists(i>>4, k>>4))
-		{
-			if (world.provider.isHellWorld) {// the Nether
-				if ((i % 2 == 1) ^ (k % 2 == 1)) {
-					for (int j = (int) (WORLD_MAX_Y * 0.5); j > -1; j--) {
-						if (world.isAirBlock(i, j, k))
-							for (; j > -1; j--)
-								if (!BlockProperties.get(world.getBlock(i, j, k)).isWallable)
-									return j;
-					}
-				} else {
-					for (int j = 0; j <= (int) (WORLD_MAX_Y * 0.5); j++)
-						if (world.isAirBlock(i, j, k))
-							return j;
-				}
-				return -1;
-			} else { // other dimensions
-				int minecraftHeight = world.getChunkFromBlockCoords(i, k).getHeightValue(i & 0xf, k & 0xf);
-				if (minecraftHeight < jinit)
-					jinit = minecraftHeight;
-				for (int j = jinit; j >= 0; j--) {
-					blockId = world.getBlock(i, j, k);
-					if (!BlockProperties.get(blockId).isWallable && (wallIsSurface || !BlockProperties.get(blockId).isArtificial))
-						return j;
-					if (waterSurfaceBuffer != IGNORE_WATER && BlockProperties.get(blockId).isWater)
-						return BlockProperties.get(world.getBlock(i, j - waterSurfaceBuffer, k)).isWater ? HIT_WATER : j;
-					// so we can still build in swamps...
-				}
-			}
-		}
-		return -1;
-	}
-
-	public static String metaValueCheck(Block blockID, int metadata) {
-		if (metadata < 0 || metadata >= 16)
-			return "All Minecraft meta values should be between 0 and 15";
-		String fail = blockID.getUnlocalizedName() + " meta value should be between";
-		if (BlockProperties.get(blockID).isStair)
-			return metadata < 8 ? null : fail + " 0 and 7";
-		// orientation metas
-		if(blockID==Blocks.rail){
-			return metadata < 10 ? null : fail + " 0 and 9";
-        }else if(blockID==Blocks.stone_button || blockID== Blocks.wooden_button){
-			return metadata % 8 > 0 && metadata % 8 < 5 ? null : fail + " 1 and 4 or 9 and 12";
-        }else if(blockID==Blocks.ladder||blockID==Blocks.dispenser||blockID==Blocks.furnace||blockID==Blocks.lit_furnace||blockID==Blocks.wall_sign
-		||blockID==Blocks.piston||blockID==Blocks.piston_extension||blockID==Blocks.chest||blockID==Blocks.hopper||blockID==Blocks.dropper||blockID==Blocks.golden_rail||blockID==Blocks.detector_rail||blockID==Blocks.activator_rail){
-			return metadata % 8 < 6 ? null : fail + " 0 and 5 or 8 and 13";
-        }else if(blockID==Blocks.pumpkin||blockID==Blocks.lit_pumpkin){
-			return metadata < 5 ? null : fail + " 0 and 4";
-        }else if(blockID==Blocks.fence_gate){
-			return metadata < 8 ? null : fail + " 0 and 7";
-        }else if(blockID==Blocks.wooden_slab ||blockID==Blocks.bed){
-			return metadata % 8 < 4 ? null : fail + " 0 and 3 or 8 and 11";
-        }else if(blockID==Blocks.torch||blockID==Blocks.redstone_torch||blockID==Blocks.unlit_redstone_torch){
-			return metadata > 0 && metadata < 7 ? null : fail + " 1 and 6";
-		}
-		return null;
-	}
-
-	public static int rotDir(int dir, int rotation) {
-		return (dir + rotation + 4) % 4;
-	}
-
-	public static void setBlockAndMetaNoLighting(World world, int i, int j, int k, Block blockId, int meta) {
-		if (i < 0xfe363c80 || k < 0xfe363c80 || i >= 0x1c9c380 || k >= 0x1c9c380 || j < 0 || j > Building.WORLD_MAX_Y)
-			return;
-		world.getChunkFromChunkCoords(i >> 4, k >> 4).func_150807_a(i & 0xf, j, k & 0xf, blockId, meta);
-	}
-
-    public static void fillDown(int[] lowPt, int jtop, World world) {
-		while (BlockProperties.get(world.getBlock(lowPt[0], lowPt[1], lowPt[2])).isArtificial)
-			lowPt[1]--;
-		Block oldSurfaceBlockId = world.getBlock(lowPt[0], lowPt[1], lowPt[2]);
-		if (BlockProperties.get(oldSurfaceBlockId).isOre)
-			oldSurfaceBlockId = Blocks.stone;
-		if (oldSurfaceBlockId == Blocks.dirt || (lowPt[1] <= SEA_LEVEL && oldSurfaceBlockId == Blocks.sand))
-			oldSurfaceBlockId = Blocks.grass;
-		if (oldSurfaceBlockId == Blocks.air)
-			oldSurfaceBlockId = world.provider.isHellWorld ? Blocks.netherrack : Blocks.grass;
-		Block fillBlockId = oldSurfaceBlockId == Blocks.grass ? Blocks.dirt : oldSurfaceBlockId;
-		for (; lowPt[1] <= jtop; lowPt[1]++)
-			setBlockAndMetaNoLighting(world, lowPt[0], lowPt[1], lowPt[2], lowPt[1] == jtop ? oldSurfaceBlockId : fillBlockId, 0);
-	}
-
-	protected static int minOrMax(int[] a, boolean isMin) {
-		if (isMin) {
-			int min = Integer.MAX_VALUE;
-			for (int i : a)
-				min = Math.min(min, i);
-			return min;
-		} else {
-			int max = Integer.MIN_VALUE;
-			for (int i : a)
-				max = Math.max(max, i);
-			return max;
-		}
-	}
-
-	// wiggle allows for some leeway before nonzero is detected
-    public static int signum(int n, int wiggle) {
-		if (n <= wiggle && -n <= wiggle)
-			return 0;
-		return n < 0 ? -1 : 1;
-	}
-
-	private static boolean isSolidBlock(Block blockID) {
+    private boolean isSolidBlock(Block blockID) {
 		return blockID.getMaterial().isSolid();
 	}
 }

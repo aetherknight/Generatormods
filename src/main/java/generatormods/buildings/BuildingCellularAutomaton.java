@@ -24,6 +24,7 @@ import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateRule;
 import generatormods.common.config.ChestType;
+import generatormods.common.Util;
 import generatormods.gen.WorldGeneratorThread;
 
 import java.util.ArrayList;
@@ -36,6 +37,12 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
+
+import static generatormods.common.WorldHelper.HIT_WATER;
+import static generatormods.common.WorldHelper.IGNORE_WATER;
+import static generatormods.common.WorldHelper.SEA_LEVEL;
+import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.common.WorldHelper.findSurfaceJ;
 
 /*
  * BuildingCellularAutomaton creates Cellular Automata-derived towers.
@@ -316,7 +323,11 @@ public class BuildingCellularAutomaton extends Building {
 			}
 		}
 		//now resize building dimensions and shift down
-		int minX = minOrMax(BB[0], true), maxX = minOrMax(BB[1], false), minY = minOrMax(BB[2], true), maxY = minOrMax(BB[3], false);
+        int minX = Util.min(BB[0]);
+        int maxX = Util.max(BB[1]);
+        int minY = Util.min(BB[2]);
+        int maxY = Util.max(BB[3]);
+
 		bWidth = maxX - minX + 1;
 		bLength = maxY - minY + 1;
         //do a height check to see we are not at the edge of a cliff etc.
@@ -386,8 +397,8 @@ public class BuildingCellularAutomaton extends Building {
 				findSurfaceJ(world, getI(0, bLength - 1), getK(0, bLength - 1), j0 + 10, false, IGNORE_WATER),
 				findSurfaceJ(world, getI(bWidth - 1, bLength - 1), getK(bWidth - 1, bLength - 1), j0 + 10, false, IGNORE_WATER),
 				findSurfaceJ(world, getI(bWidth / 2, bLength / 2), getK(bWidth / 2, bLength / 2), j0 + 10, false, IGNORE_WATER) };
-		int minHeight = minOrMax(heights, true);
-		if (minOrMax(heights, false) - minHeight > maxShift)
+        int minHeight = Util.min(heights);
+        if (Util.max(heights) - minHeight > maxShift)
 			return false;
 		else
 			j0 = minHeight;
@@ -443,7 +454,7 @@ public class BuildingCellularAutomaton extends Building {
 					int[] pt = getIJKPt(x, z, y);
 					int lightVal = world.getSavedLightValue(EnumSkyBlock.Sky, pt[0], pt[1], pt[2]);
 					//Choose spawner types. There is some kind of bug where where lightVal coming up as zero, even though it is not.
-					if (lightVal < 5 && !(lightVal == 0 && j0 + z > Building.SEA_LEVEL))
+                    if (lightVal < 5 && !(lightVal == 0 && j0 + z > SEA_LEVEL))
 						spawnerSelection = lowLightSpawnerRule;
 					else if (lightVal < 10)
 						spawnerSelection = floorBlocks > 70 ? mediumLightWideSpawnerRule : mediumLightNarrowSpawnerRule;

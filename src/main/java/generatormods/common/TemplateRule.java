@@ -20,9 +20,8 @@ package generatormods.common;
 
 import cpw.mods.fml.common.registry.GameData;
 import generatormods.buildings.Building;
-
+import generatormods.common.BlockAndMeta;
 import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockChest;
@@ -102,7 +101,7 @@ public class TemplateRule {
                 }
             }
 			if (checkMetaValue && !(blockIDs[i] instanceof BlockAir)) {
-				String checkStr = Building.metaValueCheck(blockIDs[i], blockMDs[i]);
+				String checkStr = BlockAndMeta.metaValueCheck(blockIDs[i], blockMDs[i]);
 				if (checkStr != null)
 					throw new Exception("Error reading rule: " + rule + "\nBad meta value " + blockMDs[i] + ". " + checkStr);
 			}
