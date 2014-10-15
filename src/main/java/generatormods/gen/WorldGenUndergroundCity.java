@@ -285,4 +285,9 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
     protected boolean isUnderground() {
         return true;
     }
+
+    @Override
+    public CityDataManager getCityDataManager() {
+        return cityDataManager;
+    }
 }

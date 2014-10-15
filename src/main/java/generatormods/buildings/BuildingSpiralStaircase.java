@@ -21,7 +21,6 @@ package generatormods.buildings;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.Dir;
 import generatormods.common.TemplateRule;
-import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -29,8 +28,10 @@ import net.minecraft.init.Blocks;
  * BuildingSpiralStaircase plans and builds a 3x3 spiral staircase down from origin.
  */
 public class BuildingSpiralStaircase extends Building {
-	public BuildingSpiralStaircase(WorldGeneratorThread wgt_, TemplateRule bRule_, Dir bDir_, int axXHand_, boolean centerAligned_, int height, int[] sourcePt) {
-		super(0, wgt_, bRule_, bDir_, axXHand_, centerAligned_, new int[] { 3, height, 3 }, sourcePt);
+    public BuildingSpiralStaircase(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
+            int axXHand_, boolean centerAligned_, int height, int[] sourcePt) {
+        super(0, config, bRule_, bDir_, axXHand_, centerAligned_, new int[] {3, height, 3},
+                sourcePt);
 	}
 
 	public boolean bottomIsFloor() {

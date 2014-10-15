@@ -35,14 +35,14 @@ import static generatormods.common.WorldHelper.IGNORE_WATER;
 public class BuildingTML extends Building {
 	final TemplateTML tmlt;
 
-	//****************************************  CONSTRUCTOR - BuildingTML  *************************************************************************************//
-	public BuildingTML(int ID_, WorldGeneratorThread wgt, Dir bDir_, int axXHand_, boolean centerAligned_, TemplateTML tmlt_, int[] sourcePt) {
-		super(ID_, wgt, null, bDir_, axXHand_, centerAligned_, new int[] { tmlt_.width, tmlt_.height, tmlt_.length }, sourcePt);
+    public BuildingTML(int ID_, IBuildingConfig config, Dir bDir_, int axXHand_,
+            boolean centerAligned_, TemplateTML tmlt_, int[] sourcePt) {
+        super(ID_, config, null, bDir_, axXHand_, centerAligned_, new int[] {tmlt_.width,
+                tmlt_.height, tmlt_.length}, sourcePt);
 		tmlt = tmlt_;
 		j0 -= tmlt.embed;
 	}
 
-	//****************************************  FUNCTION - build *************************************************************************************//
 	public void build() {
 		tmlt.setFixedRules(world.rand);
 		//build base
@@ -59,38 +59,17 @@ public class BuildingTML extends Building {
 		for (int z = bHeight; z < tmlt.cutIn + tmlt.embed; z++)
 			for (int y = 0; y < bLength; y++)
 				for (int x = 0; x < bWidth; x++) {
-					/*
-					 * if(!queryExplorationHandlerForChunk(x,y)) break;
-					 */
 					setBlockLocal(x, z, y, Blocks.air);
 				}
 		//build
 		for (int z = 0; z < bHeight; z++)
 			for (int y = 0; y < bLength; y++)
 				for (int x = 0; x < bWidth; x++) {
-					/*
-					 * if(!queryExplorationHandlerForChunk(x,y)) break;
-					 */
 					setBlockLocal(x, z, y, tmlt.rules[tmlt.template[z][y][x]]);
 				}
         flushDelayed();
 	}
-	//****************************************  FUNCTION - isObstructedBody*************************************************************************************//
-	/*
-	 * private boolean isObstructedBody(TemplateTML tb){ for(int
-	 * z1=Math.min(tb.height-1,2); z1<tb.height; z1++){ for(int x1=0;
-	 * x1<tb.length; x1++)
-	 * if(tb.rules[tb.template[z1][tb.width-1][x1]].getBlock(
-	 * random)[0]!=PRESERVE_ID && isWallBlock(x1,z1,tb.width-1)) return true;
-	 * for(int y1=1; y1<tb.width-1;y1++){
-	 * if(tb.rules[tb.template[z1][y1][0]].getBlock(random)[0]!=PRESERVE_ID &&
-	 * isWallBlock(0,z1,y1)) return true;
-	 * if(tb.rules[tb.template[z1][y1][tb.length
-	 * -1]].getBlock(random)[0]!=PRESERVE_ID && isWallBlock(tb.length-1,z1,y1))
-	 * return true; } } return false; }
-	 */
 
-	//****************************************  FUNCTION - queryCanBuild *************************************************************************************//
 	public boolean queryCanBuild(int ybuffer) {
 		if (j0 <= 0)
 			return false;
@@ -106,12 +85,13 @@ public class BuildingTML extends Building {
 					|| BlockProperties.get(getBlockIdLocal(bWidth - 1, waterCheckHeight, 0)).isWater || BlockProperties.get(getBlockIdLocal(bWidth - 1, waterCheckHeight, bLength - 1)).isWater)
 				return false;
 		}
-		if (wgt.isLayoutGenerator()) {
+        if (layoutGenerator != null) {
 			//allow large templates to be built over streets by using the tower code to check
 			//However, if we do build, always put down the template code
 			int layoutCode = tmlt.buildOverStreets ? WorldGeneratorThread.LAYOUT_CODE_TOWER : WorldGeneratorThread.LAYOUT_CODE_TEMPLATE;
-			if (wgt.layoutIsClear(this, tmlt.templateLayout, layoutCode)) {
-				wgt.setLayoutCode(this, tmlt.templateLayout, WorldGeneratorThread.LAYOUT_CODE_TEMPLATE);
+            if (layoutGenerator.layoutIsClear(this, tmlt.templateLayout, layoutCode)) {
+                layoutGenerator.setLayoutCode(this, tmlt.templateLayout,
+                        WorldGeneratorThread.LAYOUT_CODE_TEMPLATE);
 			} else
 				return false;
 		} else {

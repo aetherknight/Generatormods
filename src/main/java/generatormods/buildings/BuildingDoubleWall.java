@@ -29,9 +29,10 @@ public class BuildingDoubleWall extends Building {
 	public BuildingWall wall1, wall2;
 	public final TemplateWall ws;
 
-	//****************************  CONSTRUCTOR - BuildingDoubleWall *************************************************************************************//
-	public BuildingDoubleWall(int ID_, WorldGeneratorThread wgt_, TemplateWall ws_, Dir dir_, int axXHand_, int[] sourcePt) {
-		super(ID_, wgt_, ws_.TowerRule, dir_, axXHand_, false, new int[] { ws_.WWidth, ws_.WHeight, 0 }, sourcePt);
+    public BuildingDoubleWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_,
+            int axXHand_, int[] sourcePt) {
+        super(ID_, config, ws_.TowerRule, dir_, axXHand_, false, new int[] {ws_.WWidth,
+                ws_.WHeight, 0}, sourcePt);
 		ws = ws_;
 	}
 
@@ -39,8 +40,12 @@ public class BuildingDoubleWall extends Building {
 	public boolean plan() {
 		//Plan out a pair of walls in opposite directions from given start coordinates.
 		//Start planning from position 1 (pos 0 is fixed).
-		wall1 = new BuildingWall(bID, wgt, ws, bDir, Building.R_HAND, ws.MaxL / 2, true, getIJKPt(0, 0, 0));
-		wall2 = new BuildingWall(bID, wgt, ws, bDir.opposite(), Building.L_HAND, ws.MaxL / 2, true, getIJKPt(0, 0, -1)).setTowers(wall1);
+        wall1 =
+                new BuildingWall(bID, config, ws, bDir, Building.R_HAND, ws.MaxL / 2, true,
+                        getIJKPt(0, 0, 0));
+        wall2 =
+                new BuildingWall(bID, config, ws, bDir.opposite(), Building.L_HAND, ws.MaxL / 2,
+                        true, getIJKPt(0, 0, -1)).setTowers(wall1);
 		int a = wall1.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		int b = wall2.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		if (b + a - 1 < ws.MinL) {

@@ -28,8 +28,7 @@ import generatormods.common.TemplateRule;
 import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
-import generatormods.gen.WorldGenWalledCity;
-import generatormods.gen.WorldGeneratorThread;
+import generatormods.gen.ILayoutGenerator;
 import generatormods.walledcity.CityDataManager;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,14 +85,17 @@ public class Building {
     public final static int L_HAND = -1;
 
 	// **** WORKING VARIABLES ****
+    protected final IBuildingConfig config;
 	protected final World world;
 	protected final Random random;
+    protected final Logger logger;
+    protected final Map<ChestType, ChestContentsSpec> chestItems;
+    protected final ILayoutGenerator layoutGenerator;
+    protected final CityDataManager cityDataManager;
 	protected TemplateRule bRule; // main structural blocktype
 	public int bWidth, bHeight, bLength;
 	public final int bID; // Building ID number
     private final LinkedList<PlacedBlock> delayedBuildQueue;
-	protected final WorldGeneratorThread wgt;
-    protected final Logger logger;
 
 	protected boolean centerAligned; // if true, alignPt x is the central axis of the building if false, alignPt is the origin
 	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
@@ -298,18 +300,22 @@ public class Building {
 			randLightingHash[m] = rand.nextInt(LIGHTING_INVERSE_DENSITY) == 0;
 	}
 
-    public Building(int ID_, WorldGeneratorThread wgt_, TemplateRule buildingRule_, Dir dir_, int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
+    public Building(int ID_, IBuildingConfig config, TemplateRule buildingRule_, Dir dir_,
+            int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
         bID = ID_;
-        wgt = wgt_;
-        logger = wgt_.logger;
-        world = wgt.world;
+        this.config = config;
+        this.world = config.getWorld();
+        this.random = config.getRandom();
+        this.logger = config.getLogger();
+        this.cityDataManager = config.getCityDataManager();
+        this.chestItems = config.getChestConfigs();
+        this.layoutGenerator = config.getLayoutGenerator();
         bRule = buildingRule_;
         if (bRule == null)
             bRule = TemplateRule.STONE_RULE;
         bWidth = dim[0];
         bHeight = dim[1];
         bLength = dim[2];
-        random = wgt.random;
         bHand = axXHand_;
         centerAligned = centerAligned_;
         setPrimaryAx(dir_);
@@ -774,10 +780,8 @@ public class Building {
 	}
 
 	private void addDoorToNewListIfAppropriate(int par1, int par2, int par3) {
-		if (!(this.wgt instanceof WorldGenWalledCity)) {
-			return;
-		}
-        CityDataManager cityDataManager = ((WorldGenWalledCity) this.wgt).cityDataManager;
+        if (cityDataManager == null)
+            return;
 		int l = ((BlockDoor) Blocks.wooden_door).func_150013_e(this.world, par1, par2, par3);
 		int i1;
 		if (l != 0 && l != 2) {
@@ -828,7 +832,7 @@ public class Building {
 		if (chestType.equals(ChestType.TOWER) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
 			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
 		}
-		Object[][] itempool = wgt.chestItems.get(chestType).getChestItemsObjectArray();
+        Object[][] itempool = chestItems.get(chestType).getChestItemsObjectArray();
 		int idx = PickWeighted.pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
         Object obj = itempool[1][idx];
         if(obj == null){
@@ -1255,8 +1259,8 @@ public class Building {
 	private void setLootChest(int[] pt, Block chestBlock, int meta, String chestType) {
 		if (world.setBlock(pt[0], pt[1], pt[2], chestBlock, meta, 2)) {
 			TileEntityChest chest = (TileEntityChest) world.getTileEntity(pt[0], pt[1], pt[2]);
-			if (wgt.chestItems != null && wgt.chestItems.containsKey(chestType)) {
-				for (int m = 0; m < wgt.chestItems.get(chestType).getTries(); m++) {
+            if (chestItems != null && chestItems.containsKey(chestType)) {
+                for (int m = 0; m < chestItems.get(chestType).getTries(); m++) {
 					if (random.nextBoolean()) {
 						ItemStack itemstack = getChestItemstack(chestType);
 						if (itemstack != null && chest != null)

@@ -74,32 +74,36 @@ public class BuildingWall extends Building {
 	public final int Backtrack;
 
 	public BuildingWall(BuildingWall bw, int maxLength_, int i1_, int j1_, int k1_) {
-		super(bw.bID, bw.wgt, bw.bRule, bw.bDir, bw.bHand, false, new int[] { bw.bWidth, bw.bHeight, 0 }, new int[] { i1_, j1_, k1_ });
+        super(bw.bID, bw.config, bw.bRule, bw.bDir, bw.bHand, false, new int[] {bw.bWidth,
+                bw.bHeight, 0}, new int[] {i1_, j1_, k1_});
 		constructorHelper(bw.ws, maxLength_, i1_, j1_, k1_);
-		Backtrack = bw.Backtrack;
+        Backtrack = bw.Backtrack;
 		target = bw.target;
 		x_targ = bw.x_targ;
 		z_targ = bw.z_targ;
 		y_targ = bw.y_targ;
 	}
 
-	//****************************************  CONSTRUCTORS - BuildingWall  *************************************************************************************//
-    public BuildingWall(int ID_, WorldGeneratorThread wgt_, TemplateWall ws_, Dir dir_, int axXHand_, int maxLength_, boolean endTowers, int i1_, int j1_, int k1_) {
-		super(ID_, wgt_, ws_.rules[ws_.template[0][0][ws_.WWidth / 2]], dir_, axXHand_, false, new int[] { ws_.WWidth, ws_.WHeight, 0 }, new int[] { i1_, j1_, k1_ });
+    public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_, int axXHand_,
+            int maxLength_, boolean endTowers, int i1_, int j1_, int k1_) {
+        super(ID_, config, ws_.rules[ws_.template[0][0][ws_.WWidth / 2]], dir_, axXHand_, false,
+                new int[] {ws_.WWidth, ws_.WHeight, 0}, new int[] {i1_, j1_, k1_});
 		constructorHelper(ws_, maxLength_, i1_, j1_, k1_);
 		pickTowers(random.nextFloat() < ws.CircularProb, endTowers);
-		Backtrack = wgt.backtrackLength;
+        Backtrack = config.getBacktrackLength();
 		if (maxLength > 0) {
 			xArray[0] = 0;
 			zArray[0] = 0;
 		}
 	}
 
-    public BuildingWall(int ID_, WorldGeneratorThread wgt_, TemplateWall ws_, Dir dir_, int axXHand_, int maxLength_, boolean endTowers, int[] sourcePt) {
-		super(ID_, wgt_, ws_.rules[ws_.template[0][0][ws_.WWidth / 2]], dir_, axXHand_, false, new int[] { ws_.WWidth, ws_.WHeight, 0 }, sourcePt);
+    public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_, int axXHand_,
+            int maxLength_, boolean endTowers, int[] sourcePt) {
+        super(ID_, config, ws_.rules[ws_.template[0][0][ws_.WWidth / 2]], dir_, axXHand_, false,
+                new int[] {ws_.WWidth, ws_.WHeight, 0}, sourcePt);
 		constructorHelper(ws_, maxLength_, sourcePt[0], sourcePt[1], sourcePt[2]);
 		pickTowers(random.nextFloat() < ws.CircularProb, endTowers);
-		Backtrack = wgt.backtrackLength;
+        Backtrack = config.getBacktrackLength();
 		if (maxLength > 0) {
 			xArray[0] = 0;
 			zArray[0] = 0;
@@ -264,10 +268,10 @@ public class BuildingWall extends Building {
 					if (rs != null) {
                         avenues =
                                 new BuildingWall[] {
-                                        new BuildingWall(bID, wgt, rs, bDir.rotate(bHand), XHand,
-                                                XMaxLen, false, getIJKPt(bWidth, 0,
+                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand),
+                                                XHand, XMaxLen, false, getIJKPt(bWidth, 0,
                                                         XHand == -bHand ? 1 - gateWidth : 0)),
-                                        new BuildingWall(bID, wgt, rs, bDir.rotate(-bHand),
+                                        new BuildingWall(bID, config, rs, bDir.rotate(-bHand),
                                                 antiXHand, antiXMaxLen, false, getIJKPt(-1, 0,
                                                         antiXHand == bHand ? 1 - gateWidth : 0))};
 						avenues[0].setTarget(XTarget == null ? getIJKPt(bWidth + tw, 0, XHand == -bHand ? 1 - gateWidth : 0) : XTarget);
@@ -338,14 +342,16 @@ public class BuildingWall extends Building {
 							int x2 = (flankTHand == 0 || flankTHand == bHand) ? 1 - ws.TowerXOffset : bWidth - 2 + ws.TowerXOffset;
 							for (int n1 = ngw1; n1 > ngw1 - 5; n1--) {
 								if (zArray[n1 - 3] == zArray[n1] && xArray[n1 - 3] == xArray[ngw1 + 1]) {
-									new BuildingSpiralStaircase(wgt, bRule, bDir, bHand, false, -WalkHeight, getIJKPtAtN(n1, x2, WalkHeight - 2, -3)).build(1, ngw1 - n1 + 4);
+                                    new BuildingSpiralStaircase(config, bRule, bDir, bHand, false,
+                                            -WalkHeight, getIJKPtAtN(n1, x2, WalkHeight - 2, -3))
+                                            .build(1, ngw1 - n1 + 4);
 									gatewayStart = n1 - 3;
 									break;
 								}
 							}
 							for (int n1 = ngw2; n1 < ngw2 + 5; n1++) {
 								if (zArray[n1 + 3] == zArray[n1] && xArray[n1 + 3] == xArray[ngw2 - 1]) {
-                                    new BuildingSpiralStaircase(wgt, bRule, bDir.opposite(),
+                                    new BuildingSpiralStaircase(config, bRule, bDir.opposite(),
                                             -bHand, false, -WalkHeight, getIJKPtAtN(n1, x2,
                                                     WalkHeight - 2, 3)).build(1, n1 - ngw2 + 5);
 									gatewayEnd = n1 + 3;
@@ -437,7 +443,10 @@ public class BuildingWall extends Building {
                                         : ws.pickTWidth(circular, world.rand), getIJKPtAtN(nMid,
                                         bWidth / 2, 0, tw / 2));
 				if (!tower.isObstructedRoof(-1)) {
-					wgt.setLayoutCode(tower.getIJKPt(0, 0, 0), tower.getIJKPt(tw - 1, 0, tw - 1), WorldGeneratorThread.LAYOUT_CODE_TOWER);
+                    if (layoutGenerator != null)
+                        layoutGenerator.setLayoutCode(tower.getIJKPt(0, 0, 0),
+                                tower.getIJKPt(tw - 1, 0, tw - 1),
+                                WorldGeneratorThread.LAYOUT_CODE_TOWER);
 					tower.build(xArray[n0 - 1] - xArray[nMid], xArray[nBack + 1] - xArray[nMid], false);
 					setCursor(n0 + ws.BuildingInterval - 1);
 				}
@@ -659,7 +668,9 @@ public class BuildingWall extends Building {
 	public boolean queryLayout(int layoutCode) {
 		for (int n = 0; n < bLength; n++) {
 			setCursor(n);
-			if (!wgt.layoutIsClear(getIJKPt(0, 0, 0), getIJKPt(bWidth - 1, 0, 0), layoutCode)) {
+            if (layoutGenerator != null
+                    && !layoutGenerator.layoutIsClear(getIJKPt(0, 0, 0),
+                            getIJKPt(bWidth - 1, 0, 0), layoutCode)) {
 				setCursor(0);
 				return false;
 			}
@@ -680,7 +691,9 @@ public class BuildingWall extends Building {
 	public void setLayoutCode(int layoutCode) {
 		for (int n = 0; n < bLength; n++) {
 			setCursor(n);
-			wgt.setLayoutCode(getIJKPt(0, 0, 0), getIJKPt(bWidth - 1, 0, 0), layoutCode);
+            if (layoutGenerator != null)
+                layoutGenerator.setLayoutCode(getIJKPt(0, 0, 0), getIJKPt(bWidth - 1, 0, 0),
+                        layoutCode);
 		}
 		setCursor(0);
 	}
@@ -773,7 +786,7 @@ public class BuildingWall extends Building {
 			for (int tries = 0; tries < 10; tries++) {
                 ISeed seed = new SymmetricSeed(ws.CARuinContainerWidth, 0.5F);
                 BuildingCellularAutomaton bca =
-                        new BuildingCellularAutomaton(wgt, ws.CARuinRule, dir, 1, true,
+                        new BuildingCellularAutomaton(config, ws.CARuinRule, dir, 1, true,
                                 ws.CARuinContainerWidth, ws.CARuinMinHeight
                                         + random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight
                                                 + 1), ws.CARuinContainerWidth,
@@ -788,7 +801,7 @@ public class BuildingWall extends Building {
 				return makeBuilding(ws.makeDefaultTower, tw, ybuffer, overlapTowers, dir, pt);
 			}
 		} else {
-			BuildingTML buildingTML = new BuildingTML(bID + n0, wgt, dir, 1, true, template, pt);
+            BuildingTML buildingTML = new BuildingTML(bID + n0, config, dir, 1, true, template, pt);
 			if (buildingTML.queryCanBuild(ybuffer)) {
 				buildingTML.build();
 				return true;

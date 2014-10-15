@@ -18,9 +18,10 @@
  */
 package generatormods.gen;
 
-import generatormods.buildings.Building;
+import generatormods.buildings.IBuildingConfig;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
+import generatormods.walledcity.CityDataManager;
 import java.util.Map;
 import java.util.Random;
 import net.minecraft.world.World;
@@ -36,7 +37,7 @@ import static generatormods.common.WorldHelper.findSurfaceJ;
  * world. It is intended to serially hand back and forth control with a
  * BuildingExplorationHandler (not to run parallel).
  */
-public abstract class WorldGeneratorThread {
+public abstract class WorldGeneratorThread implements IBuildingConfig {
 	public final static int LAYOUT_CODE_NOCODE = -1;
     public final static int LAYOUT_CODE_EMPTY = 0;
     public final static int LAYOUT_CODE_WALL = 1;
@@ -86,28 +87,8 @@ public abstract class WorldGeneratorThread {
 		max_spawn_height = WORLD_MAX_Y;
 	}
 
-	//****************************  FUNCTION - abstract and stub functions  *************************************************************************************//
 	public abstract boolean generate(int i0, int j0, int k0);
 
-	public boolean isLayoutGenerator() {
-		return false;
-	}
-
-	public boolean layoutIsClear(int[] pt1, int[] pt2, int layoutCode) {
-		return true;
-	}
-
-	public boolean layoutIsClear(Building building, boolean[][] templateLayout, int layoutCode) {
-		return true;
-	}
-
-	public void setLayoutCode(int[] pt1, int[] pt2, int layoutCode) {
-	}
-
-	public void setLayoutCode(Building building, boolean[][] templateLayout, int layoutCode) {
-	}
-
-	//****************************  FUNCTION - run *************************************************************************************//
 	public void run() {
 		boolean success = false;
 		int tries = 0, j0 = 0, i0, k0;
@@ -133,4 +114,39 @@ public abstract class WorldGeneratorThread {
 		max_spawn_height = max_spawn_height_;
 		spawn_surface = spawn_surface_;
 	}
+
+    @Override
+    public int getBacktrackLength() {
+        return backtrackLength;
+    }
+
+    @Override
+    public Map<ChestType, ChestContentsSpec> getChestConfigs() {
+        return chestItems;
+    }
+
+    @Override
+    public CityDataManager getCityDataManager() {
+        return null;
+    }
+
+    @Override
+    public ILayoutGenerator getLayoutGenerator() {
+        return null;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public Random getRandom() {
+        return random;
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
+    }
 }

@@ -64,9 +64,11 @@ public class BuildingCellularAutomaton extends Building {
 	int[][] fBB;
 	int zGround = 0;
 
-	public BuildingCellularAutomaton(WorldGeneratorThread wgt_, TemplateRule bRule_, Dir bDir_, int axXHand_, boolean centerAligned_, int width, int height, int length, byte[][] seed_,
-			byte[][] caRule_, TemplateRule[] spawnerRules, int[] sourcePt) {
-		super(0, wgt_, bRule_, bDir_, axXHand_, centerAligned_, new int[] { width, height, length }, sourcePt);
+    public BuildingCellularAutomaton(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
+            int axXHand_, boolean centerAligned_, int width, int height, int length,
+            byte[][] seed_, byte[][] caRule_, TemplateRule[] spawnerRules, int[] sourcePt) {
+        super(0, config, bRule_, bDir_, axXHand_, centerAligned_,
+                new int[] {width, height, length}, sourcePt);
 		seed = seed_;
 		if ((bWidth - seed.length) % 2 != 0)
 			bWidth++; //so seed can be perfectly centered
@@ -375,9 +377,11 @@ public class BuildingCellularAutomaton extends Building {
 	//unlike other Buildings, this should be called after plan()
 	public boolean queryCanBuild(int ybuffer, boolean nonLayoutFrameCheck) {
 		int layoutCode = bWidth * bLength > 120 ? WorldGeneratorThread.LAYOUT_CODE_TOWER : WorldGeneratorThread.LAYOUT_CODE_TEMPLATE;
-		if (wgt.isLayoutGenerator()) {
-			if (wgt.layoutIsClear(getIJKPt(0, 0, ybuffer), getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode))
-				wgt.setLayoutCode(getIJKPt(0, 0, ybuffer), getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode);
+        if (layoutGenerator != null) {
+            if (layoutGenerator.layoutIsClear(getIJKPt(0, 0, ybuffer),
+                    getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode))
+                layoutGenerator.setLayoutCode(getIJKPt(0, 0, ybuffer),
+                        getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode);
             else {
                 logger.debug("Cannot build because layout is not clear");
 				return false;
@@ -506,7 +510,9 @@ public class BuildingCellularAutomaton extends Building {
 		if (spawnerSelection == null || random.nextBoolean()) {
 			for (int tries = 0; tries < 10; tries++) {
 				int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
-				BuildingDispenserTrap bdt = new BuildingDispenserTrap(wgt, bRule, Dir.randomDir(random), 1, getIJKPt(x, z, y));
+                BuildingDispenserTrap bdt =
+                        new BuildingDispenserTrap(config, bRule, Dir.randomDir(random), 1,
+                                getIJKPt(x, z, y));
 				if (bdt.queryCanBuild(2)) {
 					bdt.build(random.nextBoolean() ? BuildingDispenserTrap.ARROW_MISSILE : BuildingDispenserTrap.DAMAGE_POTION_MISSILE, true);
 					break;
@@ -524,7 +530,10 @@ public class BuildingCellularAutomaton extends Building {
 			int x = random.nextInt(fWidth) + fBB[0][z2], y = random.nextInt(fLength) + fBB[2][z2];
 			if (isFloor(x, z2, y)) {
 				Dir dir = Dir.randomDir(random);
-				if (buildStairs && (bss = new BuildingSpiralStaircase(wgt, bRule, dir, 1, false, z1 - z2 + 1, getIJKPt(x, z2 - 1, y))).bottomIsFloor()) {
+                if (buildStairs
+                        && (bss =
+                                new BuildingSpiralStaircase(config, bRule, dir, 1, false, z1 - z2
+                                        + 1, getIJKPt(x, z2 - 1, y))).bottomIsFloor()) {
 					bss.build(0, 0);
 				} else if (isFloor(x, z1, y)) {
 					//ladder

@@ -21,7 +21,6 @@ package generatormods.buildings;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.Dir;
 import generatormods.common.TemplateRule;
-import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -38,8 +37,9 @@ public class BuildingDispenserTrap extends Building {
 			{ { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 5, 1 } }, { { 0, 1, 0 }, { 1, 1, 1 }, { 1, 3, 1 }, { 1, 1, 1 } }, { { 0, 1, 0 }, { 1, 6, 1 }, { 1, 0, 1 }, { 1, 2, 1 } },
 			{ { 0, 1, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, };
 
-	public BuildingDispenserTrap(WorldGeneratorThread wgt_, TemplateRule bRule_, Dir bDir_, int plateSeparation, int[] sourcePt) {
-		super(0, wgt_, bRule_, bDir_, 1, true, new int[] { 3, 6, plateSeparation }, sourcePt);
+    public BuildingDispenserTrap(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
+            int plateSeparation, int[] sourcePt) {
+        super(0, config, bRule_, bDir_, 1, true, new int[] {3, 6, plateSeparation}, sourcePt);
 	}
 
 	//      ---   bLength+3 - end of mechanism
@@ -52,7 +52,7 @@ public class BuildingDispenserTrap extends Building {
 	public void build(int missileType, boolean multipleTriggers) {
 		if (bLength < 0)
 			bLength = 0;
-		//if (BuildingWall.DEBUG) FMLLog.getLogger().info("Building dispenser trap at "+i0+","+j0+","+k0+", plateSeparation="+bLength);
+        logger.debug("Building dispenser trap at "+i0+","+j0+","+k0+", plateSeparation="+bLength);
 		for (int x = 0; x < MECHANISM[0][0].length; x++) {
 			for (int y = 0; y < MECHANISM[0].length; y++) {
 				for (int z = 0; z < MECHANISM.length; z++) {

@@ -22,6 +22,7 @@ import generatormods.buildings.Building;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingTower;
 import generatormods.buildings.BuildingWall;
+import generatormods.buildings.IBuildingConfig;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateWall;
@@ -57,7 +58,7 @@ import static generatormods.common.WorldHelper.findSurfaceJ;
  * cities are composed of 4 wall template BuildingWalls in a rough rectangle,
  * filled with many street template BuildingDoubleWalls.
  */
-public class WorldGenWalledCity extends WorldGeneratorThread {
+public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutGenerator {
 	private final static int GATE_HEIGHT = 6;
 	private final static int JMEAN_DEVIATION_SLOPE = 10;
 	private final static int LEVELLING_DEVIATION_SLOPE = 18;
@@ -380,18 +381,13 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		return true;
 	}
 
-	//****************************************  FUNCTION - layoutIsClear *************************************************************************************//
-	@Override
-	public boolean isLayoutGenerator() {
-		return true;
-	}
-
 	@Override
 	public boolean layoutIsClear(Building building, boolean[][] templateLayout, int layoutCode) {
 		for (int y = 0; y < templateLayout.length; y++) {
 			for (int x = 0; x < templateLayout[0].length; x++) {
 				if (templateLayout[y][x]) {
-					int i = building.getI(x, y), k = building.getK(x, y);
+                    int i = building.getI(x, y);
+                    int k = building.getK(x, y);
 					if (i >= mincorner[0] && k >= mincorner[2] && i - mincorner[0] < layout.length && k - mincorner[2] < layout[0].length)
 						if (LAYOUT_CODE_OVERRIDE_MATRIX[layout[i - mincorner[0]][k - mincorner[2]]][layoutCode] == 0)
 							return false;
@@ -424,7 +420,6 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 		}
 	}
 
-	//****************************************  FUNCTION - setLayoutCode *************************************************************************************//
 	@Override
 	public void setLayoutCode(int[] pt1, int[] pt2, int layoutCode) {
 		for (int i = Math.min(pt1[0], pt2[0]); i <= Math.max(pt1[0], pt2[0]); i++)
@@ -433,7 +428,6 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					layout[i - mincorner[0]][k - mincorner[2]] = layoutCode;
 	}
 
-	//****************************************  FUNCTION - chooseDirection *************************************************************************************//
 	private void chooseDirection(int chunkI, int chunkK) {
         Map<Dir, Boolean> exploredChunk = new HashMap<Dir, Boolean>();
         exploredChunk.put(Dir.NORTH, world.blockExists(chunkI << 4, 0, (chunkK - 1) << 4));
@@ -455,7 +449,6 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
         dir[3] = dir[2].rotate(false, axXHand);
 	}
 
-	//****************************************  FUNCTION - levelCity  *************************************************************************************//
 	private void levelCity() {
 		for (BuildingWall w : walls)
 			w.setCursor(0);
@@ -470,7 +463,6 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 					jmin = w.zArray[n] + w.j1 + w.WalkHeight - 1;
 		}
 		int jmax = Math.max(jmean + Lmean / LEVELLING_DEVIATION_SLOPE, jmin);
-		//int jmax=Math.max(jmean + walls[0].WalkHeight, jmin);
 		for (pt[0] = corner1[0]; (corner2[0] - pt[0]) * incI > 0; pt[0] += incI) {
 			for (pt[2] = corner1[2]; (corner2[2] - pt[2]) * incK > 0; pt[2] += incK) {
 				boolean enclosed = true;
@@ -503,7 +495,6 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 				world.getChunkFromChunkCoords(chunkI, chunkK).generateSkylightMap();
 	}
 
-	//****************************************  FUNCTION - printLayout *************************************************************************************//
 	private void printLayout(File f) {
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(f)));
@@ -551,5 +542,15 @@ public class WorldGenWalledCity extends WorldGeneratorThread {
 
     protected boolean isUnderground() {
         return false;
+    }
+
+    @Override
+    public CityDataManager getCityDataManager() {
+        return cityDataManager;
+    }
+
+    @Override
+    public ILayoutGenerator getLayoutGenerator() {
+        return this;
     }
 }

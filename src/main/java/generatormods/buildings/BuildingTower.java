@@ -27,7 +27,6 @@ import generatormods.gen.WorldGeneratorThread;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
-import static generatormods.common.WorldHelper.SEA_LEVEL;
 import static generatormods.common.WorldHelper.WORLD_MAX_Y;
 
 /*
@@ -306,11 +305,11 @@ public class BuildingTower extends Building {
 			return false;
 		}
 		//check if obstructed on body
-		if (wgt.isLayoutGenerator()) {
+        if (layoutGenerator != null) {
 			int[] pt1 = getIJKPt(overlapTowers ? bWidth / 4 : 0, 0, overlapTowers ? bLength / 4 : ybuffer), pt2 = getIJKPt(overlapTowers ? 3 * bWidth / 4 - 1 : bWidth - 1, 0,
 					overlapTowers ? 3 * bLength / 4 - 1 : bLength - 1);
-			if (wgt.layoutIsClear(pt1, pt2, WorldGeneratorThread.LAYOUT_CODE_TOWER)) {
-				wgt.setLayoutCode(pt1, pt2, WorldGeneratorThread.LAYOUT_CODE_TOWER);
+            if (layoutGenerator.layoutIsClear(pt1, pt2, WorldGeneratorThread.LAYOUT_CODE_TOWER)) {
+                layoutGenerator.setLayoutCode(pt1, pt2, WorldGeneratorThread.LAYOUT_CODE_TOWER);
 			} else
 				return false;
 		} else if (!overlapTowers) {
@@ -606,7 +605,8 @@ public class BuildingTower extends Building {
 	private TemplateRule roofRule, SpawnerRule, ChestRule;
 
 	public BuildingTower(int ID_, Building parent, boolean circular_, int roofStyle_, Dir dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
-		super(ID_, parent.wgt, parent.bRule, dir_, axXHand_, centerAligned_, new int[] { TWidth_, THeight_, TLength_ }, sourcePt);
+        super(ID_, parent.config, parent.bRule, dir_, axXHand_, centerAligned_, new int[] {TWidth_,
+                THeight_, TLength_}, sourcePt);
 		baseHeight = 0;
 		roofStyle = roofStyle_;
 		minHorizDim = Math.min(bWidth, bLength);
@@ -643,7 +643,8 @@ public class BuildingTower extends Building {
 	// --------------  baseHeight-1 (floor)
 	//
 	public BuildingTower(int ID_, BuildingWall wall, Dir dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
-		super(ID_, wall.wgt, wall.towerRule, dir_, axXHand_, centerAligned_, new int[] { TWidth_, THeight_, TLength_ }, sourcePt);
+        super(ID_, wall.config, wall.towerRule, dir_, axXHand_, centerAligned_, new int[] {TWidth_,
+                THeight_, TLength_}, sourcePt);
 		baseHeight = wall.WalkHeight;
 		roofStyle = wall.roofStyle;
 		minHorizDim = Math.min(bWidth, bLength);
