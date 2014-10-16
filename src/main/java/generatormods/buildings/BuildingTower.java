@@ -24,9 +24,9 @@ import generatormods.common.Dir;
 import generatormods.common.Shape;
 import generatormods.common.TemplateRule;
 import generatormods.gen.WorldGeneratorThread;
+import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-
 import static generatormods.common.WorldHelper.WORLD_MAX_Y;
 
 /*
@@ -308,9 +308,9 @@ public class BuildingTower extends Building {
         if (layoutGenerator != null) {
 			int[] pt1 = getIJKPt(overlapTowers ? bWidth / 4 : 0, 0, overlapTowers ? bLength / 4 : ybuffer), pt2 = getIJKPt(overlapTowers ? 3 * bWidth / 4 - 1 : bWidth - 1, 0,
 					overlapTowers ? 3 * bLength / 4 - 1 : bLength - 1);
-            if (layoutGenerator.layoutIsClear(pt1, pt2, WorldGeneratorThread.LAYOUT_CODE_TOWER)) {
-                layoutGenerator.setLayoutCode(pt1, pt2, WorldGeneratorThread.LAYOUT_CODE_TOWER);
-			} else
+            if (layoutGenerator.layoutIsClear(pt1, pt2, LayoutCode.TOWER))
+                layoutGenerator.setLayoutCode(pt1, pt2, LayoutCode.TOWER);
+            else
 				return false;
 		} else if (!overlapTowers) {
 			if (isObstructedFrame(3, ybuffer)) {

@@ -172,7 +172,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
                         new BuildingDoubleWall(tries, this, sws, Dir.randomDir(random),
                                 Building.R_HAND, pt);
 				if (street.plan()) {
-					street.build(LAYOUT_CODE_NOCODE);
+                    street.build();
 					streets.add(street);
 					successes++;
 				}

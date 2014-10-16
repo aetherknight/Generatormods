@@ -21,6 +21,7 @@ package generatormods.buildings;
 import generatormods.common.Dir;
 import generatormods.common.TemplateWall;
 import generatormods.gen.WorldGeneratorThread;
+import generatormods.walledcity.LayoutCode;
 
 /*
  * BuildingDoubleWall creates double-ended walls
@@ -89,9 +90,13 @@ public class BuildingDoubleWall extends Building {
 		return true;
 	}
 
-	public void build(int layoutCode) {
+    public void build() {
+        build(null);
+    }
+
+    public void build(LayoutCode layoutCode) {
 		ws.setFixedRules(world.rand);
-		if (layoutCode != WorldGeneratorThread.LAYOUT_CODE_NOCODE) {
+        if (layoutCode != null) {
 			wall1.setLayoutCode(layoutCode);
 			wall2.setLayoutCode(layoutCode);
 		}

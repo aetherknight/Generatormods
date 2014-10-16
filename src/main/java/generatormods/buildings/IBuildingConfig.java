@@ -2,11 +2,14 @@ package generatormods.buildings;
 
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
-import generatormods.gen.ILayoutGenerator;
 import generatormods.walledcity.CityDataManager;
+import generatormods.walledcity.ILayoutGenerator;
+
 import java.util.Map;
 import java.util.Random;
+
 import net.minecraft.world.World;
+
 import org.apache.logging.log4j.Logger;
 
 

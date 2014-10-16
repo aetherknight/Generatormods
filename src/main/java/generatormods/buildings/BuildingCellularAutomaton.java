@@ -25,7 +25,7 @@ import generatormods.common.Dir;
 import generatormods.common.TemplateRule;
 import generatormods.common.config.ChestType;
 import generatormods.common.Util;
-import generatormods.gen.WorldGeneratorThread;
+import generatormods.walledcity.LayoutCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
-
 import static generatormods.common.WorldHelper.HIT_WATER;
 import static generatormods.common.WorldHelper.IGNORE_WATER;
 import static generatormods.common.WorldHelper.SEA_LEVEL;
@@ -376,7 +375,7 @@ public class BuildingCellularAutomaton extends Building {
 
 	//unlike other Buildings, this should be called after plan()
 	public boolean queryCanBuild(int ybuffer, boolean nonLayoutFrameCheck) {
-		int layoutCode = bWidth * bLength > 120 ? WorldGeneratorThread.LAYOUT_CODE_TOWER : WorldGeneratorThread.LAYOUT_CODE_TEMPLATE;
+        LayoutCode layoutCode = bWidth * bLength > 120 ? LayoutCode.TOWER : LayoutCode.TEMPLATE;
         if (layoutGenerator != null) {
             if (layoutGenerator.layoutIsClear(getIJKPt(0, 0, ybuffer),
                     getIJKPt(bWidth - 1, 0, bLength - 1), layoutCode))

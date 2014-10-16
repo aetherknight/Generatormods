@@ -83,7 +83,7 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 				return false;
 			}
 		}
-		dw.build(LAYOUT_CODE_NOCODE);
+        dw.build();
 		dw.buildTowers(true, true, ws.MakeGatehouseTowers, false, false);
 		return true;
 	}

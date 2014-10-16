@@ -30,6 +30,7 @@ import generatormods.common.TemplateTML;
 import generatormods.common.TemplateWall;
 import generatormods.common.Util;
 import generatormods.gen.WorldGeneratorThread;
+import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
@@ -445,8 +446,7 @@ public class BuildingWall extends Building {
 				if (!tower.isObstructedRoof(-1)) {
                     if (layoutGenerator != null)
                         layoutGenerator.setLayoutCode(tower.getIJKPt(0, 0, 0),
-                                tower.getIJKPt(tw - 1, 0, tw - 1),
-                                WorldGeneratorThread.LAYOUT_CODE_TOWER);
+                                tower.getIJKPt(tw - 1, 0, tw - 1), LayoutCode.TOWER);
 					tower.build(xArray[n0 - 1] - xArray[nMid], xArray[nBack + 1] - xArray[nMid], false);
 					setCursor(n0 + ws.BuildingInterval - 1);
 				}
@@ -665,7 +665,7 @@ public class BuildingWall extends Building {
 		return getX(pt) >= xArray[ptY] + buffer;
 	}
 
-	public boolean queryLayout(int layoutCode) {
+    public boolean queryLayout(LayoutCode layoutCode) {
 		for (int n = 0; n < bLength; n++) {
 			setCursor(n);
             if (layoutGenerator != null
@@ -688,7 +688,7 @@ public class BuildingWall extends Building {
 		}
 	}
 
-	public void setLayoutCode(int layoutCode) {
+    public void setLayoutCode(LayoutCode layoutCode) {
 		for (int n = 0; n < bLength; n++) {
 			setCursor(n);
             if (layoutGenerator != null)

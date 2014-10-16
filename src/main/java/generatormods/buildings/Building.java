@@ -28,13 +28,15 @@ import generatormods.common.TemplateRule;
 import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
-import generatormods.gen.ILayoutGenerator;
 import generatormods.walledcity.CityDataManager;
+import generatormods.walledcity.ILayoutGenerator;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
+
 import net.minecraft.block.*;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.init.Blocks;
@@ -44,6 +46,7 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.world.World;
+
 import org.apache.logging.log4j.Logger;
 
 import static generatormods.common.WorldHelper.findSurfaceJ;

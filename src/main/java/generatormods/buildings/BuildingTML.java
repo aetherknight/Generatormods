@@ -23,10 +23,9 @@ import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateTML;
 import generatormods.common.WorldHelper;
-import generatormods.gen.WorldGeneratorThread;
+import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-
 import static generatormods.common.WorldHelper.IGNORE_WATER;
 
 /*
@@ -88,10 +87,10 @@ public class BuildingTML extends Building {
         if (layoutGenerator != null) {
 			//allow large templates to be built over streets by using the tower code to check
 			//However, if we do build, always put down the template code
-			int layoutCode = tmlt.buildOverStreets ? WorldGeneratorThread.LAYOUT_CODE_TOWER : WorldGeneratorThread.LAYOUT_CODE_TEMPLATE;
+            LayoutCode layoutCode = tmlt.buildOverStreets ? LayoutCode.TOWER : LayoutCode.TEMPLATE;
             if (layoutGenerator.layoutIsClear(this, tmlt.templateLayout, layoutCode)) {
-                layoutGenerator.setLayoutCode(this, tmlt.templateLayout,
-                        WorldGeneratorThread.LAYOUT_CODE_TEMPLATE);
+                // TODO: shouldn't this be layoutCode, and not always set to TEMPALTE?
+                layoutGenerator.setLayoutCode(this, tmlt.templateLayout, LayoutCode.TEMPLATE);
 			} else
 				return false;
 		} else {

@@ -22,7 +22,6 @@ import generatormods.buildings.Building;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingTower;
 import generatormods.buildings.BuildingWall;
-import generatormods.buildings.IBuildingConfig;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.TemplateWall;
@@ -30,7 +29,10 @@ import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
+import generatormods.walledcity.ILayoutGenerator;
+import generatormods.walledcity.LayoutCode;
 import generatormods.walledcity.WalledCityChatHandler;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -40,10 +42,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
+
 import org.apache.logging.log4j.Logger;
 
 import static generatormods.PopulatorWalledCity.MIN_CITY_LENGTH;
@@ -73,7 +77,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	private int Lmean, jmean;
 	private final int cityType;
 	private int corner1[], corner2[], mincorner[];
-	public int[][] layout;
+    public LayoutCode[][] layout;
 
     private WalledCityChatHandler chatHandler;
     public CityDataManager cityDataManager;
@@ -256,12 +260,12 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		TemplateWall avenueWS = TemplateWall.pickBiomeWeightedWallStyle(ows.streets, world, i0, k0, world.rand, false);
 		LinkedList<BuildingWall> radialAvenues = new LinkedList<BuildingWall>();
 		//layout
-		layout = new int[Math.abs(corner1[0] - corner2[0])][Math.abs(corner1[2] - corner2[2])];
+        layout = new LayoutCode[Math.abs(corner1[0] - corner2[0])][Math.abs(corner1[2] - corner2[2])];
 		for (int x = 0; x < layout.length; x++)
 			for (int y = 0; y < layout[0].length; y++)
-				layout[x][y] = LAYOUT_CODE_EMPTY;
+                layout[x][y] = LayoutCode.EMPTY;
 		for (BuildingWall w : walls)
-			w.setLayoutCode(LAYOUT_CODE_WALL);
+            w.setLayoutCode(LayoutCode.WALL);
 		int gateFlankingTowers = 0;
 		for (BuildingWall w : walls) {
 			//build city walls
@@ -304,7 +308,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 					int TWidth = ows.getTMaxWidth(walls[w].circular) < minCornerWidth ? minCornerWidth : ows.getTMaxWidth(walls[w].circular);
 					BuildingTower tower = new BuildingTower(ID + 10 + w, walls[w], dir[(w + 2) % 4], -axXHand, false, TWidth, ows.getTMaxHeight(walls[w].circular), TWidth, walls[w].getIJKPt(-2
 							- (ows.TowerXOffset < 0 ? ows.TowerXOffset : 0), zmean, 2));
-					setLayoutCode(tower.getIJKPt(0, 0, 0), tower.getIJKPt(TWidth - 1, 0, TWidth - 1), LAYOUT_CODE_TOWER);
+                    setLayoutCode(tower.getIJKPt(0, 0, 0), tower.getIJKPt(TWidth - 1, 0, TWidth - 1), LayoutCode.TOWER);
 					tower.build(0, 0, true);
 				}
 			}
@@ -336,7 +340,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 				if (crossAvenue.plan())
 					crossAvenues.add(crossAvenue);
 			}
-			radialAvenue.setLayoutCode(LAYOUT_CODE_AVENUE);
+            radialAvenue.setLayoutCode(LayoutCode.AVENUE);
 		}
 		for (BuildingWall avenue : radialAvenues)
 			avenue.buildFromTML();
@@ -358,9 +362,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 			}
 		}
 		for (BuildingDoubleWall avenue : crossAvenues)
-			avenue.build(LAYOUT_CODE_AVENUE);
+            avenue.build(LayoutCode.AVENUE);
 		for (BuildingDoubleWall street : plannedStreets)
-			street.build(LAYOUT_CODE_STREET);
+            street.build(LayoutCode.STREET);
 		//build towers
 		for (BuildingWall avenue : radialAvenues)
 			avenue.makeBuildings(true, true, false, cityIsDense, true);
@@ -382,14 +386,14 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	}
 
 	@Override
-	public boolean layoutIsClear(Building building, boolean[][] templateLayout, int layoutCode) {
+    public boolean layoutIsClear(Building building, boolean[][] templateLayout, LayoutCode layoutCode) {
 		for (int y = 0; y < templateLayout.length; y++) {
 			for (int x = 0; x < templateLayout[0].length; x++) {
 				if (templateLayout[y][x]) {
                     int i = building.getI(x, y);
                     int k = building.getK(x, y);
 					if (i >= mincorner[0] && k >= mincorner[2] && i - mincorner[0] < layout.length && k - mincorner[2] < layout[0].length)
-						if (LAYOUT_CODE_OVERRIDE_MATRIX[layout[i - mincorner[0]][k - mincorner[2]]][layoutCode] == 0)
+                        if (!layoutCode.canOverride(layout[i - mincorner[0]][k - mincorner[2]]))
 							return false;
 				}
 			}
@@ -398,17 +402,17 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	}
 
 	@Override
-	public boolean layoutIsClear(int[] pt1, int[] pt2, int layoutCode) {
+    public boolean layoutIsClear(int[] pt1, int[] pt2, LayoutCode layoutCode) {
 		for (int i = Math.min(pt1[0], pt2[0]); i <= Math.max(pt1[0], pt2[0]); i++)
 			for (int k = Math.min(pt1[2], pt2[2]); k <= Math.max(pt1[2], pt2[2]); k++)
 				if (i >= mincorner[0] && k >= mincorner[2] && i - mincorner[0] < layout.length && k - mincorner[2] < layout[0].length)
-					if (LAYOUT_CODE_OVERRIDE_MATRIX[layout[i - mincorner[0]][k - mincorner[2]]][layoutCode] == 0)
+                    if (!layoutCode.canOverride(layout[i - mincorner[0]][k - mincorner[2]]))
 						return false;
 		return true;
 	}
 
 	@Override
-	public void setLayoutCode(Building building, boolean[][] templateLayout, int layoutCode) {
+    public void setLayoutCode(Building building, boolean[][] templateLayout, LayoutCode layoutCode) {
 		for (int y = 0; y < templateLayout.length; y++) {
 			for (int x = 0; x < templateLayout[0].length; x++) {
 				if (templateLayout[y][x]) {
@@ -421,7 +425,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	}
 
 	@Override
-	public void setLayoutCode(int[] pt1, int[] pt2, int layoutCode) {
+    public void setLayoutCode(int[] pt1, int[] pt2, LayoutCode layoutCode) {
 		for (int i = Math.min(pt1[0], pt2[0]); i <= Math.max(pt1[0], pt2[0]); i++)
 			for (int k = Math.min(pt1[2], pt2[2]); k <= Math.max(pt1[2], pt2[2]); k++)
 				if (i >= mincorner[0] && k >= mincorner[2] && i - mincorner[0] < layout.length && k - mincorner[2] < layout[0].length)
@@ -506,7 +510,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 			pw.println();
 			for (int y = layout[0].length - 1; y >= 0; y--) {
 				for (int x = layout.length - 1; x >= 0; x--) {
-					pw.print(LAYOUT_CODE_TO_CHAR[layout[x][y]]);
+                    pw.print(layout[x][y].symbol);
 				}
 				pw.println();
 			}

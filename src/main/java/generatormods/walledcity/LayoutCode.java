@@ -16,14 +16,32 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.gen;
+package generatormods.walledcity;
 
-import generatormods.buildings.Building;
+/**
+ * LayoutCode specifies the character used when generating a map of a city for
+ * debugging purposes.
+ * <p>
+ * Use null when you want to specify that a building has no code.
+ */
+public enum LayoutCode {
+    EMPTY(' '), WALL('#'), AVENUE('='), STREET('-'), TOWER('@'), TEMPLATE('&');
 
-public interface ILayoutGenerator {
-    public boolean layoutIsClear(Building building, boolean[][] templateLayout, int layoutCode);
-    public boolean layoutIsClear(int[] pt1, int[] pt2, int layoutCode);
-    public void setLayoutCode(Building building, boolean[][] templateLayout, int layoutCode);
-    public void setLayoutCode(int[] pt1, int[] pt2, int layoutCode);
+    public char symbol;
+
+    private LayoutCode(char symbol) {
+        this.symbol = symbol;
+    }
+
+    public boolean canOverride(LayoutCode oldCode) {
+        return LAYOUT_CODE_OVERRIDE_MATRIX[oldCode.ordinal()][this.ordinal()] == 1;
+    }
+
+	private final static int[][] LAYOUT_CODE_OVERRIDE_MATRIX = new int[][] { //present code=rows, attempted overriding code=columns
+		{ 0, 1, 1, 1, 1, 1 }, //present empty
+		{ 0, 0, 0, 0, 0, 0 }, //present wall
+		{ 0, 0, 1, 1, 0, 0 }, //present avenue
+		{ 0, 0, 1, 1, 1, 0 }, //present street
+		{ 0, 0, 0, 0, 0, 0 }, //present tower
+		{ 0, 0, 0, 0, 0, 0 } }; //present template
 }
-
