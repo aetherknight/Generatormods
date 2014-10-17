@@ -20,6 +20,7 @@ package generatormods.buildings;
 
 import generatormods.common.BlockAndMeta;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -29,7 +30,7 @@ import net.minecraft.init.Blocks;
  */
 public class BuildingSpiralStaircase extends Building {
     public BuildingSpiralStaircase(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
-            int axXHand_, boolean centerAligned_, int height, int[] sourcePt) {
+            Handedness axXHand_, boolean centerAligned_, int height, int[] sourcePt) {
         super(0, config, bRule_, bDir_, axXHand_, centerAligned_, new int[] {3, height, 3},
                 sourcePt);
 	}

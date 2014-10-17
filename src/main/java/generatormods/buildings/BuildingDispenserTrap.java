@@ -20,6 +20,7 @@ package generatormods.buildings;
 
 import generatormods.common.BlockAndMeta;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -39,7 +40,8 @@ public class BuildingDispenserTrap extends Building {
 
     public BuildingDispenserTrap(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
             int plateSeparation, int[] sourcePt) {
-        super(0, config, bRule_, bDir_, 1, true, new int[] {3, 6, plateSeparation}, sourcePt);
+        super(0, config, bRule_, bDir_, Handedness.R_HAND, true, new int[] {3, 6, plateSeparation},
+                sourcePt);
 	}
 
 	//      ---   bLength+3 - end of mechanism

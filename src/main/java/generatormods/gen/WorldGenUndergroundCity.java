@@ -19,11 +19,11 @@
 package generatormods.gen;
 
 import generatormods.PopulatorWalledCity;
-import generatormods.buildings.Building;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingUndergroundEntranceway;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.Shape;
 import generatormods.common.TemplateWall;
 import generatormods.common.WorldHelper;
@@ -31,14 +31,17 @@ import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+
 import org.apache.logging.log4j.Logger;
 
 import static generatormods.common.WorldHelper.IGNORE_WATER;
@@ -170,7 +173,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 				sws.MergeWalls = true;
                 BuildingDoubleWall street =
                         new BuildingDoubleWall(tries, this, sws, Dir.randomDir(random),
-                                Building.R_HAND, pt);
+                                Handedness.R_HAND, pt);
 				if (street.plan()) {
                     street.build();
 					streets.add(street);

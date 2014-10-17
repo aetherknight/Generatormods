@@ -19,8 +19,8 @@
 package generatormods.buildings;
 
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateWall;
-import generatormods.gen.WorldGeneratorThread;
 import generatormods.walledcity.LayoutCode;
 
 /*
@@ -31,7 +31,7 @@ public class BuildingDoubleWall extends Building {
 	public final TemplateWall ws;
 
     public BuildingDoubleWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_,
-            int axXHand_, int[] sourcePt) {
+            Handedness axXHand_, int[] sourcePt) {
         super(ID_, config, ws_.TowerRule, dir_, axXHand_, false, new int[] {ws_.WWidth,
                 ws_.WHeight, 0}, sourcePt);
 		ws = ws_;
@@ -42,10 +42,10 @@ public class BuildingDoubleWall extends Building {
 		//Plan out a pair of walls in opposite directions from given start coordinates.
 		//Start planning from position 1 (pos 0 is fixed).
         wall1 =
-                new BuildingWall(bID, config, ws, bDir, Building.R_HAND, ws.MaxL / 2, true,
+                new BuildingWall(bID, config, ws, bDir, Handedness.R_HAND, ws.MaxL / 2, true,
                         getIJKPt(0, 0, 0));
         wall2 =
-                new BuildingWall(bID, config, ws, bDir.opposite(), Building.L_HAND, ws.MaxL / 2,
+                new BuildingWall(bID, config, ws, bDir.opposite(), Handedness.L_HAND, ws.MaxL / 2,
                         true, getIJKPt(0, 0, -1)).setTowers(wall1);
 		int a = wall1.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		int b = wall2.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;

@@ -113,6 +113,19 @@ public enum Dir {
     }
 
     /**
+     * Return a direction rotated in the specified direction.
+     *
+     * @param turn R_HAND is 1 rotation clockwise, L_HAND is 1 rotation counterclockwise, and null
+     *        is don't rotate.
+     */
+    public Dir rotate(Handedness turn) {
+        if (turn == null)
+            return this;
+        else
+            return rotate(turn.num);
+    }
+
+    /**
      * Rotates the current Dir numTurns*90 degrees. If clockwise is true, it
      * rotates clockwise, if it is false it rotates counterclockwise.
      */

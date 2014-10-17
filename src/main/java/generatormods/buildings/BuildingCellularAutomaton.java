@@ -22,6 +22,7 @@ import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
 import generatormods.common.config.ChestType;
 import generatormods.common.Util;
@@ -64,7 +65,7 @@ public class BuildingCellularAutomaton extends Building {
 	int zGround = 0;
 
     public BuildingCellularAutomaton(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
-            int axXHand_, boolean centerAligned_, int width, int height, int length,
+            Handedness axXHand_, boolean centerAligned_, int width, int height, int length,
             byte[][] seed_, byte[][] caRule_, TemplateRule[] spawnerRules, int[] sourcePt) {
         super(0, config, bRule_, bDir_, axXHand_, centerAligned_,
                 new int[] {width, height, length}, sourcePt);
@@ -531,8 +532,9 @@ public class BuildingCellularAutomaton extends Building {
 				Dir dir = Dir.randomDir(random);
                 if (buildStairs
                         && (bss =
-                                new BuildingSpiralStaircase(config, bRule, dir, 1, false, z1 - z2
-                                        + 1, getIJKPt(x, z2 - 1, y))).bottomIsFloor()) {
+                                new BuildingSpiralStaircase(config, bRule, dir, Handedness.R_HAND,
+                                        false, z1 - z2 + 1, getIJKPt(x, z2 - 1, y)))
+                                .bottomIsFloor()) {
 					bss.build(0, 0);
 				} else if (isFloor(x, z1, y)) {
 					//ladder

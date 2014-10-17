@@ -21,11 +21,11 @@ package generatormods.buildings;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateWall;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-
 import static generatormods.common.WorldHelper.SEA_LEVEL;
 import static generatormods.common.WorldHelper.WORLD_MAX_Y;
 
@@ -40,8 +40,8 @@ public class BuildingUndergroundEntranceway extends Building {
 
     public BuildingUndergroundEntranceway(int ID_, IBuildingConfig config, TemplateWall ws_,
             Dir dir_, int[] sourcePt) {
-        super(ID_, config, ws_.TowerRule, dir_, 1, false, new int[] {PASSAGE_WIDTH, PASSAGE_HEIGHT,
-                0}, sourcePt);
+        super(ID_, config, ws_.TowerRule, dir_, Handedness.R_HAND, false, new int[] {PASSAGE_WIDTH,
+                PASSAGE_HEIGHT, 0}, sourcePt);
 		ws = ws_;
 		stairsID = ws.rules[ws.template[0][0][ws.WWidth / 2]].primaryBlock.toStair();
 		//wallBlockRule=new TemplateRule(new int[]{ws_.TowerBlock,0});
@@ -108,8 +108,8 @@ public class BuildingUndergroundEntranceway extends Building {
 		//for(int x=0; x<PASSAGE_WIDTH; x++) buildDown(x, bLength-1, bLength, bRule,20,4,3);
         flushDelayed();
         street =
-                new BuildingWall(bID, config, ws, bDir.opposite(), -bHand, ws.MaxL, true, getIJKPt(
-                        (PASSAGE_WIDTH - ws.WWidth) / 2, 0, -1));
+                new BuildingWall(bID, config, ws, bDir.opposite(), bHand.opposite(), ws.MaxL, true,
+                        getIJKPt((PASSAGE_WIDTH - ws.WWidth) / 2, 0, -1));
 		street.plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
 		return true;
 	}

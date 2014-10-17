@@ -19,10 +19,11 @@
 package generatormods.gen;
 
 import generatormods.PopulatorGreatWall;
-import generatormods.buildings.Building;
 import generatormods.buildings.BuildingWall;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateWall;
+
 import java.util.List;
 import java.util.Random;
 
@@ -45,7 +46,7 @@ public class WorldGenSingleWall extends WorldGeneratorThread {
 	public boolean generate(int i0, int j0, int k0) {
         TemplateWall ws = TemplateWall.pickBiomeWeightedWallStyle(wallStyles, world, i0, k0, world.rand, false);
         BuildingWall wall =
-                new BuildingWall(0, this, ws, Dir.NORTH, Building.R_HAND, ws.MaxL, true, i0, j0, k0);
+                new BuildingWall(0, this, ws, Dir.NORTH, Handedness.R_HAND, ws.MaxL, true, i0, j0, k0);
 		//BuildingWall(int ID_, WorldGeneratorThread wgt_,WallStyle ws_,int dir_,int axXHand_, int maxLength_,int i0_,int j0_, int k0_){
         wall.setTarget(placedCoords);
 		wall.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, false);

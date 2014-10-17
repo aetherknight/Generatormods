@@ -21,9 +21,9 @@ package generatormods.buildings;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.Shape;
 import generatormods.common.TemplateRule;
-import generatormods.gen.WorldGeneratorThread;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -604,7 +604,9 @@ public class BuildingTower extends Building {
 	private int[][] circle_shape;
 	private TemplateRule roofRule, SpawnerRule, ChestRule;
 
-	public BuildingTower(int ID_, Building parent, boolean circular_, int roofStyle_, Dir dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
+    public BuildingTower(int ID_, Building parent, boolean circular_, int roofStyle_, Dir dir_,
+            Handedness axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_,
+            int[] sourcePt) {
         super(ID_, parent.config, parent.bRule, dir_, axXHand_, centerAligned_, new int[] {TWidth_,
                 THeight_, TLength_}, sourcePt);
 		baseHeight = 0;
@@ -621,28 +623,31 @@ public class BuildingTower extends Building {
 			bLength = bWidth = minHorizDim; //enforce equal horizontal dimensions if circular
 	}
 
-	//****************************************  CONSTRUCTOR - BuildingTower *************************************************************************************//
-	//      ----
-	//     -    -
-	//    -      -
-	//   -        -
-	//  -          -
-	// -------------- bHeight
-	// -            -
-	// -            -
-	// -            -
-	// --------------
-	// -            -
-	// -            -
-	// -            -
-	// --------------
-	// -            -
-	// -            -
-	// -            -
-	// -            -  baseHeight==ws.WalkHeight
-	// --------------  baseHeight-1 (floor)
-	//
-	public BuildingTower(int ID_, BuildingWall wall, Dir dir_, int axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
+    /**
+     * <pre>
+     *      ----
+     *     -    -
+     *    -      -
+     *   -        -
+     *  -          -
+     * -------------- bHeight
+     * -            -
+     * -            -
+     * -            -
+     * --------------
+     * -            -
+     * -            -
+     * -            -
+     * --------------
+     * -            -
+     * -            -
+     * -            -
+     * -            -  baseHeight==ws.WalkHeight
+     * --------------  baseHeight-1 (floor)
+     * </pre>
+     */
+    public BuildingTower(int ID_, BuildingWall wall, Dir dir_, Handedness axXHand_,
+            boolean centerAligned_, int TWidth_, int THeight_, int TLength_, int[] sourcePt) {
         super(ID_, wall.config, wall.towerRule, dir_, axXHand_, centerAligned_, new int[] {TWidth_,
                 THeight_, TLength_}, sourcePt);
 		baseHeight = wall.WalkHeight;

@@ -22,6 +22,7 @@ import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.PickWeighted;
 import generatormods.common.PlacedBlock;
 import generatormods.common.TemplateRule;
@@ -83,11 +84,6 @@ import static generatormods.common.WorldHelper.findSurfaceJ;
  * </pre>
  */
 public class Building {
-    public final static int ROT_R = 1;
-    public final static int R_HAND = 1;
-    public final static int L_HAND = -1;
-
-	// **** WORKING VARIABLES ****
     protected final IBuildingConfig config;
 	protected final World world;
 	protected final Random random;
@@ -103,7 +99,7 @@ public class Building {
 	protected boolean centerAligned; // if true, alignPt x is the central axis of the building if false, alignPt is the origin
 	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
 	private int xI, yI, xK, yK; //
-    public int bHand; // hand of secondary axis. Takes values of 1 for right-handed, -1 for left-handed.
+    public Handedness bHand; // hand of secondary axis.
 
     /**
      * Direction code of the building's primary axis.
@@ -304,7 +300,7 @@ public class Building {
 	}
 
     public Building(int ID_, IBuildingConfig config, TemplateRule buildingRule_, Dir dir_,
-            int axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
+            Handedness axXHand_, boolean centerAligned_, int[] dim, int[] alignPt) {
         bID = ID_;
         this.config = config;
         this.world = config.getWorld();
@@ -389,7 +385,7 @@ public class Building {
      * then it would mirror dir the other way.
      */
     public Dir orientDirToBDir(Dir dir) {
-        return bDir.reorient(bHand > 0, dir);
+        return bDir.reorient(bHand == Handedness.R_HAND, dir);
     }
 
 	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setPainting
@@ -426,7 +422,7 @@ public class Building {
 		// changes of basis
         switch (bDir) {
         case NORTH:
-			xI = bHand;
+            xI = bHand.num;
 			yI = 0;
 			xK = 0;
 			yK = -1;
@@ -434,11 +430,11 @@ public class Building {
         case EAST:
 			xI = 0;
 			yI = 1;
-			xK = bHand;
+            xK = bHand.num;
 			yK = 0;
 			break;
         case SOUTH:
-			xI = -bHand;
+            xI = -(bHand.num);
 			yI = 0;
 			xK = 0;
 			yK = 1;
@@ -446,7 +442,7 @@ public class Building {
         case WEST:
 			xI = 0;
 			yI = -1;
-			xK = -bHand;
+            xK = -(bHand.num);
 			yK = 0;
 			break;
 		}
@@ -500,13 +496,13 @@ public class Building {
         String str = this.getClass().toString() + "<ID="+ bID + " axes(Y,X)=";
 		switch (bDir) {
             case SOUTH:
-                return str + "(S," + (bHand > 0 ? "W" : "E") + ")>";
+                return str + "(S," + (bHand == Handedness.R_HAND ? "W" : "E") + ")>";
             case NORTH:
-                return str + "(N," + (bHand > 0 ? "E" : "W") + ")>";
+                return str + "(N," + (bHand == Handedness.R_HAND ? "E" : "W") + ")>";
             case WEST:
-                return str + "(W," + (bHand > 0 ? "N" : "S") + ")>";
+                return str + "(W," + (bHand == Handedness.R_HAND ? "N" : "S") + ")>";
             case EAST:
-                return str + "(E," + (bHand > 0 ? "S" : "N") + ")>";
+                return str + "(E," + (bHand == Handedness.R_HAND ? "S" : "N") + ")>";
             default:
                 return str + "(bad dir value: " + bDir + ")>";
 		}
@@ -915,23 +911,23 @@ public class Building {
 					return 3;
 				}
 				if (metadata == 4) {
-					return bHand == 1 ? 4 : 5;
+                    return bHand == Handedness.R_HAND ? 4 : 5;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 5 : 4;
+                    return bHand == Handedness.R_HAND ? 5 : 4;
 				}
 				// curves
 				if (metadata == 6) {
-					return bHand == 1 ? 6 : 9;
+                    return bHand == Handedness.R_HAND ? 6 : 9;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 7 : 8;
+                    return bHand == Handedness.R_HAND ? 7 : 8;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 8 : 7;
+                    return bHand == Handedness.R_HAND ? 8 : 7;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 9 : 6;
+                    return bHand == Handedness.R_HAND ? 9 : 6;
 				}
             case EAST:
 				// flat tracks
@@ -949,23 +945,23 @@ public class Building {
 					return 4;
 				}
 				if (metadata == 4) {
-					return bHand == 1 ? 2 : 3;
+                    return bHand == Handedness.R_HAND ? 2 : 3;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 3 : 2;
+                    return bHand == Handedness.R_HAND ? 3 : 2;
 				}
 				// curves
 				if (metadata == 6) {
-					return bHand == 1 ? 7 : 6;
+                    return bHand == Handedness.R_HAND ? 7 : 6;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 8 : 9;
+                    return bHand == Handedness.R_HAND ? 8 : 9;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 9 : 8;
+                    return bHand == Handedness.R_HAND ? 9 : 8;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 6 : 7;
+                    return bHand == Handedness.R_HAND ? 6 : 7;
 				}
             case SOUTH:
 				// flat tracks
@@ -983,23 +979,23 @@ public class Building {
 					return 2;
 				}
 				if (metadata == 4) {
-					return bHand == 1 ? 5 : 4;
+                    return bHand == Handedness.R_HAND ? 5 : 4;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 4 : 5;
+                    return bHand == Handedness.R_HAND ? 4 : 5;
 				}
 				// curves
 				if (metadata == 6) {
-					return bHand == 1 ? 8 : 7;
+                    return bHand == Handedness.R_HAND ? 8 : 7;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 9 : 6;
+                    return bHand == Handedness.R_HAND ? 9 : 6;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 6 : 9;
-				}
+                    return bHand == Handedness.R_HAND ? 6 : 9;
+                }
 				if (metadata == 9) {
-					return bHand == 1 ? 7 : 8;
+                    return bHand == Handedness.R_HAND ? 7 : 8;
 				}
             case WEST:
 				// flat tracks
@@ -1017,23 +1013,23 @@ public class Building {
 					return 5;
 				}
 				if (metadata == 4) {
-					return bHand == 1 ? 3 : 2;
+                    return bHand == Handedness.R_HAND ? 3 : 2;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 2 : 3;
+                    return bHand == Handedness.R_HAND ? 2 : 3;
 				}
 				// curves
 				if (metadata == 6) {
-					return bHand == 1 ? 9 : 8;
+                    return bHand == Handedness.R_HAND ? 9 : 8;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 6 : 7;
+                    return bHand == Handedness.R_HAND ? 6 : 7;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 7 : 6;
+                    return bHand == Handedness.R_HAND ? 7 : 6;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 8 : 9;
+                    return bHand == Handedness.R_HAND ? 8 : 9;
 				}
 			}
         }else if(blockID==Blocks.bed||blockID==Blocks.fence_gate||blockID==Blocks.tripwire_hook||blockID==Blocks.pumpkin||blockID==Blocks.lit_pumpkin||blockID==Blocks.powered_repeater||blockID==Blocks.unpowered_repeater){
@@ -1058,199 +1054,199 @@ public class Building {
             switch (bDir) {
             case NORTH:
 				if (metadata == 0) {
-					return bHand == 1 ? 0 : 8;
+                    return bHand == Handedness.R_HAND ? 0 : 8;
 				}
 				if (metadata == 1) {
-					return bHand == 1 ? 1 : 7;
+                    return bHand == Handedness.R_HAND ? 1 : 7;
 				}
 				if (metadata == 2) {
-					return bHand == 1 ? 2 : 6;
+                    return bHand == Handedness.R_HAND ? 2 : 6;
 				}
 				if (metadata == 3) {
-					return bHand == 1 ? 3 : 5;
+                    return bHand == Handedness.R_HAND ? 3 : 5;
 				}
 				if (metadata == 4) {
 					return 4;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 5 : 3;
+                    return bHand == Handedness.R_HAND ? 5 : 3;
 				}
 				if (metadata == 6) {
-					return bHand == 1 ? 6 : 2;
+                    return bHand == Handedness.R_HAND ? 6 : 2;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 7 : 1;
+                    return bHand == Handedness.R_HAND ? 7 : 1;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 8 : 0;
+                    return bHand == Handedness.R_HAND ? 8 : 0;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 9 : 15;
-				}
+                    return bHand == Handedness.R_HAND ? 9 : 15;
+                }
 				if (metadata == 10) {
-					return bHand == 1 ? 10 : 14;
+                    return bHand == Handedness.R_HAND ? 10 : 14;
 				}
 				if (metadata == 11) {
-					return bHand == 1 ? 11 : 13;
+                    return bHand == Handedness.R_HAND ? 11 : 13;
 				}
 				if (metadata == 12) {
 					return 12;
 				}
 				if (metadata == 13) {
-					return bHand == 1 ? 13 : 11;
+                    return bHand == Handedness.R_HAND ? 13 : 11;
 				}
 				if (metadata == 14) {
-					return bHand == 1 ? 14 : 10;
+                    return bHand == Handedness.R_HAND ? 14 : 10;
 				}
 				if (metadata == 15) {
-					return bHand == 1 ? 15 : 9;
+                    return bHand == Handedness.R_HAND ? 15 : 9;
 				}
             case EAST:
 				if (metadata == 0) {
-					return bHand == 1 ? 4 : 12;
+                    return bHand == Handedness.R_HAND ? 4 : 12;
 				}
 				if (metadata == 1) {
-					return bHand == 1 ? 5 : 11;
+                    return bHand == Handedness.R_HAND ? 5 : 11;
 				}
 				if (metadata == 2) {
-					return bHand == 1 ? 6 : 10;
+                    return bHand == Handedness.R_HAND ? 6 : 10;
 				}
 				if (metadata == 3) {
-					return bHand == 1 ? 7 : 9;
+                    return bHand == Handedness.R_HAND ? 7 : 9;
 				}
 				if (metadata == 4) {
 					return 8;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 9 : 7;
+                    return bHand == Handedness.R_HAND ? 9 : 7;
 				}
 				if (metadata == 6) {
-					return bHand == 1 ? 10 : 6;
+                    return bHand == Handedness.R_HAND ? 10 : 6;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 11 : 5;
+                    return bHand == Handedness.R_HAND ? 11 : 5;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 12 : 4;
+                    return bHand == Handedness.R_HAND ? 12 : 4;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 13 : 3;
+                    return bHand == Handedness.R_HAND ? 13 : 3;
 				}
 				if (metadata == 10) {
-					return bHand == 1 ? 14 : 2;
+                    return bHand == Handedness.R_HAND ? 14 : 2;
 				}
 				if (metadata == 11) {
-					return bHand == 1 ? 15 : 1;
+                    return bHand == Handedness.R_HAND ? 15 : 1;
 				}
 				if (metadata == 12) {
 					return 0;
 				}
 				if (metadata == 13) {
-					return bHand == 1 ? 1 : 15;
-				}
+                    return bHand == Handedness.R_HAND ? 1 : 15;
+                }
 				if (metadata == 14) {
-					return bHand == 1 ? 2 : 14;
+                    return bHand == Handedness.R_HAND ? 2 : 14;
 				}
 				if (metadata == 15) {
-					return bHand == 1 ? 3 : 13;
+                    return bHand == Handedness.R_HAND ? 3 : 13;
 				}
             case SOUTH:
 				if (metadata == 0) {
-					return bHand == 1 ? 8 : 0;
+                    return bHand == Handedness.R_HAND ? 8 : 0;
 				}
 				if (metadata == 1) {
-					return bHand == 1 ? 9 : 15;
+                    return bHand == Handedness.R_HAND ? 9 : 15;
 				}
 				if (metadata == 2) {
-					return bHand == 1 ? 10 : 14;
+                    return bHand == Handedness.R_HAND ? 10 : 14;
 				}
 				if (metadata == 3) {
-					return bHand == 1 ? 11 : 13;
+                    return bHand == Handedness.R_HAND ? 11 : 13;
 				}
 				if (metadata == 4) {
 					return 12;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 13 : 11;
+                    return bHand == Handedness.R_HAND ? 13 : 11;
 				}
 				if (metadata == 6) {
-					return bHand == 1 ? 14 : 10;
+                    return bHand == Handedness.R_HAND ? 14 : 10;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 15 : 9;
+                    return bHand == Handedness.R_HAND ? 15 : 9;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 0 : 8;
+                    return bHand == Handedness.R_HAND ? 0 : 8;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 1 : 7;
+                    return bHand == Handedness.R_HAND ? 1 : 7;
 				}
 				if (metadata == 10) {
-					return bHand == 1 ? 2 : 6;
+                    return bHand == Handedness.R_HAND ? 2 : 6;
 				}
 				if (metadata == 11) {
-					return bHand == 1 ? 3 : 5;
+                    return bHand == Handedness.R_HAND ? 3 : 5;
 				}
 				if (metadata == 12) {
 					return 4;
 				}
 				if (metadata == 13) {
-					return bHand == 1 ? 5 : 3;
+                    return bHand == Handedness.R_HAND ? 5 : 3;
 				}
 				if (metadata == 14) {
-					return bHand == 1 ? 6 : 2;
+                    return bHand == Handedness.R_HAND ? 6 : 2;
 				}
 				if (metadata == 15) {
-					return bHand == 1 ? 7 : 1;
+                    return bHand == Handedness.R_HAND ? 7 : 1;
 				}
             case WEST:
 				if (metadata == 0) {
-					return bHand == 1 ? 12 : 4;
+                    return bHand == Handedness.R_HAND ? 12 : 4;
 				}
 				if (metadata == 1) {
-					return bHand == 1 ? 13 : 3;
+                    return bHand == Handedness.R_HAND ? 13 : 3;
 				}
 				if (metadata == 2) {
-					return bHand == 1 ? 14 : 2;
+                    return bHand == Handedness.R_HAND ? 14 : 2;
 				}
 				if (metadata == 3) {
-					return bHand == 1 ? 15 : 1;
+                    return bHand == Handedness.R_HAND ? 15 : 1;
 				}
 				if (metadata == 4) {
 					return 0;
 				}
 				if (metadata == 5) {
-					return bHand == 1 ? 1 : 15;
+                    return bHand == Handedness.R_HAND ? 1 : 15;
 				}
 				if (metadata == 6) {
-					return bHand == 1 ? 2 : 14;
+                    return bHand == Handedness.R_HAND ? 2 : 14;
 				}
 				if (metadata == 7) {
-					return bHand == 1 ? 3 : 13;
+                    return bHand == Handedness.R_HAND ? 3 : 13;
 				}
 				if (metadata == 8) {
-					return bHand == 1 ? 4 : 12;
+                    return bHand == Handedness.R_HAND ? 4 : 12;
 				}
 				if (metadata == 9) {
-					return bHand == 1 ? 5 : 11;
+                    return bHand == Handedness.R_HAND ? 5 : 11;
 				}
 				if (metadata == 10) {
-					return bHand == 1 ? 6 : 10;
+                    return bHand == Handedness.R_HAND ? 6 : 10;
 				}
 				if (metadata == 11) {
-					return bHand == 1 ? 7 : 9;
+                    return bHand == Handedness.R_HAND ? 7 : 9;
 				}
 				if (metadata == 12) {
 					return 8;
 				}
 				if (metadata == 13) {
-					return bHand == 1 ? 9 : 7;
+                    return bHand == Handedness.R_HAND ? 9 : 7;
 				}
 				if (metadata == 14) {
-					return bHand == 1 ? 10 : 6;
+                    return bHand == Handedness.R_HAND ? 10 : 6;
 				}
 				if (metadata == 15) {
-					return bHand == 1 ? 11 : 5;
+                    return bHand == Handedness.R_HAND ? 11 : 5;
 				}
 			}
 		}

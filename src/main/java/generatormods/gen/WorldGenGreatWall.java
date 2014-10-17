@@ -20,13 +20,17 @@ package generatormods.gen;
 
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateWall;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import net.minecraft.world.World;
+
 import org.apache.logging.log4j.Logger;
 
 /*
@@ -54,7 +58,7 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 			return false;
         BuildingDoubleWall dw =
                 new BuildingDoubleWall(10 * (random.nextInt(9000) + 1000), this, ws,
-                        Dir.randomDir(random), 1, new int[] {i0, j0, k0});
+                        Dir.randomDir(random), Handedness.R_HAND, new int[] {i0, j0, k0});
 		if (!dw.plan())
 			return false;
         logger.info("Building GreatWall at ("+i0+","+j0+","+k0+")");

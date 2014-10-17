@@ -24,6 +24,7 @@ import generatormods.buildings.BuildingTower;
 import generatormods.buildings.BuildingWall;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateWall;
 import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
@@ -72,7 +73,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	//**** WORKING VARIABLES **** 
 	private TemplateWall ows, sws;
 	private BuildingWall[] walls;
-	private int axXHand;
+    private Handedness axXHand;
     private Dir[] dir = null;
 	private int Lmean, jmean;
 	private final int cityType;
@@ -271,11 +272,16 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 			//build city walls
 			w.endBLength = 0;
 			w.buildFromTML();
-			int radialAvenueHand = w.bDir == dir[0] || w.bDir == dir[1] ? -1 : 1;
+            Handedness radialAvenueHand =
+                    w.bDir == dir[0] || w.bDir == dir[1] ? Handedness.L_HAND : Handedness.R_HAND;
 			int startScan = w.getY(cityCenter) + (radialAvenueHand == w.bHand ? (avenueWS.WWidth - 1) : 0);
-			BuildingWall[] avenues = w.buildGateway(new int[] { w.bLength / 4, 3 * w.bLength / 4 }, startScan, GATE_HEIGHT, avenueWS.WWidth, avenueWS, random.nextInt(6) < gateFlankingTowers ? 0
-					: axXHand, 500, null, -axXHand, 150, cityCenter, radialAvenueHand);
-			w.makeBuildings(axXHand == -1, axXHand == 1, true, false, false);
+            BuildingWall[] avenues =
+                    w.buildGateway(new int[] {w.bLength / 4, 3 * w.bLength / 4}, startScan,
+                            GATE_HEIGHT, avenueWS.WWidth, avenueWS,
+                            random.nextInt(6) < gateFlankingTowers ? null : axXHand, 500, null,
+                            axXHand.opposite(), 150, cityCenter, radialAvenueHand);
+            w.makeBuildings(axXHand == Handedness.L_HAND, axXHand == Handedness.R_HAND, true,
+                    false, false);
 			if (w.gatewayStart != BuildingWall.NO_GATEWAY)
 				gateFlankingTowers++;
 			//build avenues
@@ -286,9 +292,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 				//no gateway on this city side, try just building an interior avenue from midpoint
 				w.setCursor(startScan);
                 BuildingWall radialAvenue =
-                        new BuildingWall(0, this, sws, w.bDir.rotate(-axXHand), radialAvenueHand,
-                                ows.MaxL, false, w.getSurfaceIJKPt(-1, 0, WORLD_MAX_Y,
-                                        false, IGNORE_WATER));
+                        new BuildingWall(0, this, sws, w.bDir.rotate(axXHand.opposite()),
+                                radialAvenueHand, ows.MaxL, false, w.getSurfaceIJKPt(-1, 0,
+                                        WORLD_MAX_Y, false, IGNORE_WATER));
 				radialAvenue.setTarget(cityCenter);
 				radialAvenue.plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
 				if (radialAvenue.bLength > 20) {
@@ -306,8 +312,13 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 					int zmean = (walls[w].zArray[2] - walls[w].j1 + walls[(w + 3) % 4].zArray[walls[(w + 3) % 4].bLength - 3] + walls[(w + 3) % 4].j1) / 2;
 					int minCornerWidth = ows.WWidth + 2 + (ows.TowerXOffset < 0 ? 2 * ows.TowerXOffset : 0);
 					int TWidth = ows.getTMaxWidth(walls[w].circular) < minCornerWidth ? minCornerWidth : ows.getTMaxWidth(walls[w].circular);
-					BuildingTower tower = new BuildingTower(ID + 10 + w, walls[w], dir[(w + 2) % 4], -axXHand, false, TWidth, ows.getTMaxHeight(walls[w].circular), TWidth, walls[w].getIJKPt(-2
-							- (ows.TowerXOffset < 0 ? ows.TowerXOffset : 0), zmean, 2));
+                    BuildingTower tower =
+                            new BuildingTower(ID + 10 + w, walls[w], dir[(w + 2) % 4],
+                                    axXHand.opposite(), false, TWidth,
+                                    ows.getTMaxHeight(walls[w].circular), TWidth,
+                                    walls[w].getIJKPt(-2
+                                            - (ows.TowerXOffset < 0 ? ows.TowerXOffset : 0), zmean,
+                                            2));
                     setLayoutCode(tower.getIJKPt(0, 0, 0), tower.getIJKPt(TWidth - 1, 0, TWidth - 1), LayoutCode.TOWER);
 					tower.build(0, 0, true);
 				}
@@ -335,7 +346,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 				radialAvenue.setCursor(n);
                 BuildingDoubleWall crossAvenue =
                         new BuildingDoubleWall(ID, this, sws,
-                                radialAvenue.bDir.rotate(Building.ROT_R), Building.R_HAND,
+                                radialAvenue.bDir.rotate(1), Handedness.R_HAND,
                                 radialAvenue.getIJKPt(0, 0, 0));
 				if (crossAvenue.plan())
 					crossAvenues.add(crossAvenue);
@@ -354,7 +365,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 					//streets
                     BuildingDoubleWall street =
                             new BuildingDoubleWall(ID + tries, this, sws, Dir.randomDir(random),
-                                    Building.R_HAND, pt);
+                                    Handedness.R_HAND, pt);
 					if (street.plan()) {
 						plannedStreets.add(street);
 					}
@@ -447,10 +458,10 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		//Choose axXHand (careful it is opposite the turn direction of the square).
 		//if RH direction explored, then turn RH; else turn LH;
 		//axXHand=2*random.nextInt(2)-1;
-        axXHand = exploredChunk.get((dir[0].rotate(1))) ? -1 : 1;
-        dir[1] = dir[0].rotate(false, axXHand);
-        dir[2] = dir[1].rotate(false, axXHand);
-        dir[3] = dir[2].rotate(false, axXHand);
+        axXHand = exploredChunk.get((dir[0].rotate(1))) ? Handedness.L_HAND : Handedness.R_HAND;
+        dir[1] = dir[0].rotate(axXHand.opposite());
+        dir[2] = dir[1].rotate(axXHand.opposite());
+        dir[3] = dir[2].rotate(axXHand.opposite());
 	}
 
 	private void levelCity() {

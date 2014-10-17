@@ -24,12 +24,12 @@ import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.PickWeighted;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateTML;
 import generatormods.common.TemplateWall;
 import generatormods.common.Util;
-import generatormods.gen.WorldGeneratorThread;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -85,8 +85,8 @@ public class BuildingWall extends Building {
 		y_targ = bw.y_targ;
 	}
 
-    public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_, int axXHand_,
-            int maxLength_, boolean endTowers, int i1_, int j1_, int k1_) {
+    public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_,
+            Handedness axXHand_, int maxLength_, boolean endTowers, int i1_, int j1_, int k1_) {
         super(ID_, config, ws_.rules[ws_.template[0][0][ws_.WWidth / 2]], dir_, axXHand_, false,
                 new int[] {ws_.WWidth, ws_.WHeight, 0}, new int[] {i1_, j1_, k1_});
 		constructorHelper(ws_, maxLength_, i1_, j1_, k1_);
@@ -98,8 +98,8 @@ public class BuildingWall extends Building {
 		}
 	}
 
-    public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_, int axXHand_,
-            int maxLength_, boolean endTowers, int[] sourcePt) {
+    public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_,
+            Handedness axXHand_, int maxLength_, boolean endTowers, int[] sourcePt) {
         super(ID_, config, ws_.rules[ws_.template[0][0][ws_.WWidth / 2]], dir_, axXHand_, false,
                 new int[] {ws_.WWidth, ws_.WHeight, 0}, sourcePt);
 		constructorHelper(ws_, maxLength_, sourcePt[0], sourcePt[1], sourcePt[2]);
@@ -242,8 +242,9 @@ public class BuildingWall extends Building {
      *
      * @return y-position where gateway was built or -1 if not gateway was built.
      */
-	public BuildingWall[] buildGateway(int[] scanWindow, int scanStart, int gateHeight, int gateWidth, TemplateWall rs, int flankTHand, int XMaxLen, int[] XTarget, int XHand, int antiXMaxLen,
-			int[] antiXTarget, int antiXHand) {
+    public BuildingWall[] buildGateway(int[] scanWindow, int scanStart, int gateHeight,
+            int gateWidth, TemplateWall rs, Handedness flankTHand, int XMaxLen, int[] XTarget,
+            Handedness XHand, int antiXMaxLen, int[] antiXTarget, Handedness antiXHand) {
 		BuildingWall[] avenues = null;
 		if (rs != null)
 			gateWidth = rs.WWidth;
@@ -269,13 +270,14 @@ public class BuildingWall extends Building {
 					if (rs != null) {
                         avenues =
                                 new BuildingWall[] {
-                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand),
+                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand.num),
                                                 XHand, XMaxLen, false, getIJKPt(bWidth, 0,
-                                                        XHand == -bHand ? 1 - gateWidth : 0)),
-                                        new BuildingWall(bID, config, rs, bDir.rotate(-bHand),
+                                                        XHand != bHand ? 1 - gateWidth : 0)),
+                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand.num),
                                                 antiXHand, antiXMaxLen, false, getIJKPt(-1, 0,
                                                         antiXHand == bHand ? 1 - gateWidth : 0))};
-						avenues[0].setTarget(XTarget == null ? getIJKPt(bWidth + tw, 0, XHand == -bHand ? 1 - gateWidth : 0) : XTarget);
+                        avenues[0].setTarget(XTarget == null ? getIJKPt(bWidth + tw, 0,
+                                XHand != bHand ? 1 - gateWidth : 0) : XTarget);
 						avenues[0].plan(1, 0, DEFAULT_LOOKAHEAD, true);
 						if (XTarget == null && avenues[0].bLength >= tw) {
 							avenues[0].target = false;
@@ -298,7 +300,13 @@ public class BuildingWall extends Building {
 							avenues[1].smooth(10, 10, false);
 						}
 						Block fenceBlock = bRule.chance < 100 || bRule.primaryBlock.get() == Blocks.nether_brick ? Blocks.nether_brick_fence : Blocks.fence;
-						int fenceX = flankTHand == 0 ? bWidth / 2 : (flankTHand == bHand ? bWidth - 2 + ws.TowerXOffset : 1 - ws.TowerXOffset);
+                        int fenceX;
+                        if (flankTHand == null)
+                            fenceX = bWidth / 2;
+                        else if (flankTHand == bHand)
+                            fenceX = bWidth - 2 + ws.TowerXOffset;
+                        else
+                            fenceX = 1 - ws.TowerXOffset;
 						gateHeight = Math.min(gateHeight, bHeight - 1);
 						for (int y1 = 0; y1 > -gateWidth; y1--) {
 							//gateway
@@ -311,9 +319,9 @@ public class BuildingWall extends Building {
 								if (random.nextInt(100) < bRule.chance)
 									setBlockLocal(fenceX, z1, y1, fenceBlock);
 						}
-						if (flankTHand != -bHand)
+                        if (flankTHand == bHand)
 							setBlockLocal(-1 - ws.TowerXOffset, gateHeight - 2, -gateWidth, WEST_FACE_TORCH_BLOCK);
-						if (flankTHand != -bHand)
+                        if (flankTHand == bHand)
 							setBlockLocal(-1 - ws.TowerXOffset, gateHeight - 2, 1, WEST_FACE_TORCH_BLOCK);
 						if (flankTHand != bHand)
 							setBlockLocal(bWidth + ws.TowerXOffset, gateHeight - 2, -gateWidth, EAST_FACE_TORCH_BLOCK);
@@ -321,8 +329,8 @@ public class BuildingWall extends Building {
 							setBlockLocal(bWidth + ws.TowerXOffset, gateHeight - 2, 1, EAST_FACE_TORCH_BLOCK);
 						//build flanking towers
 						if (n0 + gateWidth + tw > bLength)
-							flankTHand = 0;
-						if (flankTHand != 0) {
+                            flankTHand = null;
+                        if (flankTHand != null) {
 							int tnMid1 = n0 - gateWidth - tw / 2;
 							int tnMid2 = n0 + tw / 2 + 1;
 							int x1 = flankTHand == bHand ? bWidth - 1 + ws.TowerXOffset : -ws.TowerXOffset;
@@ -330,7 +338,7 @@ public class BuildingWall extends Building {
                             new BuildingTower(0, this, bDir.rotate(flankTHand), bHand, true, tw,
                                     th, tw, getIJKPtAtN(tnMid1, x1, 0, 0)).build(0, 0, false);
 							//following tower
-                            new BuildingTower(0, this, bDir.rotate(flankTHand), -bHand, true, tw,
+                            new BuildingTower(0, this, bDir.rotate(flankTHand), bHand.opposite(), true, tw,
                                     th + zArray[tnMid1] - zArray[tnMid2], tw, getIJKPtAtN(tnMid2,
                                             x1, 0, 0)).build(0, 0, false);
 						}
@@ -340,7 +348,9 @@ public class BuildingWall extends Building {
 						gatewayEnd = n0;
 						if (bWidth + 2 * ws.TowerXOffset >= 5) {
 							int ngw1 = n0 - gateWidth, ngw2 = n0 + 1;
-							int x2 = (flankTHand == 0 || flankTHand == bHand) ? 1 - ws.TowerXOffset : bWidth - 2 + ws.TowerXOffset;
+                            int x2 =
+                                    (flankTHand == null || flankTHand == bHand) ? 1 - ws.TowerXOffset
+                                            : bWidth - 2 + ws.TowerXOffset;
 							for (int n1 = ngw1; n1 > ngw1 - 5; n1--) {
 								if (zArray[n1 - 3] == zArray[n1] && xArray[n1 - 3] == xArray[ngw1 + 1]) {
                                     new BuildingSpiralStaircase(config, bRule, bDir, bHand, false,
@@ -353,15 +363,15 @@ public class BuildingWall extends Building {
 							for (int n1 = ngw2; n1 < ngw2 + 5; n1++) {
 								if (zArray[n1 + 3] == zArray[n1] && xArray[n1 + 3] == xArray[ngw2 - 1]) {
                                     new BuildingSpiralStaircase(config, bRule, bDir.opposite(),
-                                            -bHand, false, -WalkHeight, getIJKPtAtN(n1, x2,
+                                            bHand.opposite(), false, -WalkHeight, getIJKPtAtN(n1, x2,
                                                     WalkHeight - 2, 3)).build(1, n1 - ngw2 + 5);
 									gatewayEnd = n1 + 3;
 									break;
 								}
 							}
 						}
-						gatewayStart -= (flankTHand != 0 ? tw + ws.BuildingInterval / 2 : 0);
-						gatewayEnd += (flankTHand != 0 ? tw + ws.BuildingInterval / 2 : 0);
+                        gatewayStart -= (flankTHand != null ? tw + ws.BuildingInterval / 2 : 0);
+                        gatewayEnd += (flankTHand != null ? tw + ws.BuildingInterval / 2 : 0);
 						return avenues;
 					}
 				}
@@ -428,19 +438,23 @@ public class BuildingWall extends Building {
 			//towers are built from n0-2 to n0-tw-1
 			//n0 and nBack used to calculat curvature are 2 further from nMid
 			int nMid = n0 - tw / 2 - 2, nBack = n0 - tw - 3;
-			int clearSide = -bHand * Integer.signum(curvature(xArray[nBack], xArray[nMid], xArray[n0], 0));
-			if (clearSide == 0) {
+            Handedness clearSide =
+                    Handedness
+                            .fromInt(-(bHand.num)
+                                    * Integer.signum(curvature(xArray[nBack], xArray[nMid],
+                                            xArray[n0], 0)));
+            if (clearSide == null) {
 				if (buildOnL && buildOnR)
-					clearSide = 2 * random.nextInt(2) - 1;
+                    clearSide = Handedness.hands[random.nextInt(2)];
 				else
-					clearSide = buildOnL ? L_HAND : R_HAND;
+                    clearSide = buildOnL ? Handedness.L_HAND : Handedness.R_HAND;
 			}
 			//try tower types
 			if (makeGatehouseTowers && curvature(zArray[nBack], zArray[nMid], zArray[n0], 0) == 0 && curvature(xArray[nBack], xArray[nMid], xArray[n0], 2) == 0) {
 				//FMLLog.getLogger().info("Building gatehouse for "+IDString()+" at n="+n0+" "+globalCoordString(0,0,0)+" width "+tw);
                 BuildingTower tower =
-                        new BuildingTower(bID + n0, this, bDir.opposite(), -bHand, true, tw,
-                                ws.pickTHeight(circular, world.rand), circular ? tw
+                        new BuildingTower(bID + n0, this, bDir.opposite(), bHand.opposite(), true,
+                                tw, ws.pickTHeight(circular, world.rand), circular ? tw
                                         : ws.pickTWidth(circular, world.rand), getIJKPtAtN(nMid,
                                         bWidth / 2, 0, tw / 2));
 				if (!tower.isObstructedRoof(-1)) {
@@ -450,7 +464,8 @@ public class BuildingWall extends Building {
 					tower.build(xArray[n0 - 1] - xArray[nMid], xArray[nBack + 1] - xArray[nMid], false);
 					setCursor(n0 + ws.BuildingInterval - 1);
 				}
-			} else if ((buildOnL && clearSide == L_HAND) || (buildOnR && clearSide == R_HAND)) { //side towers
+            } else if ((buildOnL && clearSide == Handedness.L_HAND)
+                    || (buildOnR && clearSide == Handedness.R_HAND)) { // side towers
 				//FMLLog.getLogger().info("Building side tower for "+IDString()+" at n="+n0+" "+globalCoordString(0,0,0)+" with clearSide="+clearSide+" width "+tw);
 				TemplateTML template = ws.buildings.get(PickWeighted.pickWeightedOption(world.rand, ws.buildingWeights[0], ws.buildingWeights[1]));
 				int ybuffer = -ws.TowerXOffset + (isAvenue ? 0 : 1);
@@ -775,7 +790,9 @@ public class BuildingWall extends Building {
 			int maxBL = bDir == dir ? endBLength : circular ? tw : ws.pickTWidth(false, world.rand);
 			//FMLLog.getLogger().info("Querying "+(circular? "circular " : "square ")+(bDir==dir ? "end" : "side")+" tower, ybuffer="+ybuffer+".");
 			for (int tl = maxBL; tl >= ws.getTMinWidth(circular); tl--) {
-				BuildingTower tower = new BuildingTower(bID + n0, this, dir, 1, true, circular ? tl : tw, ws.pickTHeight(circular, world.rand), tl, pt);
+                BuildingTower tower =
+                        new BuildingTower(bID + n0, this, dir, Handedness.R_HAND, true,
+                                circular ? tl : tw, ws.pickTHeight(circular, world.rand), tl, pt);
 				if (tower.queryCanBuild(ybuffer, overlapTowers)) {
 					tower.build(0, 0, true);
 					return true;
@@ -786,8 +803,9 @@ public class BuildingWall extends Building {
 			for (int tries = 0; tries < 10; tries++) {
                 ISeed seed = new SymmetricSeed(ws.CARuinContainerWidth, 0.5F);
                 BuildingCellularAutomaton bca =
-                        new BuildingCellularAutomaton(config, ws.CARuinRule, dir, 1, true,
-                                ws.CARuinContainerWidth, ws.CARuinMinHeight
+                        new BuildingCellularAutomaton(config, ws.CARuinRule, dir,
+                                Handedness.R_HAND, true, ws.CARuinContainerWidth,
+                                ws.CARuinMinHeight
                                         + random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight
                                                 + 1), ws.CARuinContainerWidth,
                                 seed.makeSeed(world.rand), caRule, null, pt);
@@ -801,7 +819,8 @@ public class BuildingWall extends Building {
 				return makeBuilding(ws.makeDefaultTower, tw, ybuffer, overlapTowers, dir, pt);
 			}
 		} else {
-            BuildingTML buildingTML = new BuildingTML(bID + n0, config, dir, 1, true, template, pt);
+            BuildingTML buildingTML =
+                    new BuildingTML(bID + n0, config, dir, Handedness.R_HAND, true, template, pt);
 			if (buildingTML.queryCanBuild(ybuffer)) {
 				buildingTML.build();
 				return true;
@@ -833,7 +852,8 @@ public class BuildingWall extends Building {
 		Block id = world.getBlock(pt[0], pt[1], pt[2]);
 		int meta = world.getBlockMetadata(pt[0], pt[1], pt[2]);
         if (BlockProperties.get(id).isStair
-                && STAIRS_META_TO_DIR[meta < 4 ? meta : (meta - 4)] == bDir.rotate(-bHand)) {
+                && STAIRS_META_TO_DIR[meta < 4 ? meta : (meta - 4)] == bDir
+                        .rotate(bHand.opposite())) {
             BlockAndMeta temp = new BlockAndMeta(id, meta).stairToSolid();
             world.setBlock(pt[0], pt[1], pt[2], temp.get(), temp.getMeta(), 2);
         }

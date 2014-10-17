@@ -21,6 +21,7 @@ package generatormods.buildings;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateTML;
 import generatormods.common.WorldHelper;
 import generatormods.walledcity.LayoutCode;
@@ -34,7 +35,7 @@ import static generatormods.common.WorldHelper.IGNORE_WATER;
 public class BuildingTML extends Building {
 	final TemplateTML tmlt;
 
-    public BuildingTML(int ID_, IBuildingConfig config, Dir bDir_, int axXHand_,
+    public BuildingTML(int ID_, IBuildingConfig config, Dir bDir_, Handedness axXHand_,
             boolean centerAligned_, TemplateTML tmlt_, int[] sourcePt) {
         super(ID_, config, null, bDir_, axXHand_, centerAligned_, new int[] {tmlt_.width,
                 tmlt_.height, tmlt_.length}, sourcePt);

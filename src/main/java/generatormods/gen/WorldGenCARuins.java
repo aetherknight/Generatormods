@@ -29,10 +29,14 @@ import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.LinearSeed;
 import generatormods.caruins.seeds.SymmetricSeed;
 import generatormods.common.Dir;
+import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
+
 import java.util.Random;
+
 import net.minecraft.world.World;
 import net.minecraft.util.WeightedRandom;
+
 import org.apache.logging.log4j.Logger;
 
 import static generatormods.common.WorldHelper.WORLD_MAX_Y;
@@ -68,9 +72,9 @@ public class WorldGenCARuins extends WorldGeneratorThread {
         //bss.bottomIsFloor();
         //return true;
         BuildingCellularAutomaton bca =
-                new BuildingCellularAutomaton(this, blockRule, Dir.randomDir(random), 1, false,
-                        ContainerWidth, th, ContainerLength, seed.makeSeed(world.rand),
-                        caRule.toBytes(), null, new int[] {i0, j0, k0});
+                new BuildingCellularAutomaton(this, blockRule, Dir.randomDir(random),
+                        Handedness.R_HAND, false, ContainerWidth, th, ContainerLength,
+                        seed.makeSeed(world.rand), caRule.toBytes(), null, new int[] {i0, j0, k0});
 		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
             logger.info("Building CARuin at ("+i0+","+j0+","+k0+")");
 			bca.build(config.smoothWithStairs, config.makeFloors);
