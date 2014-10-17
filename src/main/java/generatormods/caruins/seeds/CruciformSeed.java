@@ -18,7 +18,7 @@
  */
 package generatormods.caruins.seeds;
 
-import generatormods.buildings.BuildingCellularAutomaton;
+import generatormods.caruins.CAState;
 
 import java.util.Random;
 
@@ -29,18 +29,16 @@ public class CruciformSeed implements ISeed {
         this.maxWidth = maxWidth;
     }
 
-    public byte[][] makeSeed(Random random) {
+    public CAState[][] makeSeed(Random random) {
         if (maxWidth <= 1)
-            return new byte[][] {{BuildingCellularAutomaton.ALIVE}}; // degenerate case
+            return new CAState[][] {{CAState.ALIVE}}; // degenerate case
         // width and length are always odd
         int width = 2 * (random.nextInt(random.nextInt(maxWidth / 2) + 1) + 1) + 1;
         int length = 2 * (random.nextInt(random.nextInt(maxWidth / 2) + 1) + 1) + 1;
-        byte[][] seed = new byte[width][length];
+        CAState[][] seed = new CAState[width][length];
         for (int x = 0; x < width; x++)
             for (int y = 0; y < length; y++)
-                seed[x][y] =
-                        (x == width / 2 || y == length / 2) ? BuildingCellularAutomaton.ALIVE
-                                : BuildingCellularAutomaton.DEAD;
+                seed[x][y] = (x == width / 2 || y == length / 2) ? CAState.ALIVE : CAState.DEAD;
         return seed;
     }
 }

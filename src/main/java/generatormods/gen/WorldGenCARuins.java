@@ -74,7 +74,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
         BuildingCellularAutomaton bca =
                 new BuildingCellularAutomaton(this, blockRule, Dir.randomDir(random),
                         Handedness.R_HAND, false, ContainerWidth, th, ContainerLength,
-                        seed.makeSeed(world.rand), caRule.toBytes(), null, new int[] {i0, j0, k0});
+                        seed, caRule, null, new int[] {i0, j0, k0});
 		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
             logger.info("Building CARuin at ("+i0+","+j0+","+k0+")");
 			bca.build(config.smoothWithStairs, config.makeFloors);

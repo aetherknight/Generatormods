@@ -18,8 +18,9 @@
  */
 package generatormods.caruins.seeds;
 
+import generatormods.caruins.CAState;
 import java.util.Random;
 
 public interface ISeed {
-    public byte[][] makeSeed(Random random);
+    public CAState[][] makeSeed(Random random);
 }

@@ -19,6 +19,7 @@
 package generatormods.common;
 
 import generatormods.buildings.BuildingTower;
+import generatormods.caruins.config.CARule;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class TemplateWall extends TemplateTML {
 	public int CARuinContainerWidth = 15;
 	public int CARuinMinHeight = 20;
 	public int CARuinMaxHeight = 35;
-    public List<byte[][]> CARuinAutomataRules = null;
+    public List<CARule> CARuinAutomataRules = null;
 
 	//****************************************  CONSTRUCTOR - WallStyle*************************************************************************************//
     public TemplateWall(File wallFile, HashMap<String, TemplateTML> buildingTemplateMap, Logger logger) throws Exception {

@@ -16,27 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.caruins.seeds;
+package generatormods.caruins;
 
-import generatormods.caruins.CAState;
-
-import java.util.Random;
-
-public class LinearSeed implements ISeed {
-    private int maxWidth;
-
-    public LinearSeed(int maxWidth) {
-        this.maxWidth = maxWidth;
-    }
-
-    public CAState[][] makeSeed(Random random) {
-        if (maxWidth <= 1)
-            return new CAState[][] { { CAState.ALIVE } }; //degenerate case
-        int width = random.nextInt(random.nextInt(maxWidth - 1) + 1) + 2; //random number in (2,maxWidth) inclusive, concentrated towards low end
-        CAState[][] seed = new CAState[width][1];
-        for (int x = 0; x < width; x++)
-            seed[x][0] = CAState.ALIVE;
-        return seed;
-    }
+public enum CAState {
+    DEAD, ALIVE;
 }
-

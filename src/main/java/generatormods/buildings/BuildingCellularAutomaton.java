@@ -18,14 +18,17 @@
  */
 package generatormods.buildings;
 
+import generatormods.caruins.CAState;
+import generatormods.caruins.config.CARule;
+import generatormods.caruins.seeds.ISeed;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
-import generatormods.common.config.ChestType;
 import generatormods.common.Util;
+import generatormods.common.config.ChestType;
 import generatormods.walledcity.LayoutCode;
 
 import java.util.ArrayList;
@@ -38,6 +41,9 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
+
+import static generatormods.caruins.CAState.ALIVE;
+import static generatormods.caruins.CAState.DEAD;
 import static generatormods.common.WorldHelper.HIT_WATER;
 import static generatormods.common.WorldHelper.IGNORE_WATER;
 import static generatormods.common.WorldHelper.SEA_LEVEL;
@@ -48,7 +54,6 @@ import static generatormods.common.WorldHelper.findSurfaceJ;
  * BuildingCellularAutomaton creates Cellular Automata-derived towers.
  */
 public class BuildingCellularAutomaton extends Building {
-	public final static byte DEAD = 0, ALIVE = 1;
 	private final float MEAN_SIDE_LENGTH_PER_POPULATE = 15.0f;
 	private final static int HOLE_FLOOR_BUFFER = 2, UNREACHED = -1;
 	public final static TemplateRule DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
@@ -57,24 +62,26 @@ public class BuildingCellularAutomaton extends Building {
             new int[]{0, 0, 0, 0, 0, 0}, new String[] { "Blaze", "Silverfish", "Silverfish", "CaveSpider", "CaveSpider", "Spider" }, 100);
     public final static TemplateRule DEFAULT_LOW_LIGHT_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
             new int[]{0, 0, 0, 0, 0}, new String[] { "UPRIGHT", "UPRIGHT", "Silverfish", "LavaSlime", "CaveSpider" }, 100);
-	private byte[][][] layers = null;
-	public byte[][] seed = null;
-	private byte[][] caRule = null;
+    private CAState[][][] layers = null;
+    public CAState[][] seed = null;
+    private CAState[] birthRule = null;
+    private CAState[] survivalRule = null;
 	private final TemplateRule lowLightSpawnerRule, mediumLightNarrowSpawnerRule, mediumLightWideSpawnerRule;
 	int[][] fBB;
 	int zGround = 0;
 
     public BuildingCellularAutomaton(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
             Handedness axXHand_, boolean centerAligned_, int width, int height, int length,
-            byte[][] seed_, byte[][] caRule_, TemplateRule[] spawnerRules, int[] sourcePt) {
+            ISeed seed, CARule caRule_, TemplateRule[] spawnerRules, int[] sourcePt) {
         super(0, config, bRule_, bDir_, axXHand_, centerAligned_,
                 new int[] {width, height, length}, sourcePt);
-		seed = seed_;
-		if ((bWidth - seed.length) % 2 != 0)
+        this.seed = seed.makeSeed(random);
+        if ((bWidth - this.seed.length) % 2 != 0)
 			bWidth++; //so seed can be perfectly centered
-		if ((bLength - seed[0].length) % 2 != 0)
+        if ((bLength - this.seed[0].length) % 2 != 0)
 			bLength++;
-		caRule = caRule_;
+        birthRule = caRule_.getBirthRule();
+        survivalRule = caRule_.getSurvivalRule();
 		mediumLightNarrowSpawnerRule = spawnerRules != null ? spawnerRules[0] : DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE;
 		mediumLightWideSpawnerRule = spawnerRules != null ? spawnerRules[1] : DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE;
 		lowLightSpawnerRule = spawnerRules != null ? spawnerRules[2] : DEFAULT_LOW_LIGHT_SPAWNER_RULE;
@@ -221,7 +228,7 @@ public class BuildingCellularAutomaton extends Building {
 
 	public boolean plan(boolean bury, int MinHeightBeforeOscillation) {
 		//layers is z-flipped from usual orientation so z=0 is the top
-		layers = new byte[bHeight][bWidth][bLength];
+        layers = new CAState[bHeight][bWidth][bLength];
 		for (int z = 0; z < bHeight; z++)
 			for (int x = 0; x < bWidth; x++)
 				for (int y = 0; y < bLength; y++)
@@ -251,9 +258,13 @@ public class BuildingCellularAutomaton extends Building {
 					for (int x1 = Math.max(x - 1, 0); x1 <= Math.min(x + 1, bWidth - 1); x1++)
 						for (int y1 = Math.max(y - 1, 0); y1 <= Math.min(y + 1, bLength - 1); y1++)
 							if (!(x1 == x && y1 == y))
-								neighbors += layers[z - 1][x1][y1];
+                                if (layers[z - 1][x1][y1] == ALIVE)
+                                    neighbors += 1;
 					//update this layer based on the rule
-					layers[z][x][y] = caRule[layers[z - 1][x][y]][neighbors];
+                    if (layers[z - 1][x][y] == ALIVE)
+                        layers[z][x][y] = survivalRule[neighbors];
+                    else
+                        layers[z][x][y] = birthRule[neighbors];
 					//culling checks and update bounding box
 					if (layers[z][x][y] == ALIVE) {
 						if (x < BB[0][z])
@@ -312,8 +323,10 @@ public class BuildingCellularAutomaton extends Building {
 		int topLayerCount = 0, secondLayerCount = 0;
 		for (int x = 0; x < bWidth; x++) {
 			for (int y = 0; y < bLength; y++) {
-				topLayerCount += layers[0][x][y];
-				secondLayerCount += layers[1][x][y];
+                if (layers[0][x][y] == ALIVE)
+                    topLayerCount += 1;
+                if (layers[1][x][y] == ALIVE)
+                    secondLayerCount += 1;
 			}
 		}
 		if (2 * topLayerCount >= 3 * secondLayerCount) {
@@ -338,7 +351,7 @@ public class BuildingCellularAutomaton extends Building {
             return false;
         }
 		boolean hitWater = false;
-		if (caRule[0][2] != ALIVE) { //if not a 2-rule
+        if (birthRule[2] != ALIVE) { //if not a 2-rule
 			int[] heights = new int[] { findSurfaceJ(world, getI(bWidth - 1, 0), getK(bWidth - 1, 0), j0 + 10, false, 0),
 					findSurfaceJ(world, getI(0, bLength - 1), getK(0, bLength - 1), j0 + 10, false, 0),
 					findSurfaceJ(world, getI(bWidth - 1, bLength - 1), getK(bWidth - 1, bLength - 1), j0 + 10, false, 0),
@@ -349,13 +362,16 @@ public class BuildingCellularAutomaton extends Building {
 		if (j0 + bHeight > WORLD_MAX_Y - 1)
 			j0 = WORLD_MAX_Y - bHeight - 1; //stay 1 below top to avoid lighting problems
 		if (bury && !hitWater) {
-			zGround = caRule[0][2] == ALIVE ? Math.max(0, bHeight - bWidth / 3 - random.nextInt(bWidth)) : random.nextInt(3 * bHeight / 4);
+            zGround =
+                    birthRule[2] == ALIVE ? Math.max(0,
+                            bHeight - bWidth / 3 - random.nextInt(bWidth)) : random
+                            .nextInt(3 * bHeight / 4);
 			if (j0 - zGround < 5)
 				zGround = j0 - 5;
 			j0 -= zGround; //make ruin partially buried
 		}
 		//shift level and floor arrays
-		byte[][][] layers2 = new byte[bHeight][bWidth][bLength]; //shrunk in all 3 dimensions
+        CAState[][][] layers2 = new CAState[bHeight][bWidth][bLength]; //shrunk in all 3 dimensions
 		fBB = new int[4][bHeight];
 		for (int z = 0; z < bHeight; z++) {
 			int lZ = bHeight - z - 1;
@@ -548,7 +564,7 @@ public class BuildingCellularAutomaton extends Building {
 		}
 	}
 
-	public static String ruleToString(byte[][] rule) {
+    public static String ruleToString(CAState[][] rule) {
 		StringBuilder sb = new StringBuilder(30);
 		sb.append("B");
 		for (int n = 0; n < 9; n++)

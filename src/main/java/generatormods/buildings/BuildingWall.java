@@ -20,6 +20,7 @@ package generatormods.buildings;
 
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.SymmetricSeed;
+import generatormods.caruins.config.CARule;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
 import generatormods.common.BlockProperties;
@@ -799,7 +800,8 @@ public class BuildingWall extends Building {
 				}
 			}
 		} else if (template == ws.makeCARuin) {
-			byte[][] caRule = ws.CARuinAutomataRules.get(random.nextInt(ws.CARuinAutomataRules.size()));
+            CARule caRule =
+                    ws.CARuinAutomataRules.get(random.nextInt(ws.CARuinAutomataRules.size()));
 			for (int tries = 0; tries < 10; tries++) {
                 ISeed seed = new SymmetricSeed(ws.CARuinContainerWidth, 0.5F);
                 BuildingCellularAutomaton bca =
@@ -807,8 +809,8 @@ public class BuildingWall extends Building {
                                 Handedness.R_HAND, true, ws.CARuinContainerWidth,
                                 ws.CARuinMinHeight
                                         + random.nextInt(ws.CARuinMaxHeight - ws.CARuinMinHeight
-                                                + 1), ws.CARuinContainerWidth,
-                                seed.makeSeed(world.rand), caRule, null, pt);
+                                                + 1), ws.CARuinContainerWidth, seed, caRule, null,
+                                pt);
 				if (bca.plan(false, 12) && bca.queryCanBuild(ybuffer, ws.CARuinContainerWidth <= 15)) {
 					bca.build(true, true);
 					return true;

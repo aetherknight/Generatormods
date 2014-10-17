@@ -32,13 +32,12 @@ import net.minecraft.world.storage.ISaveHandler;
 import org.apache.logging.log4j.Logger;
 
 public class Util {
-	public static List<byte[][]> readAutomataList(Logger logger, String splitString, String read) {
-		List<byte[][]> rules = new ArrayList<byte[][]>();
+	public static List<CARule> readAutomataList(Logger logger, String splitString, String read) {
+		List<CARule> rules = new ArrayList<CARule>();
 		String[] ruleStrs = (read.split(splitString)[1]).split(",");
 		for (String ruleStr : ruleStrs) {
             try {
-                byte[][] rule = (new CARule(ruleStr.trim())).toBytes();
-				rules.add(rule);
+                rules.add(new CARule(ruleStr.trim()));
             } catch (ParseError e) {
                 logger.error("Error parsing automaton rule " + ruleStr, e);
             }

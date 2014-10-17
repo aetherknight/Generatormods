@@ -18,8 +18,11 @@
  */
 package generatormods.caruins.config;
 
-import generatormods.buildings.BuildingCellularAutomaton;
+import generatormods.caruins.CAState;
 import generatormods.common.config.ParseError;
+
+import static generatormods.caruins.CAState.ALIVE;
+import static generatormods.caruins.CAState.DEAD;
 
 /**
  * CARule is used by the CARuins mod and can be used to generate towers for
@@ -28,52 +31,54 @@ import generatormods.common.config.ParseError;
 public class CARule {
 
     private String ruleStr;
-    private byte[][] rule;
+    private CAState[] birthRule;
+    private CAState[] survivalRule;
 
     /**
      * Create a CARule. A configuration line contains a Birth number and a
      * survival number, like so:
-     * 
+     * <pre>
      *     B3/S23
-     *
+     * </pre>
      */
     public CARule(String ruleStr) throws ParseError {
         this.ruleStr = ruleStr;
-        this.rule = parseRule(ruleStr);
+        parseRule(ruleStr);
     }
 
     public String toString() {
         return ruleStr;
     }
 
-    private static byte[][] parseRule(String str) throws ParseError {
+    private void parseRule(String str) throws ParseError {
         try {
-            byte[][] rule = new byte[][] { {0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0}};
+            birthRule = new CAState[] {DEAD, DEAD, DEAD, DEAD, DEAD, DEAD, DEAD, DEAD, DEAD};
+            survivalRule = new CAState[] {DEAD, DEAD, DEAD, DEAD, DEAD, DEAD, DEAD, DEAD, DEAD};
             String birthStr = str.split("/")[0].trim();
             String surviveStr = str.split("/")[1].trim();
             for (int n = 1; n < birthStr.length(); n++) {
                 int digit = Integer.parseInt(birthStr.substring(n, n + 1));
-                rule[0][digit] = BuildingCellularAutomaton.ALIVE;
+                birthRule[digit] = ALIVE;
             }
             for (int n = 1; n < surviveStr.length(); n++) {
                 int digit = Integer.parseInt(surviveStr.substring(n, n + 1));
-                rule[1][digit] = BuildingCellularAutomaton.ALIVE;
+                survivalRule[digit] = ALIVE;
             }
-            return rule;
         } catch (Throwable e) {
             throw new ParseError("Error parsing \""+str+"\"", e);
         }
     }
 
-    /**
-     * Return the rule as 2 arrays of bytes to represent the birth rule and the
-     * survival rule.
-     */
-    public byte[][] toBytes() {
-        return rule;
+    public CAState[] getBirthRule() {
+        return birthRule;
+    }
+
+    public CAState[] getSurvivalRule() {
+        return survivalRule;
     }
 
     public boolean isFourRule() {
-        return rule[0][0] == 0 && rule[0][1] == 0 && rule[0][2] == 0 && rule[0][3] == 0;
+        return birthRule[0] == DEAD && birthRule[1] == DEAD && birthRule[2] == DEAD
+                && birthRule[3] == DEAD;
     }
 }
