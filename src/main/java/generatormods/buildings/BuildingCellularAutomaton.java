@@ -534,7 +534,8 @@ public class BuildingCellularAutomaton extends Building {
                         new BuildingDispenserTrap(config, bRule, Dir.randomDir(random), 1,
                                 getIJKPt(x, z, y));
 				if (bdt.queryCanBuild(2)) {
-					bdt.build(random.nextBoolean() ? BuildingDispenserTrap.ARROW_MISSILE : BuildingDispenserTrap.DAMAGE_POTION_MISSILE, true);
+                    bdt.build(random.nextBoolean() ? BuildingDispenserTrap.MissileType.ARROW
+                            : BuildingDispenserTrap.MissileType.DAMAGE_POTION, true);
 					break;
 				}
 			}

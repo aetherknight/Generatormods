@@ -34,7 +34,8 @@ import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
  * BuildingDispenserTrap generates a redstone activated dispenser trap
  */
 public class BuildingDispenserTrap extends Building {
-	public final static int ARROW_MISSILE = 0, DAMAGE_POTION_MISSILE = 1;
+    public enum MissileType { ARROW, DAMAGE_POTION };
+//	public final static int ARROW_MISSILE = 0, DAMAGE_POTION_MISSILE = 1;
 	private static BlockAndMeta[] CODE_TO_BLOCK = new BlockAndMeta[] { PRESERVE_BLOCK, null, new BlockAndMeta(Blocks.air, 0), new BlockAndMeta(Blocks.redstone_wire, 0), new BlockAndMeta(Blocks.redstone_torch, BUTTON_DIR_TO_META.get(Dir.NORTH)),
             new BlockAndMeta(Blocks.unlit_redstone_torch, BUTTON_DIR_TO_META.get(Dir.SOUTH)), new BlockAndMeta(Blocks.redstone_torch, 5) };
 	private static int[][][] MECHANISM = new int[][][] { { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 } }, { { 0, 0, 0 }, { 1, 1, 1 }, { 1, 4, 1 }, { 1, 1, 1 } },
@@ -54,7 +55,7 @@ public class BuildingDispenserTrap extends Building {
 	//       *    y==bLength-1 - end of redstone wire
 	//       *
 	//       0    y=0 - trigger plate
-	public void build(int missileType, boolean multipleTriggers) {
+	public void build(MissileType missileType, boolean multipleTriggers) {
 		if (bLength < 0)
 			bLength = 0;
         logger.debug("Building dispenser trap at "+i0+","+j0+","+k0+", plateSeparation="+bLength);
@@ -79,7 +80,10 @@ public class BuildingDispenserTrap extends Building {
 		}
 		setBlockLocal(1, 0, 0, Blocks.stone_pressure_plate);
         flushDelayed();
-		ItemStack itemstack = missileType == ARROW_MISSILE ? new ItemStack(Items.arrow, 30 + random.nextInt(10), 0) : new ItemStack(Items.potionitem, 30 + random.nextInt(10), 12 | 0x4000);
+        ItemStack itemstack =
+                missileType == MissileType.ARROW ? new ItemStack(Items.arrow,
+                        30 + random.nextInt(10), 0) : new ItemStack(Items.potionitem,
+                        30 + random.nextInt(10), 12 | 0x4000);
 		setItemDispenser(1, 1, bLength + 1, Dir.SOUTH, itemstack);
 	}
 
