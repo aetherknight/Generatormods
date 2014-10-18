@@ -38,8 +38,6 @@ public class BuildingTower extends Building {
 	public final static int TOWER_UNIV_MIN_WIDTH = 5, TOWER_LEVELING = 12;
 	public final static int SURFACE_PORTAL_ODDS = 20, NETHER_PORTAL_ODDS = 10;
 	public final static int BOOKSHELF_ODDS = 3, BED_ODDS = 5, CAULDRON_ODDS = 8, BREWING_STAND_ODDS = 8, ENCHANTMENT_TABLE_ODDS = 12;
-    // TODO: move door metas in with other metas?
-	public final static int NORTH_FACE_DOOR_META = 3, EAST_FACE_DOOR_META = 0, SOUTH_FACE_DOOR_META = 1, WEST_FACE_DOOR_META = 2;
 
     /**
      * Builds a tower.
@@ -689,7 +687,10 @@ public class BuildingTower extends Building {
 		if (!BlockProperties.get(getBlockIdLocal(x, z + height - 2, y + yFace)).isWallable)
 			return;
 		if (buildWoodDoor) {
-			int metadata = xFace == 0 ? (yFace > 0 ? SOUTH_FACE_DOOR_META : NORTH_FACE_DOOR_META) : (xFace > 0 ? WEST_FACE_DOOR_META : EAST_FACE_DOOR_META);
+            int metadata =
+                    xFace == 0 ? (yFace > 0 ? DOOR_DIR_TO_META.get(Dir.SOUTH) : DOOR_DIR_TO_META
+                            .get(Dir.NORTH)) : (xFace > 0 ? DOOR_DIR_TO_META.get(Dir.WEST)
+                            : DOOR_DIR_TO_META.get(Dir.EAST));
 			buffer[x + 1][z + 1][y + 1] = new BlockAndMeta(Blocks.wooden_door, metadata);
 			buffer[x + 1][z + 1 + 1][y + 1] = new BlockAndMeta(Blocks.wooden_door, random.nextBoolean() ? 8 : 9);
 			if (isFloor(x + xFace, z - 1, y + yFace) && x + xFace + 1 >= 0 && x + xFace + 1 < buffer.length && y + yFace + 1 >= 0 && y + yFace + 1 < buffer[0][0].length) {
