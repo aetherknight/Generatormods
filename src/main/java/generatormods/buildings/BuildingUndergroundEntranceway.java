@@ -27,6 +27,8 @@ import generatormods.common.TemplateRule;
 import generatormods.common.TemplateWall;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+
+import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
 import static generatormods.common.WorldHelper.SEA_LEVEL;
 import static generatormods.common.WorldHelper.WORLD_MAX_Y;
 

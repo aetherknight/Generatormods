@@ -39,6 +39,8 @@ import net.minecraft.util.ChunkCoordinates;
 
 import org.apache.logging.log4j.Logger;
 
+import static generatormods.common.DirMeta.STAIRS_META_TO_DIR;
+
 /*
  * BuildingWall plans and builds a wall that flows along Minecraft's terrain.
  */

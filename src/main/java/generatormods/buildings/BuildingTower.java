@@ -28,6 +28,9 @@ import generatormods.common.TemplateRule;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+
+import static generatormods.common.DirMeta.DOOR_DIR_TO_META;
+import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
 import static generatormods.common.WorldHelper.WORLD_MAX_Y;
 
 /*

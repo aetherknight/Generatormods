@@ -44,6 +44,8 @@ import net.minecraft.world.EnumSkyBlock;
 
 import static generatormods.caruins.CAState.ALIVE;
 import static generatormods.caruins.CAState.DEAD;
+import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
+import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
 import static generatormods.common.WorldHelper.HIT_WATER;
 import static generatormods.common.WorldHelper.IGNORE_WATER;
 import static generatormods.common.WorldHelper.SEA_LEVEL;
