@@ -19,6 +19,7 @@
 package generatormods.buildings;
 
 import generatormods.caruins.CAState;
+import generatormods.caruins.config.CARuinsConfig;
 import generatormods.caruins.config.CARule;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.common.BlockAndMeta;
@@ -58,12 +59,6 @@ import static generatormods.common.WorldHelper.findSurfaceJ;
 public class BuildingCellularAutomaton extends Building {
 	private final float MEAN_SIDE_LENGTH_PER_POPULATE = 15.0f;
 	private final static int HOLE_FLOOR_BUFFER = 2, UNREACHED = -1;
-	public final static TemplateRule DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
-            new int[]{0, 0, 0, 0, 0, 0}, new String[] { "Blaze", "Blaze", "Blaze", "Silverfish", "Silverfish", "LavaSlime" }, 100);
-    public final static TemplateRule DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
-            new int[]{0, 0, 0, 0, 0, 0}, new String[] { "Blaze", "Silverfish", "Silverfish", "CaveSpider", "CaveSpider", "Spider" }, 100);
-    public final static TemplateRule DEFAULT_LOW_LIGHT_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
-            new int[]{0, 0, 0, 0, 0}, new String[] { "UPRIGHT", "UPRIGHT", "Silverfish", "LavaSlime", "CaveSpider" }, 100);
 
     private CAState[][][] layers = null;
     public CAState[][] seed = null;
@@ -85,9 +80,15 @@ public class BuildingCellularAutomaton extends Building {
 			bLength++;
         birthRule = caRule_.getBirthRule();
         survivalRule = caRule_.getSurvivalRule();
-		mediumLightNarrowSpawnerRule = spawnerRules != null ? spawnerRules[0] : DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE;
-		mediumLightWideSpawnerRule = spawnerRules != null ? spawnerRules[1] : DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE;
-		lowLightSpawnerRule = spawnerRules != null ? spawnerRules[2] : DEFAULT_LOW_LIGHT_SPAWNER_RULE;
+        mediumLightNarrowSpawnerRule =
+                spawnerRules != null ? spawnerRules[0]
+                        : CARuinsConfig.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE;
+        mediumLightWideSpawnerRule =
+                spawnerRules != null ? spawnerRules[1]
+                        : CARuinsConfig.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE;
+        lowLightSpawnerRule =
+                spawnerRules != null ? spawnerRules[2]
+                        : CARuinsConfig.DEFAULT_LOW_LIGHT_SPAWNER_RULE;
 	}
 
 	public void build(boolean SmoothWithStairs, boolean makeFloors) {

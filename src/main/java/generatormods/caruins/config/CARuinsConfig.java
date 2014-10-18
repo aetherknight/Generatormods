@@ -35,6 +35,22 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
 
 public class CARuinsConfig extends AbstractConfig{
+    public final static TemplateRule DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE = new TemplateRule(
+            new Block[] {Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner,
+                    Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner}, new int[] {0, 0,
+                    0, 0, 0, 0}, new String[] {"Blaze", "Blaze", "Blaze", "Silverfish",
+                    "Silverfish", "LavaSlime"}, 100);
+    public final static TemplateRule DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE = new TemplateRule(
+            new Block[] {Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner,
+                    Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner}, new int[] {0, 0,
+                    0, 0, 0, 0}, new String[] {"Blaze", "Silverfish", "Silverfish", "CaveSpider",
+                    "CaveSpider", "Spider"}, 100);
+    public final static TemplateRule DEFAULT_LOW_LIGHT_SPAWNER_RULE = new TemplateRule(new Block[] {
+            Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner,
+            Blocks.mob_spawner}, new int[] {0, 0, 0, 0, 0}, new String[] {"UPRIGHT", "UPRIGHT",
+            "Silverfish", "LavaSlime", "CaveSpider"}, 100);
+
+
     // Default CARuins template is 1/3 cobblestone, 2/3 mossy cobblestone.
     private final static TemplateRule DEFAULT_TEMPLATE = new TemplateRule(new Block[] {
             Blocks.cobblestone, Blocks.mossy_cobblestone, Blocks.mossy_cobblestone}, new int[] {0,
@@ -235,13 +251,13 @@ public class CARuinsConfig extends AbstractConfig{
 
         mediumLightNarrowFloorSpawnerRule =
                 getSpawnerRule(config, section, "MediumLightNarrowFloorSpawnerRule",
-                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE);
+                        DEFAULT_MEDIUM_LIGHT_NARROW_SPAWNER_RULE);
         mediumLightWideFloorSpawnerRule =
                 getSpawnerRule(config, section, "MediumLightWideFloorSpawnerRule",
-                        BuildingCellularAutomaton.DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE);
+                        DEFAULT_MEDIUM_LIGHT_WIDE_SPAWNER_RULE);
         lowLightSpawnerRule =
                 getSpawnerRule(config, section, "LowLightSpawnerRule",
-                        BuildingCellularAutomaton.DEFAULT_LOW_LIGHT_SPAWNER_RULE);
+                        DEFAULT_LOW_LIGHT_SPAWNER_RULE);
     }
 
     /**
