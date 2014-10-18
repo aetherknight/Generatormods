@@ -22,6 +22,7 @@ import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
+import generatormods.common.RoofStyle;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateWall;
 import net.minecraft.block.Block;
@@ -63,7 +64,9 @@ public class BuildingUndergroundEntranceway extends Building {
 			}
 		}
 		//build a tower to mark top
-		BuildingTower tower = new BuildingTower(0, this, true, 4, bDir, bHand, false, 10, 7, 10, getIJKPt(-3, bLength, bLength - 7));
+        BuildingTower tower =
+                new BuildingTower(0, this, true, RoofStyle.DOME, bDir, bHand, false, 10, 7, 10,
+                        getIJKPt(-3, bLength, bLength - 7));
 		tower.build(0, 0, true);
 		//entranceway
 		for (int z = 0; z < bLength; z++) {

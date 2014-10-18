@@ -27,6 +27,7 @@ import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.PickWeighted;
+import generatormods.common.RoofStyle;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateTML;
 import generatormods.common.TemplateWall;
@@ -71,7 +72,7 @@ public class BuildingWall extends Building {
 	public TemplateTML endBTemplate = null; //either a template or DEFAULT_TOWER
 	public int endBLength = 0; //length of end tower
 	private BlockAndMeta halfStairValue = new BlockAndMeta(Blocks.stone_slab, 2); // half step based on bRule
-	public int roofStyle;
+	public RoofStyle roofStyle;
 	public TemplateRule towerRule, roofRule;
 	public final int Backtrack;
 

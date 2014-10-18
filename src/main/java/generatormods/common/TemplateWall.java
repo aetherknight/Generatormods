@@ -154,7 +154,9 @@ public class TemplateWall extends TemplateTML {
 		if (extraOptions.containsKey("square_max_width"))
 			SqrMaxWidth = Util.readIntParam(logger, SqrMaxWidth, "=", extraOptions.get("square_max_width"));
 		if (extraOptions.containsKey("square_roof_styles"))
-			SqrRoofStyles = Util.readNamedCheckList(logger, SqrRoofStyles, "=", extraOptions.get("square_roof_styles"), BuildingTower.ROOFSTYLE_NAMES, "");
+            SqrRoofStyles =
+                    Util.readNamedCheckList(logger, SqrRoofStyles, "=",
+                            extraOptions.get("square_roof_styles"), RoofStyle.names, "");
 		if (extraOptions.containsKey("square_roof_rule"))
 			SqrRoofRule = Util.readRuleIdOrRule("=", extraOptions.get("square_roof_rule"), rules);
 		if (extraOptions.containsKey("circular_tower_min_height"))
@@ -166,7 +168,9 @@ public class TemplateWall extends TemplateTML {
 		if (extraOptions.containsKey("circular_tower_max_width"))
 			CircMaxWidth = Util.readIntParam(logger, CircMaxWidth, "=", extraOptions.get("circular_tower_max_width"));
 		if (extraOptions.containsKey("circular_tower_roof_styles"))
-			CircRoofStyles = Util.readNamedCheckList(logger, CircRoofStyles, "=", extraOptions.get("circular_tower_roof_styles"), BuildingTower.ROOFSTYLE_NAMES, "");
+            CircRoofStyles =
+                    Util.readNamedCheckList(logger, CircRoofStyles, "=",
+                            extraOptions.get("circular_tower_roof_styles"), RoofStyle.names, "");
 		if (extraOptions.containsKey("circular_tower_roof_rule"))
 			CircRoofRule = Util.readRuleIdOrRule("=", extraOptions.get("circular_tower_roof_rule"), rules);
 		//default tower variables (deprecated)
@@ -298,9 +302,9 @@ public class TemplateWall extends TemplateTML {
 		return childTemplates;
 	}
 
-	//****************************************  FUNCTIONS - tower accessors *************************************************************************************//
-	public int pickRoofStyle(boolean circular, Random random) {
-		return circular ? PickWeighted.pickWeightedOption(random, CircRoofStyles, BuildingTower.ROOF_STYLE_IDS) : PickWeighted.pickWeightedOption(random, SqrRoofStyles, BuildingTower.ROOF_STYLE_IDS);
+    public RoofStyle pickRoofStyle(boolean circular, Random random) {
+        return circular ? PickWeighted.pickWeightedOption(random, CircRoofStyles, RoofStyle.styles)
+                : PickWeighted.pickWeightedOption(random, SqrRoofStyles, RoofStyle.styles);
 	}
 
 	public int getTMinWidth(boolean circular) {

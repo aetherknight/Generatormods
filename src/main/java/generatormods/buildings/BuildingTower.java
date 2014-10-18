@@ -22,6 +22,7 @@ import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
+import generatormods.common.RoofStyle;
 import generatormods.common.Shape;
 import generatormods.common.TemplateRule;
 import generatormods.walledcity.LayoutCode;
@@ -35,21 +36,19 @@ import static generatormods.common.WorldHelper.WORLD_MAX_Y;
 public class BuildingTower extends Building {
 	public final static int FLOOR_HAUNTED_CHANCE = 50, HAUNTED_CHEST_CHANCE = 60;
 	public final static int TOWER_UNIV_MIN_WIDTH = 5, TOWER_LEVELING = 12;
-	public final static String[] ROOFSTYLE_NAMES = { "Crenel", "Steep", "Steep Trim", "Shallow", "Dome", "Cone", "Two Sided" };
-	public final static int[] ROOF_STYLE_IDS = new int[ROOFSTYLE_NAMES.length];
 	public final static int SURFACE_PORTAL_ODDS = 20, NETHER_PORTAL_ODDS = 10;
 	public final static int BOOKSHELF_ODDS = 3, BED_ODDS = 5, CAULDRON_ODDS = 8, BREWING_STAND_ODDS = 8, ENCHANTMENT_TABLE_ODDS = 12;
-	public final static int ROOF_CRENEL = 0, ROOF_STEEP = 1, ROOF_TRIM = 2, ROOF_SHALLOW = 3, ROOF_DOME = 4, ROOF_CONE = 5, ROOF_TWO_SIDED = 6;
+    // TODO: move door metas in with other metas?
 	public final static int NORTH_FACE_DOOR_META = 3, EAST_FACE_DOOR_META = 0, SOUTH_FACE_DOOR_META = 1, WEST_FACE_DOOR_META = 2;
 
-	//****************************************  FUNCTION - build *************************************************************************************//
-	//builds a tower:
-	//PARAMETERS:
-	//doorOffset1,doorOffset2 - x-offset of the ground floor door from center
-	//hanging - if true, taper away tower base if hanging over air or water
-	//RETURNS:
-	//true if tower was built (dependency: buildOver).
-	//
+    /**
+     * Builds a tower.
+     *
+     * @param doorOffset1 X-offset of the ground floor door from center
+     * @param doorOffset2 Second X-offset of the ground floor door from center
+     * @param hanging If true, taper away tower base if hanging over air or water.
+     * @return True if tower was built (dependency: buildOver)
+     */
 	public void build(int doorOffset1, int doorOffset2, boolean hanging) {
 		//check against spawner chance to see if haunted.
 		//If hasUndeadSpawner =>	Don't make torches anywhere in tower.
@@ -60,7 +59,9 @@ public class BuildingTower extends Building {
 		if (SpawnerRule != TemplateRule.RULE_NOT_PROVIDED) {
 			if(SpawnerRule.hasUndeadSpawner())
                 undeadTower = true;
-			ghastTower = roofStyle == ROOF_CRENEL && SpawnerRule.getBlockOrHole(world.rand).equals(GHAST_SPAWNER);
+            ghastTower =
+                    roofStyle == RoofStyle.CRENEL
+                            && SpawnerRule.getBlockOrHole(world.rand).equals(GHAST_SPAWNER);
 			if (ghastTower || random.nextInt(100) > SpawnerRule.chance)
 				undeadTower = false;
 		}
@@ -150,12 +151,14 @@ public class BuildingTower extends Building {
 		}
 		//*** ladder ***
 		int topFloorHeight = ((bHeight - baseHeight - 4) / 4) * 4 + baseHeight + 1;
-		int ladderHeight = roofStyle == ROOF_CRENEL ? bHeight : (bHeight - baseHeight < 8 ? 0 : topFloorHeight); //don't continue through top floor unless crenellated
+        int ladderHeight =
+                roofStyle == RoofStyle.CRENEL ? bHeight : (bHeight - baseHeight < 8 ? 0
+                        : topFloorHeight); // don't continue through top floor unless crenellated
 		for (int z1 = baseHeight; z1 < ladderHeight; z1++)
 			buffer[1 + 1][z1 + 1][sideWindowY - 1 + 1] = EAST_FACE_LADDER_BLOCK;
 		//*** roof ***
 		buildRoof();
-		if (undeadTower && roofStyle == ROOF_CRENEL)
+        if (undeadTower && roofStyle == RoofStyle.CRENEL)
 			buffer[1 + 1][bHeight > baseHeight + 12 ? baseHeight + 9 : bHeight + 1][sideWindowY - 1 + 1] = bRule.getBlockOrHole(world.rand);
 		//*** run decay ***
 		int zLim = bRule.chance >= 100 ? buffer[0].length : propagateCollapse(bRule.chance);
@@ -206,7 +209,7 @@ public class BuildingTower extends Building {
 		}
 		if (ghastTower)
 			populateGhastSpawner(bHeight + 1);
-		else if (roofStyle == ROOF_CRENEL && bHeight > 22)
+        else if (roofStyle == RoofStyle.CRENEL && bHeight > 22)
 			populatePortal(bHeight + 1);
 		//*** debug signs ***
 		if (BuildingWall.DEBUG_SIGNS) {
@@ -225,8 +228,10 @@ public class BuildingTower extends Building {
 	}
 
 	public boolean isObstructedRoof(int ybuffer) {
-		int rBuffer = (roofStyle == ROOF_CRENEL ? 1 : (roofStyle == ROOF_DOME || roofStyle == ROOF_CONE) ? 0 : -1);
-		int rHeight = (roofStyle == ROOF_CRENEL ? 2 : minHorizDim / 2);
+        int rBuffer =
+                (roofStyle == RoofStyle.CRENEL ? 1
+                        : (roofStyle == RoofStyle.DOME || roofStyle == RoofStyle.CONE) ? 0 : -1);
+        int rHeight = (roofStyle == RoofStyle.CRENEL ? 2 : minHorizDim / 2);
 		if (isObstructedSolid(new int[] { rBuffer, bHeight, Math.max(rBuffer, ybuffer) }, new int[] { bWidth - 1 - rBuffer, bHeight + rHeight, bLength - 1 - rBuffer })) {
             logger.warn("Cannot build Tower " + IDString() + ". Obstructed!");
 			return true;
@@ -293,7 +298,8 @@ public class BuildingTower extends Building {
 
 	//****************************************  FUNCTION - queryCanBuild *************************************************************************************//
 	public boolean queryCanBuild(int ybuffer, boolean overlapTowers) {
-		int rooftopJ = j0 + bHeight + (roofStyle == ROOF_CONE ? minHorizDim : minHorizDim / 2) + 2;
+        int rooftopJ =
+                j0 + bHeight + (roofStyle == RoofStyle.CONE ? minHorizDim : minHorizDim / 2) + 2;
 		if (rooftopJ > WORLD_MAX_Y)
 			bHeight -= rooftopJ - WORLD_MAX_Y;
 		if (bHeight < baseHeight + 4) {
@@ -329,19 +335,25 @@ public class BuildingTower extends Building {
 		//If roofRule=sandstone/step, do wooden for steep roofstyle and sandstone/step otherwise
 		//Otherwise do wooden for sloped roofstyles, and roofRule otherwise
 		if (roofRule == TemplateRule.RULE_NOT_PROVIDED) {
-			roofRule = (roofStyle == ROOF_STEEP || roofStyle == ROOF_SHALLOW || roofStyle == ROOF_TRIM || roofStyle == ROOF_TWO_SIDED) ? new TemplateRule(Blocks.planks, 0, "") : bRule;
+            roofRule =
+                    (roofStyle == RoofStyle.STEEP || roofStyle == RoofStyle.SHALLOW
+                            || roofStyle == RoofStyle.TRIM || roofStyle == RoofStyle.TWO_SIDED) ? new TemplateRule(
+                            Blocks.planks, 0, "") : bRule;
 		}
 		int stepMeta = roofRule.primaryBlock.toStep().getMeta();
 		TemplateRule stepRule = new TemplateRule(Blocks.stone_slab, stepMeta, roofRule.chance);
 		TemplateRule doubleStepRule = (stepMeta == 2) ? new TemplateRule(Blocks.planks, 0, roofRule.chance) : new TemplateRule(Blocks.double_stone_slab, stepMeta, roofRule.chance);
-		TemplateRule trimRule = roofStyle == ROOF_TRIM ? new TemplateRule(bRule.primaryBlock.get() == Blocks.cobblestone ? Blocks.log : Blocks.cobblestone, 0, roofRule.chance) : stepRule;
+        TemplateRule trimRule =
+                roofStyle == RoofStyle.TRIM ? new TemplateRule(
+                        bRule.primaryBlock.get() == Blocks.cobblestone ? Blocks.log
+                                : Blocks.cobblestone, 0, roofRule.chance) : stepRule;
         Block roof = roofRule.primaryBlock.toStair();
         TemplateRule northStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.NORTH), roofRule.chance);
 		TemplateRule southStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.SOUTH), roofRule.chance);
 		TemplateRule eastStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.EAST), roofRule.chance);
 		TemplateRule westStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.WEST), roofRule.chance);
 		//======================================== build it! ================================================
-		if (roofStyle == ROOF_CRENEL) { //crenelated
+        if (roofStyle == RoofStyle.CRENEL) { //crenelated
 			if (circular) {
 				for (int y1 = 0; y1 < bLength; y1++) {
 					for (int x1 = 0; x1 < bWidth; x1++) {
@@ -375,7 +387,9 @@ public class BuildingTower extends Building {
 			}
 			buffer[2][bHeight + 1][bLength / 2] = EAST_FACE_LADDER_BLOCK;
 			buffer[2][bHeight + 2][bLength / 2] = new BlockAndMeta(Blocks.trapdoor, 3);
-		} else if (roofStyle == ROOF_STEEP || roofStyle == ROOF_TRIM || (roofStyle == ROOF_SHALLOW && (bWidth < 6 || bLength < 6))) { //45 degrees sloped
+        } else if (roofStyle == RoofStyle.STEEP || roofStyle == RoofStyle.TRIM
+                || (roofStyle == RoofStyle.SHALLOW && (bWidth < 6 || bLength < 6))) { // 45 degrees
+                                                                                      // sloped
 			for (int m = 0; m < (minHorizDim + 1) / 2; m++) {
 				for (int x1 = m; x1 < bWidth - m; x1++) {
 					for (int y1 = m; y1 < bLength - m; y1++) {
@@ -399,7 +413,7 @@ public class BuildingTower extends Building {
 				buffer[bWidth - m + 1][bHeight + m + 1][m - 1 + 1] = trimRule.getBlockOrHole(world.rand);
 				buffer[bWidth - m + 1][bHeight + m + 1][bLength - m + 1] = trimRule.getBlockOrHole(world.rand);
 			}
-		} else if (roofStyle == ROOF_SHALLOW) { //22 degrees sloped
+        } else if (roofStyle == RoofStyle.SHALLOW) { //22 degrees sloped
 			for (int z12 = -1; z12 < (minHorizDim + 1) / 2; z12++) {
 				int z1 = (z12 + 1) / 2;
 				if ((z12 + 1) % 2 == 0) {
@@ -428,7 +442,7 @@ public class BuildingTower extends Building {
 					buffer[bWidth - z12 - 1 + 1][z1 + bHeight + 1 + 1][bLength - z12 - 1 + 1] = stepRule.getBlockOrHole(world.rand);
 				}
 			}
-		} else if (roofStyle == ROOF_DOME) { //dome
+        } else if (roofStyle == RoofStyle.DOME) { //dome
 			for (int z1 = 0; z1 < (minHorizDim + 1) / 2; z1++) {
                 int diam = Shape.SPHERE_SHAPE[minHorizDim][z1];
 				for (int y1 = 0; y1 < diam; y1++) {
@@ -445,7 +459,7 @@ public class BuildingTower extends Building {
 					}
 				}
 			}
-		} else if (roofStyle == ROOF_CONE) { //cone
+        } else if (roofStyle == RoofStyle.CONE) { //cone
 			int prevDiam = 0;
 			for (int z1 = 0; z1 < minHorizDim + 1; z1++) {
 				int diam = minHorizDim % 2 == 0 ? 2 * ((minHorizDim - z1 + 1) / 2) : 2 * ((minHorizDim - z1) / 2) + 1;
@@ -465,7 +479,7 @@ public class BuildingTower extends Building {
 				}
 				prevDiam = diam;
 			}
-		} else if (roofStyle == ROOF_TWO_SIDED) { //Two Sided
+        } else if (roofStyle == RoofStyle.TWO_SIDED) { //Two Sided
 			//roof peak will follow the major horizontal axis
 			//if X-axis is the major axis, rot will be false, minAxLen==bLength, maxAxLen==bWidth, and p==x1, r==y1.
 			boolean rot = bLength > minHorizDim;
@@ -493,7 +507,9 @@ public class BuildingTower extends Building {
 					}
 		}
 		//close up corner overhangs
-		if (circular && (roofStyle == ROOF_STEEP || roofStyle == ROOF_TRIM || roofStyle == ROOF_SHALLOW || roofStyle == ROOF_TWO_SIDED)) {
+        if (circular
+                && (roofStyle == RoofStyle.STEEP || roofStyle == RoofStyle.TRIM
+                        || roofStyle == RoofStyle.SHALLOW || roofStyle == RoofStyle.TWO_SIDED)) {
 			for (int x1 = 0; x1 < minHorizDim; x1++) {
 				for (int y1 = 0; y1 < minHorizDim; y1++) {
 					if (circle_shape[x1][y1] < 0)
@@ -509,7 +525,7 @@ public class BuildingTower extends Building {
 				}
 			}
 		}
-		if (roofStyle == ROOF_DOME || roofStyle == ROOF_CONE) {
+        if (roofStyle == RoofStyle.DOME || roofStyle == RoofStyle.CONE) {
 			int xBuff = (bWidth - minHorizDim) / 2, yBuff = (bLength - minHorizDim) / 2;
 			for (int x1 = 0; x1 < minHorizDim; x1++) {
 				for (int y1 = 0; y1 < minHorizDim; y1++) {
@@ -594,19 +610,16 @@ public class BuildingTower extends Building {
 		return true;
 	}
 
-	static {
-		for (int m = 0; m < ROOFSTYLE_NAMES.length; m++)
-			ROOF_STYLE_IDS[m] = m;
-	}
-	public int baseHeight, roofStyle, minHorizDim;
+    public int baseHeight, minHorizDim;
+    public RoofStyle roofStyle;
 	public final boolean PopulateFurniture, MakeDoors, circular;
 	private BlockAndMeta[][][] buffer;
 	private int[][] circle_shape;
 	private TemplateRule roofRule, SpawnerRule, ChestRule;
 
-    public BuildingTower(int ID_, Building parent, boolean circular_, int roofStyle_, Dir dir_,
-            Handedness axXHand_, boolean centerAligned_, int TWidth_, int THeight_, int TLength_,
-            int[] sourcePt) {
+    public BuildingTower(int ID_, Building parent, boolean circular_, RoofStyle roofStyle_,
+            Dir dir_, Handedness axXHand_, boolean centerAligned_, int TWidth_, int THeight_,
+            int TLength_, int[] sourcePt) {
         super(ID_, parent.config, parent.bRule, dir_, axXHand_, centerAligned_, new int[] {TWidth_,
                 THeight_, TLength_}, sourcePt);
 		baseHeight = 0;

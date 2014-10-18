@@ -62,6 +62,7 @@ public class BuildingCellularAutomaton extends Building {
             new int[]{0, 0, 0, 0, 0, 0}, new String[] { "Blaze", "Silverfish", "Silverfish", "CaveSpider", "CaveSpider", "Spider" }, 100);
     public final static TemplateRule DEFAULT_LOW_LIGHT_SPAWNER_RULE = new TemplateRule(new Block[]{Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner},
             new int[]{0, 0, 0, 0, 0}, new String[] { "UPRIGHT", "UPRIGHT", "Silverfish", "LavaSlime", "CaveSpider" }, 100);
+
     private CAState[][][] layers = null;
     public CAState[][] seed = null;
     private CAState[] birthRule = null;
