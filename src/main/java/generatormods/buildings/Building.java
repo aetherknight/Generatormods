@@ -28,13 +28,15 @@ import generatormods.common.PlacedBlock;
 import generatormods.common.TemplateRule;
 import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
+import generatormods.common.config.ChestItemSpec;
 import generatormods.common.config.ChestType;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.ILayoutGenerator;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -831,9 +833,16 @@ public class Building {
 		if (chestType.equals(ChestType.TOWER) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
 			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
 		}
-        Object[][] itempool = chestItems.get(chestType).getChestItemsObjectArray();
-		int idx = PickWeighted.pickWeightedOption(world.rand, Arrays.asList(itempool[3]), Arrays.asList(itempool[0]));
-        Object obj = itempool[1][idx];
+        ChestContentsSpec chestContentsSpec = chestItems.get(chestType);
+
+        List<Integer> weights = new ArrayList<Integer>();
+        for (ChestItemSpec chestItemSpec : chestContentsSpec.getChestItems()) {
+            weights.add(chestItemSpec.getSelectionWeight());
+        }
+        ChestItemSpec chosenItem =
+                PickWeighted.pickWeightedOption(world.rand, weights,
+                        chestContentsSpec.getChestItems());
+        Object obj = chosenItem.getBlockOrItem();
         if(obj == null){
             return null;
         }
@@ -842,7 +851,9 @@ public class Building {
                 return null;
             obj = Item.getItemFromBlock((Block)obj);
         }
-		return new ItemStack((Item)obj, Integer.class.cast(itempool[4][idx]) + random.nextInt(Integer.class.cast(itempool[5][idx]) - Integer.class.cast(itempool[4][idx]) + 1), Integer.class.cast(itempool[2][idx]));
+        return new ItemStack((Item) obj, chosenItem.getMinStackSize()
+                + random.nextInt(chosenItem.getMaxStackSize() - chosenItem.getMinStackSize() + 1),
+                chosenItem.getMetadata());
 	}
 
 	private int rotateMetadata(Block blockID, int metadata) {

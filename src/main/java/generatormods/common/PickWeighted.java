@@ -18,21 +18,51 @@
  */
 package generatormods.common;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 public class PickWeighted {
-    public static int pickWeightedOption(Random random, List<Object> weights, List<Object> options){
-        int[] w = new int[weights.size()];
-        int[] o = new int[options.size()];
-        for (int i= 0; i < w.length; i++)
-            w[i]= ((Integer)weights.get(i));
-        for (int i= 0; i < o.length; i++)
-            o[i]= ((Integer)options.get(i));
-        return pickWeightedOption(random, w, o);
+    public static <T> T pickWeightedOption(Random random, List<Integer> weights, List<T> options){
+        //TODO what if weights and options are different lengths?
+        int sum = 0;
+        for(int weight : weights)
+            sum += weight;
+        int choice = random.nextInt(sum);
+        sum = 0;
+        Iterator<Integer> wi = weights.iterator();
+        Iterator<T> wo = options.iterator();
+        while (wi.hasNext()) {
+            int weight = wi.next();
+            T option = wo.next();
+            sum += weight;
+            if (sum > choice)
+                return option;
+        }
+        return options.get(options.size() - 1);
     }
 
     public static int pickWeightedOption(Random random, int[] weights, int[] options) {
+        int sum = 0, n;
+        for (n = 0; n < weights.length; n++)
+            sum += weights[n];
+        if (sum <= 0) {
+            // TODO: report error due to netagive net weight.
+            return options[0]; // default to returning first option
+        }
+        int s = random.nextInt(sum);
+        sum = 0;
+        n = 0;
+        while (n < weights.length) {
+            sum += weights[n];
+            if (sum > s)
+                return options[n];
+            n++;
+        }
+        return options[options.length - 1];
+    }
+
+    public static <T> T pickWeightedOption(Random random, int[] weights, T[] options) {
         int sum = 0, n;
         for (n = 0; n < weights.length; n++)
             sum += weights[n];

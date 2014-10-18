@@ -56,15 +56,6 @@ public class ChestContentsSpec {
         return chestItems;
     }
 
-    public Object[][] getChestItemsObjectArray() {
-        Object[][] chestItemArray = new Object[chestItems.size()][];
-        for (int i = 0; i < chestItems.size(); i++) {
-            chestItemArray[i] = chestItems.get(i).toObjectArray();
-            chestItemArray[i][0] = i;
-        }
-        return chestItemArray;
-    }
-
     public String toString() {
         String str = "ChestContentsSpec(" + chestType + ", " + tries + ", {";
         for (ChestItemSpec chestItem : chestItems) {

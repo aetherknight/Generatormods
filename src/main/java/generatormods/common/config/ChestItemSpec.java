@@ -148,20 +148,4 @@ public class ChestItemSpec {
         return blockName + "-" + metadata + "," + selectionWeight + "," + minStackSize + ","
                 + maxStackSize;
     }
-
-    /**
-     * Returns an Object[6] array that represents this chest item
-     * specification. The 0'th index is supposed to be the entry's index in a
-     * list.
-     */
-    public Object[] toObjectArray() {
-        Object[] newArray = new Object[6];
-        newArray[0] = 0;
-        newArray[1] = blockOrItem;
-        newArray[2] = metadata;
-        newArray[3] = selectionWeight;
-        newArray[4] = minStackSize;
-        newArray[5] = maxStackSize;
-        return newArray;
-    }
 }
