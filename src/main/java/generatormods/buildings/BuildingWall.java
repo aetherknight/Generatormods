@@ -169,26 +169,32 @@ public class BuildingWall extends Building {
 				boolean keepWallFromAbove = true;
 				for (int z1 = bHeight + OVERHEAD_CLEARENCE - 1; z1 >= -ws.embed; z1--) {
 					boolean wallBlockPresent = isWallBlock(x1, z1, 0);
-					idAndMeta = z1 < bHeight ? ws.rules[layer[z1 + ws.embed][x1]].getBlockOrHole(world.rand) : HOLE_BLOCK_NO_LIGHTING;
+                    idAndMeta =
+                            z1 < bHeight ? ws.rules[layer[z1 + ws.embed][x1]]
+                                    .getBlockOrHole(world.rand)
+                                    : BlockAndMeta.AIR_WITH_NO_LIGHTING;
 					//starting from top, preserve old wall block until we run into a non-wall block
-					if (keepWallFromAbove && wallBlockPresent && idAndMeta.get() == Blocks.air) {
+                    if (keepWallFromAbove && wallBlockPresent && idAndMeta.getBlock() == Blocks.air) {
 						continue;
 					} else
 						keepWallFromAbove = false;
-					if (idAndMeta.get() == Blocks.air && idAndMeta instanceof BlockExtended && ((BlockExtended) idAndMeta).info.equals(TemplateRule.SPECIAL_STAIR)) {
+                    if (idAndMeta.getBlock() == Blocks.air && idAndMeta instanceof BlockExtended
+                            && ((BlockExtended) idAndMeta).info.equals(TemplateRule.SPECIAL_STAIR)) {
 						if (!wallBlockPresent && !BlockProperties.get(getBlockIdLocal(x1, z1, 0)).isWater) {
 							if (n0 > 0 && zArray[n0 - 1] > zArray[n0]) { //stairs, going down
 								if ((n0 == 1 || zArray[n0 - 2] == zArray[n0 - 1]) && (n0 == bLength - 1 || zArray[n0] == zArray[n0 + 1]))
-									setSpecialBlockLocal(x1, z1, 0, idAndMeta.get(), idAndMeta.getMeta(), ((BlockExtended) idAndMeta).info);
+                                    setSpecialBlockLocal(x1, z1, 0, idAndMeta.getBlock(),
+                                            idAndMeta.getMeta(), ((BlockExtended) idAndMeta).info);
 								else
 									setBlockLocal(x1, z1, 0, STEP_TO_STAIRS[-idAndMeta.getMeta() > 7 ? -idAndMeta.getMeta() - 8 : -idAndMeta.getMeta()], 2);
 							} else if (n0 < bLength - 1 && zArray[n0] < zArray[n0 + 1]) { //stairs, going up
 								if ((n0 == 0 || zArray[n0 - 1] == zArray[n0]) && (n0 == bLength - 2 || zArray[n0 + 1] == zArray[n0 + 2]))
-									setSpecialBlockLocal(x1, z1, 0, idAndMeta.get(), idAndMeta.getMeta(), ((BlockExtended) idAndMeta).info);
+                                    setSpecialBlockLocal(x1, z1, 0, idAndMeta.getBlock(),
+                                            idAndMeta.getMeta(), ((BlockExtended) idAndMeta).info);
 								else
 									setBlockLocal(x1, z1, 0, STEP_TO_STAIRS[-idAndMeta.getMeta() > 7 ? -idAndMeta.getMeta() - 8 : -idAndMeta.getMeta()], 3);
 							} else
-								setBlockLocal(x1, z1, 0, idAndMeta.get());
+                                setBlockLocal(x1, z1, 0, idAndMeta.getBlock());
 						}
 					} else { //not a stair
 						// if merging walls, don't clutter with crenelations etc.
@@ -197,7 +203,8 @@ public class BuildingWall extends Building {
 										&& (wallBlockPresent || isFloor(bWidth, WalkHeight - 1, 0) || isWallBlock(bWidth, WalkHeight - 2, 0)))) {
 							continue;
 						}
-						if (idAndMeta.get() == Blocks.air && idAndMeta.getMeta() == 0 && z1 < bHeight)
+                        if (idAndMeta.getBlock() == Blocks.air && idAndMeta.getMeta() == 0
+                                && z1 < bHeight)
                             removeBlockWithLighting(x1, z1, 0); //force lighting update for holes
 						else
 							setBlockLocal(x1, z1, 0, idAndMeta); //straightforward build from template
@@ -303,7 +310,10 @@ public class BuildingWall extends Building {
 							avenues[0].smooth(10, 10, false);
 							avenues[1].smooth(10, 10, false);
 						}
-						Block fenceBlock = bRule.chance < 100 || bRule.primaryBlock.get() == Blocks.nether_brick ? Blocks.nether_brick_fence : Blocks.fence;
+                        Block fenceBlock =
+                                bRule.chance < 100
+                                        || bRule.primaryBlock.getBlock() == Blocks.nether_brick ? Blocks.nether_brick_fence
+                                        : Blocks.fence;
                         int fenceX;
                         if (flankTHand == null)
                             fenceX = bWidth / 2;
@@ -324,13 +334,17 @@ public class BuildingWall extends Building {
 									setBlockLocal(fenceX, z1, y1, fenceBlock);
 						}
                         if (flankTHand == bHand)
-							setBlockLocal(-1 - ws.TowerXOffset, gateHeight - 2, -gateWidth, WEST_FACE_TORCH_BLOCK);
+                            setBlockLocal(-1 - ws.TowerXOffset, gateHeight - 2, -gateWidth,
+                                    BlockAndMeta.WEST_FACING_TORCH);
                         if (flankTHand == bHand)
-							setBlockLocal(-1 - ws.TowerXOffset, gateHeight - 2, 1, WEST_FACE_TORCH_BLOCK);
+                            setBlockLocal(-1 - ws.TowerXOffset, gateHeight - 2, 1,
+                                    BlockAndMeta.WEST_FACING_TORCH);
 						if (flankTHand != bHand)
-							setBlockLocal(bWidth + ws.TowerXOffset, gateHeight - 2, -gateWidth, EAST_FACE_TORCH_BLOCK);
+                            setBlockLocal(bWidth + ws.TowerXOffset, gateHeight - 2, -gateWidth,
+                                    BlockAndMeta.EAST_FACING_TORCH);
 						if (flankTHand != bHand)
-							setBlockLocal(bWidth + ws.TowerXOffset, gateHeight - 2, 1, EAST_FACE_TORCH_BLOCK);
+                            setBlockLocal(bWidth + ws.TowerXOffset, gateHeight - 2, 1,
+                                    BlockAndMeta.EAST_FACING_TORCH);
 						//build flanking towers
 						if (n0 + gateWidth + tw > bLength)
                             flankTHand = null;
@@ -842,16 +856,19 @@ public class BuildingWall extends Building {
 	private void mergeWallLayer() {
 		//if side is a floor one below, add a step down
 		if (isFloor(-1, WalkHeight - 1, 0))
-			setBlockLocal(-1, WalkHeight - 1, 0, halfStairValue.get(), halfStairValue.getMeta());
+            setBlockLocal(-1, WalkHeight - 1, 0, halfStairValue.getBlock(),
+                    halfStairValue.getMeta());
 		if (isFloor(bWidth, WalkHeight - 1, 0))
-			setBlockLocal(bWidth, WalkHeight - 1, 0, halfStairValue.get(), halfStairValue.getMeta());
+            setBlockLocal(bWidth, WalkHeight - 1, 0, halfStairValue.getBlock(),
+                    halfStairValue.getMeta());
 		//      x
 		// if  xxo are floors one above, add a step up
 		//      x
 		if (isFloor(-1, WalkHeight + 1, 0) && isFloor(-2, WalkHeight + 2, 0) && isFloor(-2, WalkHeight + 2, 1) && isFloor(-2, WalkHeight + 2, -1))
-			setBlockLocal(0, WalkHeight, 0, halfStairValue.get(), halfStairValue.getMeta());
+            setBlockLocal(0, WalkHeight, 0, halfStairValue.getBlock(), halfStairValue.getMeta());
 		if (isFloor(bWidth, WalkHeight + 1, 0) && isFloor(bWidth + 1, WalkHeight + 2, 0) && isFloor(bWidth + 1, WalkHeight + 2, 1) && isFloor(bWidth + 1, WalkHeight + 2, -1))
-			setBlockLocal(bWidth - 1, WalkHeight, 0, halfStairValue.get(), halfStairValue.getMeta());
+            setBlockLocal(bWidth - 1, WalkHeight, 0, halfStairValue.getBlock(),
+                    halfStairValue.getMeta());
 		//clean up stairs descending into this wall
 		int[] pt = getIJKPt(-1, WalkHeight - 1, 0);
 		Block id = world.getBlock(pt[0], pt[1], pt[2]);
@@ -860,7 +877,7 @@ public class BuildingWall extends Building {
                 && STAIRS_META_TO_DIR[meta < 4 ? meta : (meta - 4)] == bDir
                         .rotate(bHand.opposite())) {
             BlockAndMeta temp = new BlockAndMeta(id, meta).stairToSolid();
-            world.setBlock(pt[0], pt[1], pt[2], temp.get(), temp.getMeta(), 2);
+            world.setBlock(pt[0], pt[1], pt[2], temp.getBlock(), temp.getMeta(), 2);
         }
 		pt = getIJKPt(bWidth, WalkHeight - 1, 0);
 		id = world.getBlock(pt[0], pt[1], pt[2]);
@@ -868,7 +885,7 @@ public class BuildingWall extends Building {
         if (BlockProperties.get(id).isStair
                 && STAIRS_META_TO_DIR[meta < 4 ? meta : (meta - 4)] == bDir.rotate(bHand)) {
             BlockAndMeta temp = new BlockAndMeta(id, meta).stairToSolid();
-            world.setBlock(pt[0], pt[1], pt[2], temp.get(), temp.getMeta(), 2);
+            world.setBlock(pt[0], pt[1], pt[2], temp.getBlock(), temp.getMeta(), 2);
         }
 	}
 

@@ -128,18 +128,6 @@ public class Building {
             "LavaSlime", "Villager", "SnowMan", "MushroomCow", "Sheep", "Cow", "Chicken", "Squid", "Wolf", "Giant",
             "Silverfish", "EnderDragon", "Ozelot", "VillagerGolem", "WitherBoss", "Bat", "Witch"
     };
-	// some prebuilt directional blocks
-    public final static BlockAndMeta WEST_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.WEST));
-    public final static BlockAndMeta EAST_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.EAST));
-    public final static BlockAndMeta NORTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.NORTH));
-    public final static BlockAndMeta SOUTH_FACE_TORCH_BLOCK = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.SOUTH));
-    public final static BlockAndMeta EAST_FACE_LADDER_BLOCK = new BlockAndMeta(Blocks.ladder, LADDER_DIR_TO_META.get(Dir.EAST));
-    public final static BlockAndMeta HOLE_BLOCK_LIGHTING = new BlockAndMeta(Blocks.air, 0);
-    public final static BlockAndMeta HOLE_BLOCK_NO_LIGHTING = new BlockAndMeta(Blocks.air, 1);
-    public final static BlockAndMeta PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, "PRESERVE");
-    public final static BlockAndMeta TOWER_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString());
-    public final static BlockAndMeta HARD_CHEST_BLOCK = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString());
-    public final static BlockAndMeta GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
 
 	private final static int LIGHTING_INVERSE_DENSITY = 10;
 	private final static boolean[] randLightingHash = new boolean[512];
@@ -437,14 +425,14 @@ public class Building {
     public final void flushDelayed(){
         while(delayedBuildQueue.size()>0){
             PlacedBlock block = delayedBuildQueue.poll();
-            setDelayed(block.get(), block.x, block.y, block.z, block.getMeta());
+            setDelayed(block.getBlock(), block.x, block.y, block.z, block.getMeta());
         }
     }
 
 	protected void setDelayed(Block blc, int...block) {
 		if (BlockProperties.get(blc).isStair) {
             BlockAndMeta temp = getDelayedStair(blc, block);
-            blc = temp.get();
+            blc = temp.getBlock();
             block[3] = temp.getMeta();
 		} else if (blc instanceof BlockVine) {
 			if (block[3] == 0 && !isSolidBlock(world.getBlock(block[0], block[1] + 1, block[2])))
@@ -524,7 +512,8 @@ public class Building {
         if (!(blockID instanceof BlockChest))
             emptyIfChest(pt);
         if (BlockProperties.get(blockID).isDelayed){
-            delayedBuildQueue.offer(new PlacedBlock(blockID, new int[]{pt[0], pt[1], pt[2], rotateMetadata(blockID, metadata)}));
+            delayedBuildQueue.offer(new PlacedBlock(blockID, rotateMetadata(blockID, metadata),
+                    new int[] {pt[0], pt[1], pt[2]}));
         }else if (randLightingHash[(x & 0x7) | (y & 0x38) | (z & 0x1c0)]) {
             world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 2);
         } else {
@@ -538,9 +527,10 @@ public class Building {
 
 	protected final void setBlockLocal(int x, int z, int y, BlockAndMeta block) {
         if(block instanceof BlockExtended){
-            setSpecialBlockLocal(x, z, y, block.get(), block.getMeta(), ((BlockExtended) block).info);
+            setSpecialBlockLocal(x, z, y, block.getBlock(), block.getMeta(),
+                    ((BlockExtended) block).info);
         }else{
-            setBlockLocal(x, z, y, block.get(), block.getMeta());
+            setBlockLocal(x, z, y, block.getBlock(), block.getMeta());
         }
 	}
 
@@ -558,13 +548,16 @@ public class Building {
 
     protected final void setBlockWithLightingLocal(int x, int z, int y, BlockAndMeta block, boolean lighting) {
         if(block instanceof BlockExtended){
-            setSpecialBlockLocal(x, z, y, block.get(), block.getMeta(), ((BlockExtended) block).info);
+            setSpecialBlockLocal(x, z, y, block.getBlock(), block.getMeta(),
+                    ((BlockExtended) block).info);
         }else{
-            setBlockWithLightingLocal(x, z, y, block.get(), block.getMeta(), lighting);
+            setBlockWithLightingLocal(x, z, y, block.getBlock(), block.getMeta(), lighting);
         }
     }
 
-	// allows control of lighting. Also will build even if replacing air with air.
+    /**
+     * Allows control of lighting. Also will build even if replacing air with air.
+     */
 	protected final void setBlockWithLightingLocal(int x, int z, int y, Block blockID, int metadata, boolean lighting) {
 		int[] pt = getIJKPt(x, z, y);
         if (blockID == Blocks.air && world.isAirBlock(pt[0], pt[1], pt[2]))
@@ -572,7 +565,8 @@ public class Building {
 		if (!(blockID instanceof BlockChest))
 			emptyIfChest(pt);
 		if (BlockProperties.get(blockID).isDelayed)
-            delayedBuildQueue.offer(new PlacedBlock(blockID, new int[]{pt[0], pt[1], pt[2], rotateMetadata(blockID, metadata)}));
+            delayedBuildQueue.offer(new PlacedBlock(blockID, rotateMetadata(blockID, metadata),
+                    new int[] {pt[0], pt[1], pt[2]}));
 		else if (lighting)
 			world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 3);
 		else
@@ -608,7 +602,8 @@ public class Building {
                 return;
             }
             if (extra.equals(TemplateRule.SPECIAL_PAINT) && metadata>=PAINTING_BLOCK_OFFSET) {//Remember:Paintings are not blocks
-                delayedBuildQueue.offer(new PlacedBlock(blockID, new int[]{pt[0], pt[1], pt[2], metadata}));
+                delayedBuildQueue.offer(new PlacedBlock(blockID, metadata, new int[] {pt[0], pt[1],
+                        pt[2]}));
                 return;
             }
 			Block presentBlock = world.getBlock(pt[0], pt[1], pt[2]);
@@ -679,7 +674,8 @@ public class Building {
 
 	private ItemStack getChestItemstack(String chestType) {
 		if (chestType.equals(ChestType.TOWER) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
-			return new ItemStack(bRule.primaryBlock.get(), random.nextInt(10), bRule.primaryBlock.getMeta());
+            return new ItemStack(bRule.primaryBlock.getBlock(), random.nextInt(10),
+                    bRule.primaryBlock.getMeta());
 		}
         ChestContentsSpec chestContentsSpec = chestItems.get(chestType);
 

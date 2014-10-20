@@ -35,12 +35,42 @@ import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
  */
 public class BuildingDispenserTrap extends Building {
     public enum MissileType { ARROW, DAMAGE_POTION };
-//	public final static int ARROW_MISSILE = 0, DAMAGE_POTION_MISSILE = 1;
-	private static BlockAndMeta[] CODE_TO_BLOCK = new BlockAndMeta[] { PRESERVE_BLOCK, null, new BlockAndMeta(Blocks.air, 0), new BlockAndMeta(Blocks.redstone_wire, 0), new BlockAndMeta(Blocks.redstone_torch, BUTTON_DIR_TO_META.get(Dir.NORTH)),
-            new BlockAndMeta(Blocks.unlit_redstone_torch, BUTTON_DIR_TO_META.get(Dir.SOUTH)), new BlockAndMeta(Blocks.redstone_torch, 5) };
-	private static int[][][] MECHANISM = new int[][][] { { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 } }, { { 0, 0, 0 }, { 1, 1, 1 }, { 1, 4, 1 }, { 1, 1, 1 } },
-			{ { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 5, 1 } }, { { 0, 1, 0 }, { 1, 1, 1 }, { 1, 3, 1 }, { 1, 1, 1 } }, { { 0, 1, 0 }, { 1, 6, 1 }, { 1, 0, 1 }, { 1, 2, 1 } },
-			{ { 0, 1, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }, };
+
+    private static BlockAndMeta[] CODE_TO_BLOCK = new BlockAndMeta[] {
+            BlockAndMeta.PRESERVE_BLOCK,
+            null,
+            new BlockAndMeta(Blocks.air, 0),
+            new BlockAndMeta(Blocks.redstone_wire, 0),
+            new BlockAndMeta(Blocks.redstone_torch, BUTTON_DIR_TO_META.get(Dir.NORTH)),
+            new BlockAndMeta(Blocks.unlit_redstone_torch, BUTTON_DIR_TO_META.get(Dir.SOUTH)),
+            new BlockAndMeta(Blocks.redstone_torch, 5)};
+
+    /* [z][y][x] */
+    private static int[][][] MECHANISM = new int[][][] {
+            {   { 0, 0, 0 },
+                { 0, 0, 0 },
+                { 0, 1, 0 },
+                { 0, 0, 0 } },
+            {   { 0, 0, 0 },
+                { 1, 1, 1 },
+                { 1, 4, 1 },
+                { 1, 1, 1 } },
+            {   { 0, 0, 0 },
+                { 1, 1, 1 },
+                { 1, 1, 1 },
+                { 1, 5, 1 } },
+            {   { 0, 1, 0 },
+                { 1, 1, 1 },
+                { 1, 3, 1 },
+                { 1, 1, 1 } },
+            {   { 0, 1, 0 },
+                { 1, 6, 1 },
+                { 1, 0, 1 },
+                { 1, 2, 1 } },
+            {   { 0, 1, 0 },
+                { 1, 1, 1 },
+                { 1, 1, 1 },
+                { 1, 1, 1 } }, };
 
     public BuildingDispenserTrap(IBuildingConfig config, TemplateRule bRule_, Dir bDir_,
             int plateSeparation, int[] sourcePt) {
@@ -48,13 +78,17 @@ public class BuildingDispenserTrap extends Building {
                 sourcePt);
 	}
 
-	//      ---   bLength+3 - end of mechanism
-	//      | |
-	//      | |
-	//      ---   y=bLength - mechanism start,
-	//       *    y==bLength-1 - end of redstone wire
-	//       *
-	//       0    y=0 - trigger plate
+    /**
+     * <pre>
+     *      ---   bLength+3 - end of mechanism
+     *      | |
+     *      | |
+     *      ---   y=bLength - mechanism start,
+     *       *    y==bLength-1 - end of redstone wire
+     *       *
+     *       0    y=0 - trigger plate
+     * </pre>
+     */
 	public void build(MissileType missileType, boolean multipleTriggers) {
 		if (bLength < 0)
 			bLength = 0;

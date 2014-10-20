@@ -57,8 +57,8 @@ public class TemplateRule {
 		for (int i = 0; i < numblocks; i++) {
 			data = items[i + 2].trim().split("-", 2);
             if(data[0].equals(SPECIAL_AIR)){//Preserve block rule
-                blockIDs[i] = Building.PRESERVE_BLOCK.get();
-                blockMDs[i] = Building.PRESERVE_BLOCK.getMeta();
+                blockIDs[i] = BlockAndMeta.PRESERVE_BLOCK.getBlock();
+                blockMDs[i] = BlockAndMeta.PRESERVE_BLOCK.getMeta();
                 extraData[i] = data[0];
             }else if(data[0].equals(SPECIAL_STAIR)||data[0].equals(SPECIAL_PAINT)){//Walls stairs or paintings block rule
                 blockIDs[i] = Blocks.air;
@@ -172,14 +172,14 @@ public class TemplateRule {
             else
                 return new BlockAndMeta(blockIDs[m], blockMDs[m]);
 		}
-		return Building.HOLE_BLOCK_LIGHTING;
+        return BlockAndMeta.AIR_WITH_LIGHTING;
 	}
 
 	public boolean isPreserveRule() {
 		for (int i = 0; i<blockIDs.length; i++){
-			if(blockIDs[i] != Building.PRESERVE_BLOCK.get())
+            if(blockIDs[i] != BlockAndMeta.PRESERVE_BLOCK.getBlock())
 				return false;
-            if(blockMDs[i] != Building.PRESERVE_BLOCK.getMeta())
+            if(blockMDs[i] != BlockAndMeta.PRESERVE_BLOCK.getMeta())
                 return false;
             if(extraData == null || extraData[i] == null || !extraData[i].equals(SPECIAL_AIR))
                 return false;

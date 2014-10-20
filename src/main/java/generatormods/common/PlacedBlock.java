@@ -25,10 +25,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Sub-type of BlockAndMeta that represents a block placed in the world.
  */
-public class PlacedBlock extends BlockAndMeta{
+public class PlacedBlock extends BlockAndMeta {
     public final int x, y, z;
-    public PlacedBlock(Block block, int[] data) {
-        super(block, data[3]);
+    public PlacedBlock(Block block, int meta, int[] data) {
+        super(block, meta);
         this.x = data[0];
         this.y = data[1];
         this.z = data[2];
@@ -36,22 +36,17 @@ public class PlacedBlock extends BlockAndMeta{
 
     @Override
     public boolean equals(Object obj){
-        if(obj==null){
+        if(!super.equals(obj))
             return false;
-        }
-        if(obj==this){
-            return true;
-        }
-        if(!super.equals(obj)){
+        if(!(obj instanceof PlacedBlock))
             return false;
-        }else if(obj instanceof PlacedBlock){
-            return this.x == ((PlacedBlock) obj).x && this.y == ((PlacedBlock) obj).y && this.z == ((PlacedBlock) obj).z;
-        }
-        return false;
+        PlacedBlock other = (PlacedBlock) obj;
+        return this.x == other.x && this.y == other.y && this.z == other.z;
     }
 
     @Override
     public int hashCode(){
-        return new HashCodeBuilder().append(getMeta()).append(get()).append(x).append(y).append(z).toHashCode();
+        return new HashCodeBuilder().append(getMeta()).append(getBlock()).append(x).append(y)
+                .append(z).toHashCode();
     }
 }

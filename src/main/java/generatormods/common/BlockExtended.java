@@ -28,29 +28,24 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class BlockExtended extends BlockAndMeta{
     public final String info;
+
     public BlockExtended(Block block, int meta, String extra) {
         super(block, meta);
         info = extra;
     }
 
     @Override
-    public boolean equals(Object obj){
-        if(obj==null){
+    public boolean equals(Object obj) {
+        if (!super.equals(obj))
             return false;
-        }
-        if(obj==this){
-            return true;
-        }
-        if(!super.equals(obj)){
+        if (!(obj instanceof BlockExtended))
             return false;
-        }else if(obj instanceof BlockExtended){
-            return this.info.equals(((BlockExtended) obj).info);
-        }
-        return false;
+        BlockExtended other = (BlockExtended) obj;
+        return (this.info.equals(other.info));
     }
 
     @Override
-    public int hashCode(){
-        return new HashCodeBuilder().append(getMeta()).append(get()).append(info).toHashCode();
+    public int hashCode() {
+        return new HashCodeBuilder().append(getMeta()).append(getBlock()).append(info).toHashCode();
     }
 }

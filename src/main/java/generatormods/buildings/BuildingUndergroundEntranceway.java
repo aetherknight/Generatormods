@@ -96,9 +96,9 @@ public class BuildingUndergroundEntranceway extends Building {
 			}
 			if (z % SUPPORT_INTERVAL == SUPPORT_INTERVAL / 2 && z <= bLength - PASSAGE_HEIGHT) {
 				if (random.nextInt(2) == 0)
-					setBlockLocal(0, z + PASSAGE_HEIGHT - 3, z, EAST_FACE_TORCH_BLOCK);
+                    setBlockLocal(0, z + PASSAGE_HEIGHT - 3, z, BlockAndMeta.EAST_FACING_TORCH);
 				if (random.nextInt(2) == 0)
-					setBlockLocal(PASSAGE_WIDTH - 1, z + PASSAGE_HEIGHT - 3, z, WEST_FACE_TORCH_BLOCK);
+                    setBlockLocal(PASSAGE_WIDTH - 1, z + PASSAGE_HEIGHT - 3, z, BlockAndMeta.WEST_FACING_TORCH);
 			}
 		}
 		//reinforce start of entrance

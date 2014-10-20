@@ -62,7 +62,8 @@ public class BuildingTower extends Building {
                 undeadTower = true;
             ghastTower =
                     roofStyle == RoofStyle.CRENEL
-                            && SpawnerRule.getBlockOrHole(world.rand).equals(GHAST_SPAWNER);
+                            && SpawnerRule.getBlockOrHole(world.rand).equals(
+                                    BlockAndMeta.GHAST_SPAWNER);
 			if (ghastTower || random.nextInt(100) > SpawnerRule.chance)
 				undeadTower = false;
 		}
@@ -76,7 +77,7 @@ public class BuildingTower extends Building {
 		for (int x1 = 0; x1 < bWidth + 2; x1++)
 			for (int y1 = 0; y1 < bLength + 2; y1++)
 				for (int z1 = 0; z1 < bHeight + minHorizDim + 3; z1++)
-					buffer[x1][z1][y1] = PRESERVE_BLOCK;
+                    buffer[x1][z1][y1] = BlockAndMeta.PRESERVE_BLOCK;
 		//========================================= build it ==========================================
 		//*** sidewalls and base ***
 		for (int x1 = 0; x1 < bWidth; x1++) {
@@ -89,7 +90,7 @@ public class BuildingTower extends Building {
 						{
 							buffer[x1 + 1][z1 + 1][y1 + 1] = bRule.getBlockOrHole(world.rand);
 						} else
-							buffer[x1 + 1][z1 + 1][y1 + 1] = HOLE_BLOCK_NO_LIGHTING;
+                            buffer[x1 + 1][z1 + 1][y1 + 1] = BlockAndMeta.AIR_WITH_NO_LIGHTING;
 					}
 					//column above source point
 					for (int z1 = -1; z1 < baseHeight - 1; z1++)
@@ -120,25 +121,27 @@ public class BuildingTower extends Building {
 			for (int y1 = 1; y1 < bLength - 1; y1++)
 				for (int x1 = 1; x1 < bWidth - 1; x1++)
 					if (!circular || circle_shape[x1][y1] == 0)
-						buffer[x1 + 1][z1 + 1][y1 + 1] = bRule.primaryBlock.get() == Blocks.log ? new BlockAndMeta(Blocks.planks, 0): bRule.getBlockOrHole(world.rand);
+                        buffer[x1 + 1][z1 + 1][y1 + 1] =
+                                bRule.primaryBlock.getBlock() == Blocks.log ? new BlockAndMeta(
+                                        Blocks.planks, 0) : bRule.getBlockOrHole(world.rand);
 						//door torches
 						if (!undeadTower && bRule.chance == 100) {
-							buffer[torchX1 + 1][z1 + 3 + 1][1 + (circular && bLength == 6 ? 1 : 0) + 1] = NORTH_FACE_TORCH_BLOCK;
-							buffer[torchX2 + 1][z1 + 3 + 1][bLength - 2 - (circular && bLength == 6 ? 1 : 0) + 1] = SOUTH_FACE_TORCH_BLOCK;
+                            buffer[torchX1 + 1][z1 + 3 + 1][1 + (circular && bLength == 6 ? 1 : 0) + 1] = BlockAndMeta.NORTH_FACING_TORCH;
+                            buffer[torchX2 + 1][z1 + 3 + 1][bLength - 2 - (circular && bLength == 6 ? 1 : 0) + 1] = BlockAndMeta.SOUTH_FACING_TORCH;
 						}
 						//*** mob spawners***
 						if (floorHasUndeadSpawner && z1 == baseHeight + 4 && bRule.chance == 100) {
 							for (int x1 = bWidth / 2 - 1; x1 <= bWidth / 2 + 1; x1++) {
 								for (int y1 = 1; y1 < Math.min(3, sideWindowY - 1); y1++)
 									if (!circular || circle_shape[x1][y1] == 0)
-										buffer[x1 + 1][z1 + 1][y1 + 1] = HOLE_BLOCK_LIGHTING;
+                                        buffer[x1 + 1][z1 + 1][y1 + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 								for (int y1 = bLength - Math.min(3, sideWindowY - 1); y1 < bLength - 1; y1++)
 									if (!circular || circle_shape[x1][y1] == 0)
-										buffer[x1 + 1][z1 + 1][y1 + 1] = HOLE_BLOCK_LIGHTING;
+                                        buffer[x1 + 1][z1 + 1][y1 + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 							}
 						} else if (SpawnerRule != TemplateRule.RULE_NOT_PROVIDED && random.nextInt(100) < SpawnerRule.chance && !ghastTower) {
                             BlockAndMeta spawnerBlock = SpawnerRule.getNonAirBlock(world.rand);
-							if (!spawnerBlock.equals(GHAST_SPAWNER))
+                            if (!spawnerBlock.equals(BlockAndMeta.GHAST_SPAWNER))
 								buffer[bWidth / 2 + 1][z1 + 1 + 1][sideWindowY + 1] = spawnerBlock;
 						}
 						//chests
@@ -146,7 +149,7 @@ public class BuildingTower extends Building {
 						if (ChestRule != TemplateRule.RULE_NOT_PROVIDED && random.nextInt(100) < ChestRule.chance)
 							buffer[bWidth - 2 + 1][z1 + 1 + 1][sideWindowY - 1 + 1] = ChestRule.getNonAirBlock(world.rand);
 						else if (floorHasUndeadSpawner && random.nextInt(100) < HAUNTED_CHEST_CHANCE) //even if no chest rule, can have chests if floorIsHaunted
-							buffer[bWidth - 2 + 1][z1 + 1 + 1][sideWindowY - 1 + 1] = z1 < 15 ? TOWER_CHEST_BLOCK : HARD_CHEST_BLOCK;
+                            buffer[bWidth - 2 + 1][z1 + 1 + 1][sideWindowY - 1 + 1] = z1 < 15 ? BlockAndMeta.TOWER_CHEST : BlockAndMeta.HARD_CHEST;
 						if (z1 == baseHeight - 1)
 							z1++; //ground floor is one block higher
 		}
@@ -156,7 +159,7 @@ public class BuildingTower extends Building {
                 roofStyle == RoofStyle.CRENEL ? bHeight : (bHeight - baseHeight < 8 ? 0
                         : topFloorHeight); // don't continue through top floor unless crenellated
 		for (int z1 = baseHeight; z1 < ladderHeight; z1++)
-			buffer[1 + 1][z1 + 1][sideWindowY - 1 + 1] = EAST_FACE_LADDER_BLOCK;
+            buffer[1 + 1][z1 + 1][sideWindowY - 1 + 1] = BlockAndMeta.EAST_FACING_LADDER;
 		//*** roof ***
 		buildRoof();
         if (undeadTower && roofStyle == RoofStyle.CRENEL)
@@ -184,9 +187,12 @@ public class BuildingTower extends Building {
 		}
 		//*** prettify any stairs outside entrance/exit ***
 		for (int x1 = 1; x1 < bWidth - 1; x1++) {
-			if (isStairBlock(x1, baseHeight, -1) && getBlockIdLocal(x1, baseHeight, -2) == bRule.primaryBlock.get())
+            if (isStairBlock(x1, baseHeight, -1)
+                    && getBlockIdLocal(x1, baseHeight, -2) == bRule.primaryBlock.getBlock())
 				setBlockLocal(x1, baseHeight, -1, bRule.primaryBlock);
-			if (isStairBlock(x1, baseHeight, bLength) && getBlockIdLocal(x1, baseHeight, bLength + 1) == bRule.primaryBlock.get())
+            if (isStairBlock(x1, baseHeight, bLength)
+                    && getBlockIdLocal(x1, baseHeight, bLength + 1) == bRule.primaryBlock
+                            .getBlock())
 				setBlockLocal(x1, baseHeight, bLength, bRule.primaryBlock);
 		}
 		//furniture
@@ -252,13 +258,15 @@ public class BuildingTower extends Building {
 					support[x][z][y] = 0;
 		for (int x = 0; x < xLim; x++)
 			for (int y = 0; y < yLim; y++)
-				if (buffer[x][0][y].get() != Blocks.air)
+                if (buffer[x][0][y].getBlock() != Blocks.air)
 					support[x][0][y] = 2;
 		for (int z = 1; z < zLim; z++) {
 			boolean levelCollapsed = true;
 			for (int x = 0; x < xLim; x++) {
 				for (int y = 0; y < yLim; y++) {
-					if (buffer[x][z][y].get() != Blocks.air && BlockProperties.get(buffer[x][z - 1][y].get()).isLoaded && support[x][z - 1][y] > 0) {
+                    if (buffer[x][z][y].getBlock() != Blocks.air
+                            && BlockProperties.get(buffer[x][z - 1][y].getBlock()).isLoaded
+                            && support[x][z - 1][y] > 0) {
 						support[x][z][y] = 2;
 						levelCollapsed = false;
 					}
@@ -269,15 +277,15 @@ public class BuildingTower extends Building {
 			for (int m = 0; m < 4; m++) {
 				for (int x = 0; x < xLim; x++) {
 					for (int y = 0; y < yLim; y++) {
-						if (buffer[x][z][y].get() != Blocks.air && support[x][z][y] == 0) {
+                        if (buffer[x][z][y].getBlock() != Blocks.air && support[x][z][y] == 0) {
 							int neighbors = 0;
-							if (x < xLim - 1 && BlockProperties.get(buffer[x + 1][z][y].get()).isLoaded)
+                            if (x < xLim - 1 && BlockProperties.get(buffer[x + 1][z][y].getBlock()).isLoaded)
 								neighbors += support[x + 1][z][y];
-							if (x > 0 && BlockProperties.get(buffer[x - 1][z][y].get()).isLoaded)
+                            if (x > 0 && BlockProperties.get(buffer[x - 1][z][y].getBlock()).isLoaded)
 								neighbors += support[x - 1][z][y];
-							if (y < yLim - 1 && BlockProperties.get(buffer[x][z][y + 1].get()).isLoaded)
+                            if (y < yLim - 1 && BlockProperties.get(buffer[x][z][y + 1].getBlock()).isLoaded)
 								neighbors += support[x][z][y + 1];
-							if (y > 0 && BlockProperties.get(buffer[x][z][y - 1].get()).isLoaded)
+                            if (y > 0 && BlockProperties.get(buffer[x][z][y - 1].getBlock()).isLoaded)
 								neighbors += support[x][z][y - 1];
 							if (neighbors > random.nextInt(4))
 								support[x][z][y] = 1;
@@ -288,8 +296,8 @@ public class BuildingTower extends Building {
 			//remove blocks if no support
 			for (int x = 0; x < xLim; x++) {
 				for (int y = 0; y < yLim; y++) {
-					if (support[x][z][y] == 0 && !buffer[x][z][y].equals(Building.PRESERVE_BLOCK))
-						buffer[x][z][y] = HOLE_BLOCK_LIGHTING;
+                    if (support[x][z][y] == 0 && !buffer[x][z][y].equals(BlockAndMeta.PRESERVE_BLOCK))
+                        buffer[x][z][y] = BlockAndMeta.AIR_WITH_LIGHTING;
 					//else buffer[x][z][y]=new int[]{40+support[x][z][y],0};
 				}
 			}
@@ -346,7 +354,7 @@ public class BuildingTower extends Building {
 		TemplateRule doubleStepRule = (stepMeta == 2) ? new TemplateRule(Blocks.planks, 0, roofRule.chance) : new TemplateRule(Blocks.double_stone_slab, stepMeta, roofRule.chance);
         TemplateRule trimRule =
                 roofStyle == RoofStyle.TRIM ? new TemplateRule(
-                        bRule.primaryBlock.get() == Blocks.cobblestone ? Blocks.log
+                        bRule.primaryBlock.getBlock() == Blocks.cobblestone ? Blocks.log
                                 : Blocks.cobblestone, 0, roofRule.chance) : stepRule;
         Block roof = roofRule.primaryBlock.toStair();
         TemplateRule northStairsRule = new TemplateRule(roof, STAIRS_DIR_TO_META.get(Dir.NORTH), roofRule.chance);
@@ -369,24 +377,36 @@ public class BuildingTower extends Building {
 					for (int x1 = 0; x1 < bWidth; x1++)
 						buffer[x1 + 1][bHeight + 1][y1 + 1] = bRule.getBlockOrHole(world.rand);
 				for (int m = 0; m < bWidth; m += 2) {
-					if (!(getBlockIdLocal(m, bHeight, -1) == bRule.primaryBlock.get() || getBlockIdLocal(m, bHeight - 1, -1) == bRule.primaryBlock.get()))
-						buffer[m + 1][bHeight + 1 + 1][0 + 1] = (m + 1) % 2 == 0 ? HOLE_BLOCK_LIGHTING : bRule.getBlockOrHole(world.rand);
-					if (!(getBlockIdLocal(m, bHeight, bLength) == bRule.primaryBlock.get() || getBlockIdLocal(m, bHeight - 1, bLength) == bRule.primaryBlock.get()))
-						buffer[m + 1][bHeight + 1 + 1][bLength - 1 + 1] = (m + 1) % 2 == 0 ? HOLE_BLOCK_LIGHTING : bRule.getBlockOrHole(world.rand);
+                    if (!(getBlockIdLocal(m, bHeight, -1) == bRule.primaryBlock.getBlock() || getBlockIdLocal(
+                            m, bHeight - 1, -1) == bRule.primaryBlock.getBlock()))
+                        buffer[m + 1][bHeight + 1 + 1][0 + 1] =
+                                (m + 1) % 2 == 0 ? BlockAndMeta.AIR_WITH_LIGHTING : bRule
+                                        .getBlockOrHole(world.rand);
+                    if (!(getBlockIdLocal(m, bHeight, bLength) == bRule.primaryBlock.getBlock() || getBlockIdLocal(
+                            m, bHeight - 1, bLength) == bRule.primaryBlock.getBlock()))
+                        buffer[m + 1][bHeight + 1 + 1][bLength - 1 + 1] =
+                                (m + 1) % 2 == 0 ? BlockAndMeta.AIR_WITH_LIGHTING : bRule
+                                        .getBlockOrHole(world.rand);
 				}
 				for (int m = 0; m < bLength; m += 2) {
-					if (!(getBlockIdLocal(-1, bHeight, m) == bRule.primaryBlock.get() || getBlockIdLocal(-1, bHeight - 1, m) == bRule.primaryBlock.get()))
-						buffer[0 + 1][bHeight + 1 + 1][m + 1] = (m + 1) % 2 == 0 ? HOLE_BLOCK_LIGHTING : bRule.getBlockOrHole(world.rand);
-					if (!(getBlockIdLocal(bWidth, bHeight, m) == bRule.primaryBlock.get() || getBlockIdLocal(bWidth, bHeight - 1, m) == bRule.primaryBlock.get()))
-						buffer[bWidth - 1 + 1][bHeight + 1 + 1][m + 1] = (m + 1) % 2 == 0 ? HOLE_BLOCK_LIGHTING : bRule.getBlockOrHole(world.rand);
+                    if (!(getBlockIdLocal(-1, bHeight, m) == bRule.primaryBlock.getBlock() || getBlockIdLocal(
+                            -1, bHeight - 1, m) == bRule.primaryBlock.getBlock()))
+                        buffer[0 + 1][bHeight + 1 + 1][m + 1] =
+                                (m + 1) % 2 == 0 ? BlockAndMeta.AIR_WITH_LIGHTING : bRule
+                                        .getBlockOrHole(world.rand);
+                    if (!(getBlockIdLocal(bWidth, bHeight, m) == bRule.primaryBlock.getBlock() || getBlockIdLocal(
+                            bWidth, bHeight - 1, m) == bRule.primaryBlock.getBlock()))
+                        buffer[bWidth - 1 + 1][bHeight + 1 + 1][m + 1] =
+                                (m + 1) % 2 == 0 ? BlockAndMeta.AIR_WITH_LIGHTING : bRule
+                                        .getBlockOrHole(world.rand);
 				}
 				for (int y1 = 1; y1 < bLength - 1; y1++)
 					for (int x1 = 1; x1 < bWidth - 1; x1++)
 						if (isWallBlock(x1, bHeight, y1)
 								&& !(isWallBlock(x1 + 1, bHeight, y1) || isWallBlock(x1 - 1, bHeight, y1) || isWallBlock(x1, bHeight, y1 + 1) || isWallBlock(x1, bHeight, y1 - 1)))
-							buffer[x1 + 1][bHeight + 1 - 1 + 1][y1 + 1] = HOLE_BLOCK_LIGHTING;
+                            buffer[x1 + 1][bHeight + 1 - 1 + 1][y1 + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 			}
-			buffer[2][bHeight + 1][bLength / 2] = EAST_FACE_LADDER_BLOCK;
+            buffer[2][bHeight + 1][bLength / 2] = BlockAndMeta.EAST_FACING_LADDER;
 			buffer[2][bHeight + 2][bLength / 2] = new BlockAndMeta(Blocks.trapdoor, 3);
         } else if (roofStyle == RoofStyle.STEEP || roofStyle == RoofStyle.TRIM
                 || (roofStyle == RoofStyle.SHALLOW && (bWidth < 6 || bLength < 6))) { // 45 degrees
@@ -394,7 +414,7 @@ public class BuildingTower extends Building {
 			for (int m = 0; m < (minHorizDim + 1) / 2; m++) {
 				for (int x1 = m; x1 < bWidth - m; x1++) {
 					for (int y1 = m; y1 < bLength - m; y1++) {
-						buffer[x1 + 1][bHeight + m + 1][y1 + 1] = HOLE_BLOCK_LIGHTING;
+                        buffer[x1 + 1][bHeight + m + 1][y1 + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 						if (m == (bWidth + 1) / 2 - 1)
 							buffer[x1 + 1][bHeight + m + 1 + 1][y1 + 1] = trimRule.getBlockOrHole(world.rand);
 					}
@@ -436,7 +456,7 @@ public class BuildingTower extends Building {
 							buffer[x1 + 1][z1 + bHeight + 1][y1 + 1] = doubleStepRule.getBlockOrHole(world.rand);
 					for (int y1 = z12 + 2; y1 < bLength - z12 - 2; y1++)
 						for (int x1 = z12 + 2; x1 < bWidth - z12 - 2; x1++)
-							buffer[x1 + 1][z1 + bHeight + 1][y1 + 1] = HOLE_BLOCK_LIGHTING;
+                            buffer[x1 + 1][z1 + bHeight + 1][y1 + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 					buffer[z12 + 1][z1 + bHeight + 1 + 1][z12 + 1] = stepRule.getBlockOrHole(world.rand);
 					buffer[z12 + 1][z1 + bHeight + 1 + 1][bLength - z12 - 1 + 1] = stepRule.getBlockOrHole(world.rand);
 					buffer[bWidth - z12 - 1 + 1][z1 + bHeight + 1 + 1][z12 + 1] = stepRule.getBlockOrHole(world.rand);
@@ -449,8 +469,11 @@ public class BuildingTower extends Building {
 				for (int y1 = 0; y1 < diam; y1++) {
 					for (int x1 = 0; x1 < diam; x1++) {
                         if (Shape.CIRCLE_SHAPE[diam][x1][y1] >= 0)
-                            buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1 + (bLength - diam) / 2 + 1] = (Shape.CIRCLE_SHAPE[diam][x1][y1] == 1 || z1 >= (minHorizDim + 1) / 2 - 2) ? roofRule
-									.getBlockOrHole(world.rand) : HOLE_BLOCK_LIGHTING;
+                            buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1
+                                    + (bLength - diam) / 2 + 1] =
+                                    (Shape.CIRCLE_SHAPE[diam][x1][y1] == 1 || z1 >= (minHorizDim + 1) / 2 - 2) ? roofRule
+                                            .getBlockOrHole(world.rand)
+                                            : BlockAndMeta.AIR_WITH_LIGHTING;
 									if (z1 < (minHorizDim - 1) / 2) {
                                         int nextDiam = Shape.SPHERE_SHAPE[minHorizDim][z1 + 1];
 										int x2 = x1 - (diam - nextDiam) / 2, y2 = y1 - (diam - nextDiam) / 2;
@@ -470,7 +493,8 @@ public class BuildingTower extends Building {
                             buffer[x1 + (bWidth - diam) / 2 + 1][bHeight + z1 + 1 + 1][y1
                                     + (bLength - diam) / 2 + 1] =
                                     Shape.CIRCLE_SHAPE[diam][x1][y1] == 1 ? roofRule
-                                            .getBlockOrHole(world.rand) : HOLE_BLOCK_LIGHTING;
+                                            .getBlockOrHole(world.rand)
+                                            : BlockAndMeta.AIR_WITH_LIGHTING;
                         if (z1 > 0
                                 && Shape.CIRCLE_SHAPE[diam][x1][y1] != 0
                                 && Shape.CIRCLE_SHAPE[prevDiam][x1 + (prevDiam - diam) / 2][y1
@@ -490,7 +514,7 @@ public class BuildingTower extends Building {
 					for (int m = 0; m <= minHorizDim / 2; m++) {
 						for (int p = 0; p < maxAxLen; p++) {
 							for (int r = m + 1; r < minAxLen - m - 1; r++)
-								buildXYRotated(p + 1, bHeight + m + 1, r + 1, HOLE_BLOCK_LIGHTING, rot);
+                                buildXYRotated(p + 1, bHeight + m + 1, r + 1, BlockAndMeta.AIR_WITH_LIGHTING, rot);
 							buildXYRotated(p + 1, bHeight + m + 1, m - 1 + 1, forwardsStairsRule, rot);
 							buildXYRotated(p + 1, bHeight + m + 1, minAxLen - m + 1, backwardsStirRule, rot);
 							if (!(minHorizDim % 2 == 0 && m == minHorizDim / 2)) {
@@ -517,7 +541,7 @@ public class BuildingTower extends Building {
 						buffer[x1 + 1][bHeight + 1][y1 + 1] = doubleStepRule.getBlockOrHole(world.rand);
 					if (circle_shape[x1][y1] == 1) {
 						for (int z1 = bHeight; z1 < bHeight + minHorizDim; z1++) {
-							if (buffer[x1 + 1][z1 + 1][y1 + 1] == HOLE_BLOCK_LIGHTING)
+                            if (buffer[x1 + 1][z1 + 1][y1 + 1] == BlockAndMeta.AIR_WITH_LIGHTING)
 								buffer[x1 + 1][z1 + 1][y1 + 1] = bRule.getBlockOrHole(world.rand);
 							else
 								break;
@@ -531,7 +555,9 @@ public class BuildingTower extends Building {
 			for (int x1 = 0; x1 < minHorizDim; x1++) {
 				for (int y1 = 0; y1 < minHorizDim; y1++) {
 					if (circle_shape[x1][y1] >= 0)
-						buffer[x1 + xBuff + 1][bHeight + 1][y1 + yBuff + 1] = circle_shape[x1][y1] == 0 ? HOLE_BLOCK_LIGHTING : bRule.getBlockOrHole(world.rand);
+                        buffer[x1 + xBuff + 1][bHeight + 1][y1 + yBuff + 1] =
+                                circle_shape[x1][y1] == 0 ? BlockAndMeta.AIR_WITH_LIGHTING
+                                        : bRule.getBlockOrHole(world.rand);
 					else if (!circular)
 						buffer[x1 + xBuff + 1][bHeight + 1][y1 + yBuff + 1] = bRule.getBlockOrHole(world.rand);
 				}
@@ -701,11 +727,11 @@ public class BuildingTower extends Building {
 			}
 		} else
 			for (int z1 = z; z1 < z + height; z1++)
-				buffer[x + 1][z1 + 1][y + 1] = HOLE_BLOCK_LIGHTING; //carve out the aperture
-		//clear a step in front of window if there is a floor at z+1
+                buffer[x + 1][z1 + 1][y + 1] = BlockAndMeta.AIR_WITH_LIGHTING; //carve out the aperture
+        //clear a step in front of window if there is a floor at z+1
 		if (isFloor(x + xFace, z + 2, y + yFace) && isWallBlock(x + xFace, z, y + yFace) && x + xFace + 1 >= 0 && x + xFace + 1 < buffer.length && y + yFace + 1 >= 0
 				&& y + yFace + 1 < buffer[0][0].length)
-			buffer[x + xFace + 1][z + 1 + 1][y + yFace + 1] = HOLE_BLOCK_LIGHTING;
+            buffer[x + xFace + 1][z + 1 + 1][y + yFace + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 	}
 
 	//****************************************  FUNCTIONS  - populators *************************************************************************************//
@@ -758,7 +784,7 @@ public class BuildingTower extends Building {
 			int x1 = random.nextInt(bWidth - 2) + 1;
 			int y1 = random.nextInt(bLength - 2) + 1;
 			if (isFloor(x1, z, y1)) {
-				setBlockLocal(x1, z, y1, GHAST_SPAWNER);
+                setBlockLocal(x1, z, y1, BlockAndMeta.GHAST_SPAWNER);
 				return true;
 			}
 		}

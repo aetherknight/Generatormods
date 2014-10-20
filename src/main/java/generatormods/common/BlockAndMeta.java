@@ -18,60 +18,80 @@
  */
 package generatormods.common;
 
+import generatormods.common.config.ChestType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.Tuple;
-
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import static generatormods.common.DirMeta.BUTTON_DIR_TO_META;
+import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
 
 /**
  * Stores a block type, plus a metadata value for that block.
  */
-public class BlockAndMeta extends Tuple {
-    public BlockAndMeta(Block block, int meta){
-        super(block,meta);
+public class BlockAndMeta {
+    // some prebuilt directional blocks
+    public final static BlockAndMeta WEST_FACING_TORCH = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.WEST));
+    public final static BlockAndMeta EAST_FACING_TORCH = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.EAST));
+    public final static BlockAndMeta NORTH_FACING_TORCH = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.NORTH));
+    public final static BlockAndMeta SOUTH_FACING_TORCH = new BlockAndMeta(Blocks.torch, BUTTON_DIR_TO_META.get(Dir.SOUTH));
+    public final static BlockAndMeta EAST_FACING_LADDER = new BlockAndMeta(Blocks.ladder, LADDER_DIR_TO_META.get(Dir.EAST));
+    public final static BlockAndMeta AIR_WITH_LIGHTING = new BlockAndMeta(Blocks.air, 0);
+    public final static BlockAndMeta AIR_WITH_NO_LIGHTING = new BlockAndMeta(Blocks.air, 1);
+    public final static BlockAndMeta PRESERVE_BLOCK = new BlockExtended(Blocks.air, 0, TemplateRule.SPECIAL_AIR);
+    public final static BlockAndMeta TOWER_CHEST = new BlockExtended(Blocks.chest, 0, ChestType.TOWER.toString());
+    public final static BlockAndMeta HARD_CHEST = new BlockExtended(Blocks.chest, 0, ChestType.HARD.toString());
+    public final static BlockAndMeta GHAST_SPAWNER = new BlockExtended(Blocks.mob_spawner, 0, "Ghast");
+
+    private final Block block;
+    private final int meta;
+
+    public BlockAndMeta(Block block, int meta) {
+        this.block = block;
+        this.meta = meta;
     }
 
-    public Block get(){
-        return Block.class.cast(getFirst());
+    public Block getBlock() {
+        return block;
     }
 
-    public int getMeta(){
-        return Integer.class.cast(getSecond());
+    public int getMeta() {
+        return meta;
     }
 
     @Override
-    public boolean equals(Object obj){
-        if(obj==null){
+    public boolean equals(Object obj) {
+        if (obj == null)
             return false;
-        }
-        if(obj==this){
+        if (obj == this)
             return true;
-        }
-        return obj instanceof BlockAndMeta && this.getMeta()==((BlockAndMeta) obj).getMeta() && this.get()==((BlockAndMeta) obj).get();
+        if (!(obj instanceof BlockAndMeta))
+            return false;
+        BlockAndMeta other = (BlockAndMeta) obj;
+        return obj instanceof BlockAndMeta && this.meta == other.getMeta()
+                && this.block == other.getBlock();
     }
 
     @Override
-    public int hashCode(){
-        return new HashCodeBuilder().append(getMeta()).append(get()).toHashCode();
+    public int hashCode() {
+        return new HashCodeBuilder().append(meta).append(block).toHashCode();
     }
 
-    public Block toStair(){
-        if(get()== Blocks.cobblestone||get()==Blocks.mossy_cobblestone){
+    public Block toStair() {
+        if (block == Blocks.cobblestone || block == Blocks.mossy_cobblestone) {
             return Blocks.stone_stairs;
-        }else if(get()==Blocks.nether_brick){
+        } else if (block == Blocks.nether_brick) {
             return Blocks.nether_brick_stairs;
-        }else if(get()==Blocks.stonebrick||get()==Blocks.stone){
+        } else if (block == Blocks.stonebrick || block == Blocks.stone) {
             return Blocks.stone_brick_stairs;
-        }else if(get()==Blocks.brick_block){
+        } else if (block == Blocks.brick_block) {
             return Blocks.brick_stairs;
-        }else if(get()==Blocks.sandstone){
+        } else if (block == Blocks.sandstone) {
             return Blocks.sandstone_stairs;
-        }else if(get()==Blocks.quartz_block){
+        } else if (block == Blocks.quartz_block) {
             return Blocks.quartz_stairs;
-        }else if(get()==Blocks.planks){
-            int tempdata = getMeta();
-            switch (tempdata) {
+        } else if (block == Blocks.planks) {
+            switch (meta) {
                 case 0:
                     return Blocks.oak_stairs;
                 case 1:
@@ -86,66 +106,66 @@ public class BlockAndMeta extends Tuple {
                     return Blocks.dark_oak_stairs;
             }
         }
-        return get();
+        return block;
     }
 
-    public BlockAndMeta toStep(){
-        if (!BlockProperties.get(get()).isArtificial)
+    public BlockAndMeta toStep() {
+        if (!BlockProperties.get(block).isArtificial)
             return this;
-        if(get()==Blocks.sandstone){
+        if (block == Blocks.sandstone) {
             return new BlockAndMeta(Blocks.stone_slab, 1);
-        }else if(get()==Blocks.planks){
+        } else if (block == Blocks.planks) {
             return new BlockAndMeta(Blocks.stone_slab, 2);
-        }else if(get()==Blocks.cobblestone){
+        } else if (block == Blocks.cobblestone) {
             return new BlockAndMeta(Blocks.stone_slab, 3);
-        }else if(get()==Blocks.brick_block){
+        } else if (block == Blocks.brick_block) {
             return new BlockAndMeta(Blocks.stone_slab, 4);
-        }else if(get()==Blocks.stonebrick){
+        } else if (block == Blocks.stonebrick) {
             return new BlockAndMeta(Blocks.stone_slab, 5);
-        }else if(get()==Blocks.nether_brick){
+        } else if (block == Blocks.nether_brick) {
             return new BlockAndMeta(Blocks.stone_slab, 6);
-        }else if(get()==Blocks.quartz_block){
+        } else if (block == Blocks.quartz_block) {
             return new BlockAndMeta(Blocks.stone_slab, 7);
-        }else if(get()==Blocks.stone_slab||get()==Blocks.double_stone_slab){
+        } else if (block == Blocks.stone_slab || block == Blocks.double_stone_slab) {
             return new BlockAndMeta(Blocks.stone_slab, getMeta());
-        }else if(get()==Blocks.double_wooden_slab||get()==Blocks.wooden_slab){
+        } else if (block == Blocks.double_wooden_slab || block == Blocks.wooden_slab) {
             return new BlockAndMeta(Blocks.wooden_slab, getMeta());
-        }else{
-            return new BlockAndMeta(get(), 0);
+        } else {
+            return new BlockAndMeta(block, 0);
         }
     }
 
-    public BlockAndMeta stairToSolid(){
-        Block block = get();
+    public BlockAndMeta stairToSolid() {
+        Block block = this.block;
         int meta = 0;
-        if(block==Blocks.stone_stairs) {
+        if (block == Blocks.stone_stairs) {
             block = Blocks.cobblestone;
-        }else if(block==Blocks.oak_stairs) {
+        } else if (block == Blocks.oak_stairs) {
             block = Blocks.planks;
-        }else if(block==Blocks.spruce_stairs) {
+        } else if (block == Blocks.spruce_stairs) {
             block = Blocks.planks;
             meta = 1;
-        }else if(block==Blocks.birch_stairs) {
+        } else if (block == Blocks.birch_stairs) {
             block = Blocks.planks;
             meta = 2;
-        }else if(block==Blocks.jungle_stairs) {
+        } else if (block == Blocks.jungle_stairs) {
             block = Blocks.planks;
             meta = 3;
-        }else if(block==Blocks.acacia_stairs) {
+        } else if (block == Blocks.acacia_stairs) {
             block = Blocks.planks;
             meta = 4;
-        }else if(block==Blocks.dark_oak_stairs) {
+        } else if (block == Blocks.dark_oak_stairs) {
             block = Blocks.planks;
             meta = 5;
-        }else if(block==Blocks.brick_stairs) {
+        } else if (block == Blocks.brick_stairs) {
             block = Blocks.brick_block;
-        }else if(block==Blocks.stone_brick_stairs) {
+        } else if (block == Blocks.stone_brick_stairs) {
             block = Blocks.stonebrick;
-        }else if(block==Blocks.nether_brick_stairs) {
+        } else if (block == Blocks.nether_brick_stairs) {
             block = Blocks.nether_brick;
-        }else if(block==Blocks.sandstone_stairs) {
+        } else if (block == Blocks.sandstone_stairs) {
             block = Blocks.sandstone;
-        }else if(block==Blocks.quartz_stairs) {
+        } else if (block == Blocks.quartz_stairs) {
             block = Blocks.quartz_block;
         }
         return new BlockAndMeta(block, meta);
@@ -157,8 +177,7 @@ public class BlockAndMeta extends Tuple {
      * @param blockID The block type being checked.
      * @param metadata The metadata value being checked.
      *
-     * @return null if valid, otherwise a string describing what is wrong with
-     * the metadata value.
+     * @return null if valid, otherwise a string describing what is wrong with the metadata value.
      */
     public static String metaValueCheck(Block blockID, int metadata) {
         if (metadata < 0 || metadata >= 16)
