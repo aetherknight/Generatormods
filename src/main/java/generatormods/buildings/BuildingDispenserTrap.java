@@ -83,10 +83,10 @@ public class BuildingDispenserTrap extends Building {
      *      ---   bLength+3 - end of mechanism
      *      | |
      *      | |
-     *      ---   y=bLength - mechanism start,
-     *       *    y==bLength-1 - end of redstone wire
+     *      ---   z=bLength - mechanism start,
+     *       *    z==bLength-1 - end of redstone wire
      *       *
-     *       0    y=0 - trigger plate
+     *       0    z=0 - trigger plate
      * </pre>
      */
 	public void build(MissileType missileType, boolean multipleTriggers) {
@@ -94,23 +94,25 @@ public class BuildingDispenserTrap extends Building {
 			bLength = 0;
         logger.debug("Building dispenser trap at "+i0+","+j0+","+k0+", plateSeparation="+bLength);
 		for (int x = 0; x < MECHANISM[0][0].length; x++) {
-			for (int y = 0; y < MECHANISM[0].length; y++) {
-				for (int z = 0; z < MECHANISM.length; z++) {
-					if (MECHANISM[z][3 - y][x] == 1)
-						setBlockLocal(x, z - 3, y + bLength, bRule);
+            for (int z = 0; z < MECHANISM[0].length; z++) {
+                for (int y = 0; y < MECHANISM.length; y++) {
+                    if (MECHANISM[y][3 - z][x] == 1)
+                        setBlockLocal(x, y - 3, z + bLength, bRule);
 					else
-						setBlockLocal(x, z - 3, y + bLength, CODE_TO_BLOCK[MECHANISM[z][3 - y][x]]);
+                        setBlockLocal(x, y - 3, z + bLength, CODE_TO_BLOCK[MECHANISM[y][3 - z][x]]);
 				}
 			}
 		}
-		for (int y = 0; y < bLength; y++) {
-			setBlockLocal(1, -3, y, bRule);
-			setBlockLocal(1, -2, y, Blocks.redstone_wire);
-			setBlockLocal(0, -2, y, bRule);
-			setBlockLocal(2, -2, y, bRule);
-			setBlockLocal(1, -1, y, bRule);
-			setBlockLocal(1, 0, y, multipleTriggers && random.nextBoolean() ? Blocks.stone_pressure_plate : Blocks.air);
-			setBlockLocal(1, 1, y, Blocks.air);
+        for (int z = 0; z < bLength; z++) {
+            setBlockLocal(1, -3, z, bRule);
+            setBlockLocal(1, -2, z, Blocks.redstone_wire);
+            setBlockLocal(0, -2, z, bRule);
+            setBlockLocal(2, -2, z, bRule);
+            setBlockLocal(1, -1, z, bRule);
+            setBlockLocal(1, 0, z,
+                    multipleTriggers && random.nextBoolean() ? Blocks.stone_pressure_plate
+                            : Blocks.air);
+            setBlockLocal(1, 1, z, Blocks.air);
 		}
 		setBlockLocal(1, 0, 0, Blocks.stone_pressure_plate);
         flushDelayed();
@@ -125,16 +127,16 @@ public class BuildingDispenserTrap extends Building {
 		if (!isFloor(1, 0, 0))
 			return false;
 		//search along floor for a height 2 wall. If we find it, reset bLength and return true.
-		for (int y = 1; y < 9; y++) {
-			if (isFloor(1, 0, y))
+        for (int z = 1; z < 9; z++) {
+            if (isFloor(1, 0, z))
 				continue;
-			if (!isWallBlock(1, -1, y))
+            if (!isWallBlock(1, -1, z))
 				return false;
-			//now must have block at (1,0,y)...
-			if (y < minLength)
+            //now must have block at (1,0,z)...
+            if (z < minLength)
 				return false;
-			if (!isWallable(1, 1, y)) {
-				bLength = y;
+            if (!isWallable(1, 1, z)) {
+                bLength = z;
 				return true;
 			}
 			return false;
@@ -142,8 +144,8 @@ public class BuildingDispenserTrap extends Building {
 		return false;
 	}
 
-	private void setItemDispenser(int x, int z, int y, Dir metaDir, ItemStack itemstack) {
-		int[] pt = getIJKPt(x, z, y);
+    private void setItemDispenser(int x, int y, int z, Dir metaDir, ItemStack itemstack) {
+        int[] pt = getIJKPt(x, y, z);
 		world.setBlock(pt[0], pt[1], pt[2], Blocks.dispenser, 0, 2);
 		world.setBlockMetadataWithNotify(pt[0], pt[1], pt[2], LADDER_DIR_TO_META.get(orientDirToBDir(metaDir)), 3);
 		try {

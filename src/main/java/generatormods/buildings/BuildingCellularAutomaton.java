@@ -106,67 +106,80 @@ public class BuildingCellularAutomaton extends Building {
 		}
 		int centerX = (fBB[0][0] + fBB[1][0]) / 2;
 		int[][] holeLimits = new int[bLength][2];
-		for (int y = 0; y < bLength; y++) {
-			holeLimits[y][0] = centerX;
-			holeLimits[y][1] = centerX + 1;
+        for (int z = 0; z < bLength; z++) {
+            holeLimits[z][0] = centerX;
+            holeLimits[z][1] = centerX + 1;
 		}
-		for (int z = bHeight - 1; z >= 0; z--) {
-			//for(int y=0; y<bLength; y++){
-			//holeLimits[y][0]=centerX; holeLimits[y][1]=centerX+1; }
+        for (int y = bHeight - 1; y >= 0; y--) {
+            //for(int z=0; z<bLength; z++){
+            //holeLimits[z][0]=centerX; holeLimits[z][1]=centerX+1; }
 			for (int x = 0; x < bWidth; x++) {
-				for (int y = 0; y < bLength; y++) {
-					//if(fBB[0][z]<=x && x<=fBB[1][z] && fBB[2][z]<=y && y<=fBB[3][z])
-					//	setBlockLocal(x,z,y,GLASS_ID);
-					if (layers[z][x][y] == ALIVE)
-						setBlockLocal(x, z, y, bRule);
-					else if (z > 0 && layers[z - 1][x][y] == ALIVE) { //if a floor block
+                for (int z = 0; z < bLength; z++) {
+                    //if(fBB[0][y]<=x && x<=fBB[1][y] && fBB[2][y]<=z && z<=fBB[3][y])
+                    //	setBlockLocal(x,y,z,GLASS_ID);
+                    if (layers[y][x][z] == ALIVE)
+                        setBlockLocal(x, y, z, bRule);
+                    else if (y > 0 && layers[y - 1][x][z] == ALIVE) { //if a floor block
 						//if in central core
-						if (z < bHeight - 5 && fBB[0][z] <= x && x <= fBB[1][z] && fBB[2][z] <= y && y <= fBB[3][z]) {
+                        if (y < bHeight - 5 && fBB[0][y] <= x && x <= fBB[1][y] && fBB[2][y] <= z
+                                && z <= fBB[3][y]) {
 							if (makeFloors) {
-								floorBlocks.get(z).add(new int[] { x, y });
-								if (x - HOLE_FLOOR_BUFFER < holeLimits[y][0])
-									holeLimits[y][0] = Math.max(fBB[0][z], x - HOLE_FLOOR_BUFFER);
-								if (x + HOLE_FLOOR_BUFFER > holeLimits[y][1])
-									holeLimits[y][1] = Math.min(fBB[1][z], x + HOLE_FLOOR_BUFFER);
-								floorBlockCounts[z]++;
+                                floorBlocks.get(y).add(new int[] {x, z});
+                                if (x - HOLE_FLOOR_BUFFER < holeLimits[z][0])
+                                    holeLimits[z][0] = Math.max(fBB[0][y], x - HOLE_FLOOR_BUFFER);
+                                if (x + HOLE_FLOOR_BUFFER > holeLimits[z][1])
+                                    holeLimits[z][1] = Math.min(fBB[1][y], x + HOLE_FLOOR_BUFFER);
+                                floorBlockCounts[y]++;
 							}
 						}
 						//try smoothing with stairs here
-						else if (stairsBlock != Blocks.air && (z == bHeight - 1 || layers[z + 1][x][y] != ALIVE)) {
-							if (y + 1 < bLength && layers[z][x][y + 1] == ALIVE && (y - 1 < 0 || //y+1 present and (we are at the edge or...
-									(layers[z][x][y - 1] != ALIVE //y-1 empty and..
-									&& (x + 1 == bWidth || !(layers[z][x + 1][y] != ALIVE && layers[z][x + 1][y - 1] == ALIVE)) //not obstructing gaps to the sides
-									&& (x - 1 < 0 || !(layers[z][x - 1][y] != ALIVE && layers[z][x - 1][y - 1] == ALIVE))) && random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs.get(Dir.NORTH));
-							else if (y - 1 >= 0
-									&& layers[z][x][y - 1] == ALIVE
-									&& (y + 1 == bLength || (layers[z][x][y + 1] != ALIVE && (x + 1 == bWidth || !(layers[z][x + 1][y] != ALIVE && layers[z][x + 1][y + 1] == ALIVE)) && (x - 1 < 0 || !(layers[z][x - 1][y] != ALIVE && layers[z][x - 1][y + 1] == ALIVE)))
-									&& random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs.get(Dir.SOUTH));
-							else if (x + 1 < bWidth
-									&& layers[z][x + 1][y] == ALIVE
-									&& (x - 1 < 0 || (layers[z][x - 1][y] != ALIVE && (y + 1 == bLength || !(layers[z][x][y + 1] != ALIVE && layers[z][x - 1][y + 1] == ALIVE)) && (y - 1 < 0 || !(layers[z][x][y - 1] != ALIVE && layers[z][x - 1][y - 1] == ALIVE)))
-											&& random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs.get(Dir.EAST));
-							else if (x - 1 >= 0
-									&& layers[z][x - 1][y] == ALIVE
-									&& (x + 1 == bWidth || (layers[z][x + 1][y] != ALIVE && (y + 1 == bLength || !(layers[z][x][y + 1] != ALIVE && layers[z][x + 1][y + 1] == ALIVE)) && (y - 1 < 0 || !(layers[z][x][y - 1] != ALIVE && layers[z][x + 1][y - 1] == ALIVE)))
-									&& random.nextInt(100) < bRule.chance))
-								setBlockLocal(x, z, y, stairs.get(Dir.WEST));
+                        else if (stairsBlock != Blocks.air
+                                && (y == bHeight - 1 || layers[y + 1][x][z] != ALIVE)) {
+                            // z+1 present and (we are at the edge or...
+                            if (z + 1 < bLength
+                                    && layers[y][x][z + 1] == ALIVE
+                                    && (z - 1 < 0 ||
+                                    // z-1 empty and..
+                                    (layers[y][x][z - 1] != ALIVE
+                                    // not obstructing gaps to the sides
+                                            && (x + 1 == bWidth || !(layers[y][x + 1][z] != ALIVE && layers[y][x + 1][z - 1] == ALIVE)) && (x - 1 < 0 || !(layers[y][x - 1][z] != ALIVE && layers[y][x - 1][z - 1] == ALIVE)))
+                                            && random.nextInt(100) < bRule.chance))
+                                setBlockLocal(x, y, z, stairs.get(Dir.NORTH));
+                            else if (z - 1 >= 0
+                                    && layers[y][x][z - 1] == ALIVE
+                                    && (z + 1 == bLength || (layers[y][x][z + 1] != ALIVE
+                                            && (x + 1 == bWidth || !(layers[y][x + 1][z] != ALIVE && layers[y][x + 1][z + 1] == ALIVE)) && (x - 1 < 0 || !(layers[y][x - 1][z] != ALIVE && layers[y][x - 1][z + 1] == ALIVE)))
+                                            && random.nextInt(100) < bRule.chance))
+                                setBlockLocal(x, y, z, stairs.get(Dir.SOUTH));
+                            else if (x + 1 < bWidth
+                                    && layers[y][x + 1][z] == ALIVE
+                                    && (x - 1 < 0 || (layers[y][x - 1][z] != ALIVE
+                                            && (z + 1 == bLength || !(layers[y][x][z + 1] != ALIVE && layers[y][x - 1][z + 1] == ALIVE)) && (z - 1 < 0 || !(layers[y][x][z - 1] != ALIVE && layers[y][x - 1][z - 1] == ALIVE)))
+                                            && random.nextInt(100) < bRule.chance))
+                                setBlockLocal(x, y, z, stairs.get(Dir.EAST));
+                            else if (x - 1 >= 0
+                                    && layers[y][x - 1][z] == ALIVE
+                                    && (x + 1 == bWidth || (layers[y][x + 1][z] != ALIVE
+                                            && (z + 1 == bLength || !(layers[y][x][z + 1] != ALIVE && layers[y][x + 1][z + 1] == ALIVE)) && (z - 1 < 0 || !(layers[y][x][z - 1] != ALIVE && layers[y][x + 1][z - 1] == ALIVE)))
+                                            && random.nextInt(100) < bRule.chance))
+                                setBlockLocal(x, y, z, stairs.get(Dir.WEST));
 						}
 					}
 				}
 			}
 			//now clear a hole surrounding the central floor volume
-			for (int y = 0; y < bLength; y++)
-				for (int x = holeLimits[y][0] + 1; x <= holeLimits[y][1] - 1; x++)
-					if (layers[z][x][y] != ALIVE && !BlockProperties.get(getBlockIdLocal(x, z, y)).isArtificial)
-						setBlockLocal(x, z, y, Blocks.air);
+            for (int z = 0; z < bLength; z++)
+                for (int x = holeLimits[z][0] + 1; x <= holeLimits[z][1] - 1; x++)
+                    if (layers[y][x][z] != ALIVE
+                            && !BlockProperties.get(getBlockIdLocal(x, y, z)).isArtificial)
+                        setBlockLocal(x, y, z, Blocks.air);
 			//then gradually taper hole limits...
-			if (z % 2 == 0) {
-				for (int y = 0; y < bLength; y++) {
-					holeLimits[y][0] = holeLimits[y][0] < centerX ? (holeLimits[y][0] + 1) : centerX;
-					holeLimits[y][1] = holeLimits[y][1] > (centerX + 1) ? (holeLimits[y][1] - 1) : centerX + 1;
+            if (y % 2 == 0) {
+                for (int z = 0; z < bLength; z++) {
+                    holeLimits[z][0] =
+                            holeLimits[z][0] < centerX ? (holeLimits[z][0] + 1) : centerX;
+                    holeLimits[z][1] =
+                            holeLimits[z][1] > (centerX + 1) ? (holeLimits[z][1] - 1) : centerX + 1;
 				}
 			}
 		}
@@ -231,124 +244,134 @@ public class BuildingCellularAutomaton extends Building {
 	}
 
 	public boolean plan(boolean bury, int MinHeightBeforeOscillation) {
-		//layers is z-flipped from usual orientation so z=0 is the top
+        //layers is y-flipped from usual orientation so y=0 is the top
         layers = new CAState[bHeight][bWidth][bLength];
-		for (int z = 0; z < bHeight; z++)
+        for (int y = 0; y < bHeight; y++)
 			for (int x = 0; x < bWidth; x++)
-				for (int y = 0; y < bLength; y++)
-					layers[z][x][y] = DEAD;
+                for (int z = 0; z < bLength; z++)
+                    layers[y][x][z] = DEAD;
 		int[][] BB = new int[4][bHeight];
 		BB[0][0] = (bWidth - seed.length) / 2;
 		BB[1][0] = (bWidth - seed.length) / 2 + seed.length - 1;
 		BB[2][0] = (bLength - seed[0].length) / 2;
 		BB[3][0] = (bLength - seed[0].length) / 2 + seed[0].length - 1;
 		for (int x = 0; x < seed.length; x++)
-			for (int y = 0; y < seed[0].length; y++)
-				layers[0][BB[0][0] + x][BB[2][0] + y] = seed[x][y];
+            for (int z = 0; z < seed[0].length; z++)
+                layers[0][BB[0][0] + x][BB[2][0] + z] = seed[x][z];
 		int crystallizationHeight = UNREACHED;
-		for (int z = 1; z < bHeight; z++) {
+        for (int y = 1; y < bHeight; y++) {
 			boolean layerIsAlive = false;
-			boolean layerIsFixed = crystallizationHeight == UNREACHED && z >= 1;
-			boolean layerIsPeriod2 = crystallizationHeight == UNREACHED && z >= 2;
-			boolean layerIsPeriod3 = crystallizationHeight == UNREACHED && z >= 3;
-			BB[0][z] = bWidth / 2;
-			BB[1][z] = bWidth / 2;
-			BB[2][z] = bLength / 2;
-			BB[3][z] = bLength / 2;
-			for (int x = Math.max(0, BB[0][z - 1] - 1); x <= Math.min(bWidth - 1, BB[1][z - 1] + 1); x++) {
-				for (int y = Math.max(0, BB[2][z - 1] - 1); y <= Math.min(bLength - 1, BB[3][z - 1] + 1); y++) {
+            boolean layerIsFixed = crystallizationHeight == UNREACHED && y >= 1;
+            boolean layerIsPeriod2 = crystallizationHeight == UNREACHED && y >= 2;
+            boolean layerIsPeriod3 = crystallizationHeight == UNREACHED && y >= 3;
+            BB[0][y] = bWidth / 2;
+            BB[1][y] = bWidth / 2;
+            BB[2][y] = bLength / 2;
+            BB[3][y] = bLength / 2;
+            for (int x = Math.max(0, BB[0][y - 1] - 1); x <= Math.min(bWidth - 1, BB[1][y - 1] + 1); x++) {
+                for (int z = Math.max(0, BB[2][y - 1] - 1); z <= Math.min(bLength - 1,
+                        BB[3][y - 1] + 1); z++) {
 					//try the 8 neighboring points in previous layer
 					int neighbors = 0;
 					for (int x1 = Math.max(x - 1, 0); x1 <= Math.min(x + 1, bWidth - 1); x1++)
-						for (int y1 = Math.max(y - 1, 0); y1 <= Math.min(y + 1, bLength - 1); y1++)
-							if (!(x1 == x && y1 == y))
-                                if (layers[z - 1][x1][y1] == ALIVE)
+                        for (int y1 = Math.max(z - 1, 0); y1 <= Math.min(z + 1, bLength - 1); y1++)
+                            if (!(x1 == x && y1 == z))
+                                if (layers[y - 1][x1][y1] == ALIVE)
                                     neighbors += 1;
 					//update this layer based on the rule
-                    if (layers[z - 1][x][y] == ALIVE)
-                        layers[z][x][y] = survivalRule[neighbors];
+                    if (layers[y - 1][x][z] == ALIVE)
+                        layers[y][x][z] = survivalRule[neighbors];
                     else
-                        layers[z][x][y] = birthRule[neighbors];
+                        layers[y][x][z] = birthRule[neighbors];
 					//culling checks and update bounding box
-					if (layers[z][x][y] == ALIVE) {
-						if (x < BB[0][z])
-							BB[0][z] = x;
-						if (x > BB[1][z])
-							BB[1][z] = x;
-						if (y < BB[2][z])
-							BB[2][z] = y;
-						if (y > BB[3][z])
-							BB[3][z] = y;
+                    if (layers[y][x][z] == ALIVE) {
+                        if (x < BB[0][y])
+                            BB[0][y] = x;
+                        if (x > BB[1][y])
+                            BB[1][y] = x;
+                        if (z < BB[2][y])
+                            BB[2][y] = z;
+                        if (z > BB[3][y])
+                            BB[3][y] = z;
 						layerIsAlive = true;
 					}
-					if (layers[z][x][y] != layers[z - 1][x][y])
+                    if (layers[y][x][z] != layers[y - 1][x][z])
 						layerIsFixed = false;
-					if (z >= 2 && layers[z][x][y] != layers[z - 2][x][y])
+                    if (y >= 2 && layers[y][x][z] != layers[y - 2][x][z])
 						layerIsPeriod2 = false;
-					if (z >= 3 && layers[z][x][y] != layers[z - 3][x][y])
+                    if (y >= 3 && layers[y][x][z] != layers[y - 3][x][z])
 						layerIsPeriod3 = false;
 				}
 			}
 			if (!layerIsAlive) {
-                if (z <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer "+z+" is not alive and is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
+                if (y <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer "
+                            + y
+                            + " is not alive and is less than or equal to MinHeightBeforeOscillation: "
+                            + MinHeightBeforeOscillation);
 					return false;
                 }
-				bHeight = z;
+                bHeight = y;
 				break;
 			}
 			if (layerIsFixed) {
-                if (z - 1 <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer "+z+" is fixed and layer "+(z-1)+" is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
+                if (y - 1 <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer " + y + " is fixed and layer " + (y - 1)
+                            + " is less than or equal to MinHeightBeforeOscillation: "
+                            + MinHeightBeforeOscillation);
 					return false;
                 }
-				crystallizationHeight = z - 1;
+                crystallizationHeight = y - 1;
 			}
 			if (layerIsPeriod2) {
-                if (z - 2 <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer "+z+" is period2 and layer "+(z-2)+" is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
+                if (y - 2 <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer " + y + " is period2 and layer "
+                            + (y - 2) + " is less than or equal to MinHeightBeforeOscillation: "
+                            + MinHeightBeforeOscillation);
 					return false;
                 }
-				crystallizationHeight = z - 2;
+                crystallizationHeight = y - 2;
 			}
 			if (layerIsPeriod3) {
-                if (z - 3 <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer "+z+" is period3 and layer "+(z-3)+" is less than or equal to MinHeightBeforeOscillation: "+MinHeightBeforeOscillation);
+                if (y - 3 <= MinHeightBeforeOscillation) {
+                    logger.debug("Rejecting because layer " + y + " is period3 and layer "
+                            + (y - 3) + " is less than or equal to MinHeightBeforeOscillation: "
+                            + MinHeightBeforeOscillation);
 					return false;
                 }
-				crystallizationHeight = z - 3;
+                crystallizationHeight = y - 3;
 			}
-			if (crystallizationHeight > UNREACHED && z > 2 * crystallizationHeight) {
-				bHeight = z;
+            if (crystallizationHeight > UNREACHED && y > 2 * crystallizationHeight) {
+                bHeight = y;
 				break;
 			}
 		}
 		//prune top layer
 		int topLayerCount = 0, secondLayerCount = 0;
 		for (int x = 0; x < bWidth; x++) {
-			for (int y = 0; y < bLength; y++) {
-                if (layers[0][x][y] == ALIVE)
+            for (int z = 0; z < bLength; z++) {
+                if (layers[0][x][z] == ALIVE)
                     topLayerCount += 1;
-                if (layers[1][x][y] == ALIVE)
+                if (layers[1][x][z] == ALIVE)
                     secondLayerCount += 1;
 			}
 		}
 		if (2 * topLayerCount >= 3 * secondLayerCount) {
 			for (int x = 0; x < bWidth; x++) {
-				for (int y = 0; y < bLength; y++) {
-					if (layers[0][x][y] == ALIVE && layers[1][x][y] == DEAD)
-						layers[0][x][y] = DEAD;
+                for (int z = 0; z < bLength; z++) {
+                    if (layers[0][x][z] == ALIVE && layers[1][x][z] == DEAD)
+                        layers[0][x][z] = DEAD;
 				}
 			}
 		}
 		//now resize building dimensions and shift down
         int minX = Util.min(BB[0]);
         int maxX = Util.max(BB[1]);
-        int minY = Util.min(BB[2]);
-        int maxY = Util.max(BB[3]);
+        int minZ = Util.min(BB[2]);
+        int maxZ = Util.max(BB[3]);
 
 		bWidth = maxX - minX + 1;
-		bLength = maxY - minY + 1;
+        bLength = maxZ - minZ + 1;
         //do a height check to see we are not at the edge of a cliff etc.
         if (!shiftBuidlingJDown(15)) {
             logger.debug("Rejecting because the surface below the building varies by more than 15 meters");
@@ -377,18 +400,18 @@ public class BuildingCellularAutomaton extends Building {
 		//shift level and floor arrays
         CAState[][][] layers2 = new CAState[bHeight][bWidth][bLength]; //shrunk in all 3 dimensions
 		fBB = new int[4][bHeight];
-		for (int z = 0; z < bHeight; z++) {
-			int lZ = bHeight - z - 1;
+        for (int y = 0; y < bHeight; y++) {
+            int lZ = bHeight - y - 1;
 			for (int x = 0; x < bWidth; x++) {
-				for (int y = 0; y < bLength; y++) {
-					layers2[z][x][y] = layers[lZ][x + minX][y + minY];
+                for (int z = 0; z < bLength; z++) {
+                    layers2[y][x][z] = layers[lZ][x + minX][z + minZ];
 				}
 			}
 			//floor bounding box
-			fBB[0][z] = BB[0][lZ] - minX + (BB[1][lZ] - BB[0][lZ]) / 4;
-			fBB[1][z] = BB[1][lZ] - minX - (BB[1][lZ] - BB[0][lZ]) / 4;
-			fBB[2][z] = BB[2][lZ] - minY + (BB[3][lZ] - BB[2][lZ]) / 4;
-			fBB[3][z] = BB[3][lZ] - minY - (BB[3][lZ] - BB[2][lZ]) / 4;
+            fBB[0][y] = BB[0][lZ] - minX + (BB[1][lZ] - BB[0][lZ]) / 4;
+            fBB[1][y] = BB[1][lZ] - minX - (BB[1][lZ] - BB[0][lZ]) / 4;
+            fBB[2][y] = BB[2][lZ] - minZ + (BB[3][lZ] - BB[2][lZ]) / 4;
+            fBB[3][y] = BB[3][lZ] - minZ - (BB[3][lZ] - BB[2][lZ]) / 4;
 		}
 		layers = layers2;
 		return true;
@@ -429,61 +452,63 @@ public class BuildingCellularAutomaton extends Building {
 		return true;
 	}
 
-	private void makeFloorAt(int x, int z, int y, boolean[][] layout) {
-		if (layout[x][y])
+    private void makeFloorAt(int x, int y, int z, boolean[][] layout) {
+        if (layout[x][z])
 			return;
-		if (BlockProperties.get(getBlockIdLocal(x, z, y)).isArtificial && BlockProperties.get(getBlockIdLocal(x, z + 1, y)).isArtificial) { //pillar
-			if (!BlockProperties.get(getBlockIdLocal(x, z + 2, y)).isArtificial)
-				setBlockLocal(x, z + 2, y, bRule);
+        if (BlockProperties.get(getBlockIdLocal(x, y, z)).isArtificial
+                && BlockProperties.get(getBlockIdLocal(x, y + 1, z)).isArtificial) { // pillar
+            if (!BlockProperties.get(getBlockIdLocal(x, y + 2, z)).isArtificial)
+                setBlockLocal(x, y + 2, z, bRule);
 			return;
 		}
-		if (!BlockProperties.get(getBlockIdLocal(x, z - 1, y)).isArtificial) { //raise to floor
+        if (!BlockProperties.get(getBlockIdLocal(x, y - 1, z)).isArtificial) { //raise to floor
             BlockAndMeta idAndMeta = bRule.getNonAirBlock(world.rand);
-			setBlockWithLightingLocal(x, z - 1, y, idAndMeta, true);
+            setBlockWithLightingLocal(x, y - 1, z, idAndMeta, true);
 		}
-        removeBlockWithLighting(x, z, y);
-        removeBlockWithLighting(x, z + 1, y);
-		layout[x][y] = true;
+        removeBlockWithLighting(x, y, z);
+        removeBlockWithLighting(x, y + 1, z);
+        layout[x][z] = true;
 	}
 
-	private void makeFloorCrossAt(int x, int z, int y, boolean[][] layout) {
-		makeFloorAt(x, z, y, layout);
-		if (x - 1 >= fBB[0][z])
-			makeFloorAt(x - 1, z, y, layout);
-		if (x + 1 <= fBB[1][z])
-			makeFloorAt(x + 1, z, y, layout);
-		if (y - 1 >= fBB[2][z])
-			makeFloorAt(x, z, y - 1, layout);
-		if (y + 1 <= fBB[2][z])
-			makeFloorAt(x, z, y + 1, layout);
+    private void makeFloorCrossAt(int x, int y, int z, boolean[][] layout) {
+        makeFloorAt(x, y, z, layout);
+        if (x - 1 >= fBB[0][y])
+            makeFloorAt(x - 1, y, z, layout);
+        if (x + 1 <= fBB[1][y])
+            makeFloorAt(x + 1, y, z, layout);
+        if (z - 1 >= fBB[2][y])
+            makeFloorAt(x, y, z - 1, layout);
+        if (z + 1 <= fBB[2][y])
+            makeFloorAt(x, y, z + 1, layout);
 	}
 
-	private ChestType pickCAChestType(int z) {
-		if (Math.abs(zGround - z) > random.nextInt(1 + z > zGround ? (bHeight - zGround) : zGround) && (z > zGround ? (bHeight - zGround) : zGround) > 20)
-			return random.nextBoolean() ? ChestType.MEDIUM : ChestType.HARD;
-		else
-			return random.nextBoolean() ? ChestType.EASY : ChestType.MEDIUM;
+    private ChestType pickCAChestType(int y) {
+        if (Math.abs(zGround - y) > random.nextInt(1 + y > zGround ? (bHeight - zGround) : zGround)
+                && (y > zGround ? (bHeight - zGround) : zGround) > 20)
+            return random.nextBoolean() ? ChestType.MEDIUM : ChestType.HARD;
+        else
+            return random.nextBoolean() ? ChestType.EASY : ChestType.MEDIUM;
 	}
 
-	private void populateFloor(int z, int floorBlocks) {
+    private void populateFloor(int y, int floorBlocks) {
 		TemplateRule spawnerSelection = null;
-		int fWidth = fBB[1][z] - fBB[0][z], fLength = fBB[3][z] - fBB[2][z];
+        int fWidth = fBB[1][y] - fBB[0][y], fLength = fBB[3][y] - fBB[2][y];
 		if (fWidth <= 0 || fLength <= 0)
 			return;
 		//spawners
 		if (random.nextInt(100) < 70) {
 			for (int tries = 0; tries < 8; tries++) {
-				int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
-				if (isFloor(x, z, y)) {
-					int[] pt = getIJKPt(x, z, y);
+                int x = random.nextInt(fWidth) + fBB[0][y], z = random.nextInt(fLength) + fBB[2][y];
+                if (isFloor(x, y, z)) {
+                    int[] pt = getIJKPt(x, y, z);
 					int lightVal = world.getSavedLightValue(EnumSkyBlock.Sky, pt[0], pt[1], pt[2]);
 					//Choose spawner types. There is some kind of bug where where lightVal coming up as zero, even though it is not.
-                    if (lightVal < 5 && !(lightVal == 0 && j0 + z > SEA_LEVEL))
+                    if (lightVal < 5 && !(lightVal == 0 && j0 + y > SEA_LEVEL))
 						spawnerSelection = lowLightSpawnerRule;
 					else if (lightVal < 10)
 						spawnerSelection = floorBlocks > 70 ? mediumLightWideSpawnerRule : mediumLightNarrowSpawnerRule;
 						if (spawnerSelection != null) {
-							setBlockLocal(x, z, y, spawnerSelection);
+                            setBlockLocal(x, y, z, spawnerSelection);
 							break;
 						}
 				}
@@ -492,10 +517,11 @@ public class BuildingCellularAutomaton extends Building {
 		//chest
 		if (random.nextInt(100) < (spawnerSelection == null ? 20 : 70)) {
 			for (int tries = 0; tries < 8; tries++) {
-				int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
-				if (isFloor(x, z, y)) {
-					setBlockLocal(x, z - 1, y, new BlockExtended(Blocks.chest, 0, pickCAChestType(z).toString()));
-					setBlockLocal(x, z - 2, y, bRule);
+                int x = random.nextInt(fWidth) + fBB[0][y], z = random.nextInt(fLength) + fBB[2][y];
+                if (isFloor(x, y, z)) {
+                    setBlockLocal(x, y - 1, z, new BlockExtended(Blocks.chest, 0,
+                            pickCAChestType(y).toString()));
+                    setBlockLocal(x, y - 2, z, bRule);
 					if (random.nextBoolean()) {
 						break; //chance of > 1 chest. Expected # of chests is one.
 					}
@@ -505,34 +531,34 @@ public class BuildingCellularAutomaton extends Building {
 		//1 TNT trap
 		int s = random.nextInt(1 + random.nextInt(5)) - 2;
 		for (int tries = 0; tries < s; tries++) {
-			int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
-			if (isFloor(x, z, y)) {
-				setBlockLocal(x, z, y, Blocks.stone_pressure_plate);
-				setBlockLocal(x, z - 1, y, Blocks.tnt);
-				setBlockLocal(x, z - 2, y, bRule);
+            int x = random.nextInt(fWidth) + fBB[0][y], z = random.nextInt(fLength) + fBB[2][y];
+            if (isFloor(x, y, z)) {
+                setBlockLocal(x, y, z, Blocks.stone_pressure_plate);
+                setBlockLocal(x, y - 1, z, Blocks.tnt);
+                setBlockLocal(x, y - 2, z, bRule);
 			}
 		}
 		//2 TNT trap
 		s = spawnerSelection == null ? random.nextInt(1 + random.nextInt(7)) - 2 : 0;
 		for (int tries = 0; tries < s; tries++) {
-			int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
-			if (isFloor(x, z, y) && isFloor(x, z, y = 1)) {
+            int x = random.nextInt(fWidth) + fBB[0][y], z = random.nextInt(fLength) + fBB[2][y];
+            if (isFloor(x, y, z) && isFloor(x, y, z = 1)) {
 				for (int x1 = x - 1; x1 <= x + 1; x1++)
-					for (int y1 = y - 1; y1 <= y + 2; y1++)
-						for (int z1 = z - 3; z1 <= z - 2; z1++)
-							setBlockLocal(x1, z1, y1, bRule);
-				setBlockLocal(x, z, y, Blocks.stone_pressure_plate);
-				setBlockLocal(x, z - 2, y, Blocks.tnt);
-				setBlockLocal(x, z - 2, y + 1, Blocks.tnt);
+                    for (int z1 = z - 1; z1 <= z + 2; z1++)
+                        for (int y1 = y - 3; y1 <= y - 2; y1++)
+                            setBlockLocal(x1, y1, z1, bRule);
+                setBlockLocal(x, y, z, Blocks.stone_pressure_plate);
+                setBlockLocal(x, y - 2, z, Blocks.tnt);
+                setBlockLocal(x, y - 2, z + 1, Blocks.tnt);
 			}
 		}
 		//dispenser trap
 		if (spawnerSelection == null || random.nextBoolean()) {
 			for (int tries = 0; tries < 10; tries++) {
-				int x = random.nextInt(fWidth) + fBB[0][z], y = random.nextInt(fLength) + fBB[2][z];
+                int x = random.nextInt(fWidth) + fBB[0][y], z = random.nextInt(fLength) + fBB[2][y];
                 BuildingDispenserTrap bdt =
                         new BuildingDispenserTrap(config, bRule, Dir.randomDir(random), 1,
-                                getIJKPt(x, z, y));
+                                getIJKPt(x, y, z));
 				if (bdt.queryCanBuild(2)) {
                     bdt.build(random.nextBoolean() ? BuildingDispenserTrap.MissileType.ARROW
                             : BuildingDispenserTrap.MissileType.DAMAGE_POTION, true);
@@ -542,43 +568,33 @@ public class BuildingCellularAutomaton extends Building {
 		}
 	}
 
-	private void populateLadderOrStairway(int z1, int z2, boolean buildStairs) {
-		int fWidth = fBB[1][z2] - fBB[0][z2], fLength = fBB[3][z2] - fBB[2][z2];
+    private void populateLadderOrStairway(int y1, int y2, boolean buildStairs) {
+        int fWidth = fBB[1][y2] - fBB[0][y2];
+        int fLength = fBB[3][y2] - fBB[2][y2];
 		if (fWidth <= 0 || fLength <= 0)
 			return;
 		BuildingSpiralStaircase bss;
 		for (int tries = 0; tries < 8; tries++) {
-			int x = random.nextInt(fWidth) + fBB[0][z2], y = random.nextInt(fLength) + fBB[2][z2];
-			if (isFloor(x, z2, y)) {
+            int x = random.nextInt(fWidth) + fBB[0][y2];
+            int z = random.nextInt(fLength) + fBB[2][y2];
+            if (isFloor(x, y2, z)) {
 				Dir dir = Dir.randomDir(random);
                 if (buildStairs
                         && (bss =
                                 new BuildingSpiralStaircase(config, bRule, dir, Handedness.R_HAND,
-                                        false, z1 - z2 + 1, getIJKPt(x, z2 - 1, y)))
+                                        false, y1 - y2 + 1, getIJKPt(x, y2 - 1, z)))
                                 .bottomIsFloor()) {
 					bss.build(0, 0);
-				} else if (isFloor(x, z1, y)) {
+                } else if (isFloor(x, y1, z)) {
 					//ladder
-					for (int z = z1; z < z2; z++) {
-						setBlockLocal(x + dir.x, z, y + dir.y, bRule);
-						setBlockLocal(x, z, y, Blocks.ladder, LADDER_DIR_TO_META.get(dir.opposite()));
+                    for (int y = y1; y < y2; y++) {
+						setBlockLocal(x + dir.x, y, z + dir.z, bRule);
+                        setBlockLocal(x, y, z, Blocks.ladder,
+                                LADDER_DIR_TO_META.get(dir.opposite()));
 					}
 				}
 				return;
 			}
 		}
-	}
-
-    public static String ruleToString(CAState[][] rule) {
-		StringBuilder sb = new StringBuilder(30);
-		sb.append("B");
-		for (int n = 0; n < 9; n++)
-			if (rule[0][n] == ALIVE)
-				sb.append(n);
-		sb.append("S");
-		for (int n = 0; n < 9; n++)
-			if (rule[1][n] == ALIVE)
-				sb.append(n);
-		return sb.toString();
 	}
 }

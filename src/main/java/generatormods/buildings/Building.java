@@ -71,6 +71,9 @@ import static generatormods.common.WorldHelper.findSurfaceJ;
  * Building is a general class for buildings. Classes can inherit from Building
  * to build from a local frame of reference.
  * <p>
+ * INFLIGHT: renaming x, y, and z to match minecrat concepts. Replacing X with
+ * localX, Z with localY, and Y with localZ.
+ * <p>
  * Note: Building currently swaps the terminology of Y and Z as Minecraft
  * uses them. In minecraft, y is up(+)-down(-), and z is south(+)-north(-).
  * Building and subclasses use z to refer to the Y axis, and y to refer to the
@@ -112,9 +115,28 @@ public class Building {
     private final LinkedList<PlacedBlock> delayedBuildQueue;
 
 	protected boolean centerAligned; // if true, alignPt x is the central axis of the building if false, alignPt is the origin
-	protected int i0, j0, k0; // origin coordinates (x=0,z=0,y=0). The child class may want to move the origin as it progress to use as a "cursor" position.
-	private int xI, yI, xK, yK; //
-    public Handedness bHand; // hand of secondary axis.
+
+    /**
+     * The origin coordinates of the building (the world's (X, Y, Z)). A child
+     * class might move the origin around as it progresses to use it as a
+     * "cursor" position.
+     */
+    protected int i0, j0, k0;
+
+    /* Used to for computations related to building orientation. */
+    private int xI;
+    /* Used to for computations related to building orientation. */
+    private int zI;
+    /* Used to for computations related to building orientation. */
+    private int xK;
+    /* Used to for computations related to building orientation. */
+    private int zK;
+
+    /**
+     * Handedness of the secondary axis. R_HAND means the building's own X-axis
+     * matches the world, while L_HAND means it is "mirrored".
+     */
+    public Handedness bHand;
 
     /**
      * Direction code of the building's primary axis.
@@ -165,53 +187,82 @@ public class Building {
         delayedBuildQueue = new LinkedList<PlacedBlock>();
     }
 
-	// ******************** LOCAL COORDINATE FUNCTIONS - ACCESSORS
-	// *************************************************************************************************************//
-	// Use these instead of World.java functions when to build from a local
-	// reference frame
-	// when i0,j0,k0 are set to working values.
-	public final int getI(int x, int y) {
-		return i0 + yI * y + xI * x;
-	}
+    /**
+     * Converts the given local building coordinates into the world's
+     * coordinate system, for just the X (I) axis.
+     */
+    public final int getI(int x, int z) {
+        return i0 + (zI * z) + (xI * x);
+    }
 
-	public final int[] getIJKPt(int x, int z, int y) {
-		int[] pt = new int[3];
-		pt[0] = i0 + yI * y + xI * x;
-		pt[1] = j0 + z;
-		pt[2] = k0 + yK * y + xK * x;
-		return pt;
-	}
+    /**
+     * Converts the given local building coordinates (relative to the cursor
+     * position) into the world's coordinate system, for just the Y (J) axis.
+     */
+    public final int getJ(int y) {
+        return j0 + y;
+    }
 
-	public final int getJ(int z) {
-		return j0 + z;
-	}
+    /**
+     * Converts the given local building coordinates (relative to the cursor
+     * position) into the world's coordinate system, for just the Z (K) axis.
+     */
+    public final int getK(int x, int z) {
+        return k0 + zK * z + xK * x;
+    }
 
-	public final int getK(int x, int y) {
-		return k0 + yK * y + xK * x;
-	}
+    /**
+     * Converts the given local building coordinates (relative to the cursor
+     * position) into a world coordinate, based upon the building's
+     * orientation.
+     */
+    public final int[] getIJKPt(int x, int y, int z) {
+        int[] pt = new int[3];
+        pt[0] = getI(x, z);
+        pt[1] = getJ(y);
+        pt[2] = getK(x, z);
+        return pt;
+    }
 
-	public final int[] getSurfaceIJKPt(int x, int y, int j, boolean wallIsSurface, int waterSurfaceBuffer) {
-		int[] pt = getIJKPt(x, 0, y);
-		pt[1] = findSurfaceJ(world, pt[0], pt[2], j, wallIsSurface, waterSurfaceBuffer);
-		return pt;
-	}
+    /**
+     * Get the surface point (in world coordinates) based on the local building
+     * coordinates (relative to the cursor position).
+     */
+    public final int[] getSurfaceIJKPt(int x, int z, int j, boolean wallIsSurface, int waterSurfaceBuffer) {
+        int[] pt = getIJKPt(x, 0, z);
+        pt[1] = findSurfaceJ(world, pt[0], pt[2], j, wallIsSurface, waterSurfaceBuffer);
+        return pt;
+    }
 
-	public final int getX(int[] pt) {
-		return xI * (pt[0] - i0) + xK * (pt[2] - k0);
-	}
+    /**
+     * Get the local X coordinate of the building based on the global pt.
+     */
+    public final int getX(int[] pt) {
+        return xI * (pt[0] - i0) + xK * (pt[2] - k0);
+    }
 
-	public final int getY(int[] pt) {
-		return yI * (pt[0] - i0) + yK * (pt[2] - k0);
-	}
+    /**
+     * Get the local Y coordinate of the building based on the global pt.
+     */
+    public final int getY(int[] pt) {
+        return pt[1] - j0;
+    }
 
-	public final int getZ(int[] pt) {
-		return pt[1] - j0;
-	}
+    /**
+     * Get the local Z coordinate of the building based on the global pt.
+     */
+    public final int getZ(int[] pt) {
+        return zI * (pt[0] - i0) + zK * (pt[2] - k0);
+    }
 
-	public final String localCoordString(int x, int z, int y) {
-		int[] pt = getIJKPt(x, z, y);
-		return "(" + pt[0] + "," + pt[1] + "," + pt[2] + ")";
-	}
+    /**
+     * Return a string gdescribing the global coordinate of a given local
+     * coordinate.
+     */
+    public final String localCoordString(int x, int y, int z) {
+        int[] pt = getIJKPt(x, y, z);
+        return "(" + pt[0] + "," + pt[1] + "," + pt[2] + ")";
+    }
 
     /**
      * Reorients dir in relation to this Building's orientation and handedness.
@@ -253,43 +304,48 @@ public class Building {
 			world.spawnEntityInWorld(entitypainting);
 	}
 
-	// ******************** ORIENTATION FUNCTIONS
-	// *************************************************************************************************************//
+    /**
+     * Updates the building's orientation.
+     * <p>
+     * It computes several internal variables that are derived form the
+     * building's orientation and handedness. If the building is NORTH oriented
+     * and R_HAND, then the building's local X and Z axes match up. However, if
+     * the building is L_HAND instead, then its X axis would be
+     * inverted/mirrored compared to the world's axes.
+     */
     public void setPrimaryAx(Dir dir_) {
 		bDir = dir_;
 		// changes of basis
         switch (bDir) {
         case NORTH:
             xI = bHand.num;
-			yI = 0;
+            zI = 0;
 			xK = 0;
-			yK = -1;
+            zK = -1;
 			break;
         case EAST:
 			xI = 0;
-			yI = 1;
+            zI = 1;
             xK = bHand.num;
-			yK = 0;
+            zK = 0;
 			break;
         case SOUTH:
             xI = -(bHand.num);
-			yI = 0;
+            zI = 0;
 			xK = 0;
-			yK = 1;
+            zK = 1;
 			break;
         case WEST:
 			xI = 0;
-			yI = -1;
+            zI = -1;
             xK = -(bHand.num);
-			yK = 0;
+            zK = 0;
 			break;
-		}
-	}
+        }
+    }
 
-	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setSignOrPost
-	// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
-	public void setSignOrPost(int x2, int z2, int y2, boolean post, int sDir, String[] lines) {
-		int[] pt = getIJKPt(x2, z2, y2);
+    public void setSignOrPost(int x2, int y2, int z2, boolean post, int sDir, String[] lines) {
+        int[] pt = getIJKPt(x2, y2, z2);
 		world.setBlock(pt[0], pt[1], pt[2], post ? Blocks.standing_sign : Blocks.wall_sign, sDir, 2);
 		TileEntitySign tileentitysign = (TileEntitySign) world.getTileEntity(pt[0], pt[1], pt[2]);
 		if (tileentitysign == null)
@@ -297,31 +353,32 @@ public class Building {
         System.arraycopy(lines, 0, tileentitysign.signText, 0, Math.min(lines.length, 4));
 	}
 
-	// call with z=start of builDown, will buildDown a maximum of maxDepth
-	// blocks + foundationDepth.
-	// if buildDown column is completely air, instead buildDown reserveDepth
-	// blocks.
-	public void buildDown(int x, int z, int y, TemplateRule buildRule, int maxDepth, int foundationDepth, int reserveDepth) {
-		int stopZ;
-		for (stopZ = z; stopZ > z - maxDepth; stopZ--) {
-			if (!isWallable(x, stopZ, y))
+    /**
+     * Builds down to a maximum of maxDepth blocks + foundationDepth, starting
+     * at local y. If buildDown column is completely air, it will instead build
+     * down reserveDepth blocks.
+     */
+    public void buildDown(int x, int y, int z, TemplateRule buildRule, int maxDepth, int foundationDepth, int reserveDepth) {
+        int stopY;
+        for (stopY = y; stopY > y - maxDepth; stopY--) {
+            if (!isWallable(x, stopY, z))
 				break; // find ground height
 		}
-		if (stopZ == z - maxDepth && isWallable(x, z - maxDepth, y)) // if we never hit ground
-			stopZ = z - reserveDepth;
+        if (stopY == y - maxDepth && isWallable(x, y - maxDepth, z)) // if we never hit ground
+            stopY = y - reserveDepth;
 		else
-			stopZ -= foundationDepth;
-		for (int z1 = z; z1 > stopZ; z1--) {
-			setBlockWithLightingLocal(x, z1, y, buildRule, false);
+            stopY -= foundationDepth;
+        for (int y1 = y; y1 > stopY; y1--) {
+            setBlockWithLightingLocal(x, y1, z, buildRule, false);
 		}
 	}
 
-	protected final Block getBlockIdLocal(int x, int z, int y) {
-		return world.getBlock(i0 + yI * y + xI * x, j0 + z, k0 + yK * y + xK * x);
+    protected final Block getBlockIdLocal(int x, int y, int z) {
+        return world.getBlock(getI(x, z), getJ(y), getK(x, z));
 	}
 
-	protected final int getBlockMetadataLocal(int x, int z, int y) {
-		return world.getBlockMetadata(i0 + yI * y + xI * x, j0 + z, k0 + yK * y + xK * x);
+    protected final int getBlockMetadataLocal(int x, int y, int z) {
+        return world.getBlockMetadata(getI(x, z), getJ(y), getK(x, z));
 	}
 
     /**
@@ -346,35 +403,40 @@ public class Building {
 		}
 	}
 
-	protected final boolean isArtificialWallBlock(int x, int z, int y) {
-		Block blockId = getBlockIdLocal(x, z, y);
-		return BlockProperties.get(blockId).isArtificial && !(blockId == Blocks.sandstone && (getBlockIdLocal(x, z + 1, y) == Blocks.sand || getBlockIdLocal(x, z + 2, y) == Blocks.sand));
+    protected final boolean isArtificialWallBlock(int x, int y, int z) {
+        Block blockId = getBlockIdLocal(x, y, z);
+        return BlockProperties.get(blockId).isArtificial
+                && !(blockId == Blocks.sandstone && (getBlockIdLocal(x, y + 1, z) == Blocks.sand || getBlockIdLocal(
+                        x, y + 2, z) == Blocks.sand));
 	}
 
-	protected final boolean isDoorway(int x, int z, int y) {
-		return isFloor(x, z, y) && (isWallBlock(x + 1, z, y) && isWallBlock(x - 1, z, y) || isWallBlock(x, z, y + 1) && isWallBlock(x - 1, z, y - 1));
+    protected final boolean isDoorway(int x, int y, int z) {
+        return isFloor(x, y, z)
+                && (isWallBlock(x + 1, y, z) && isWallBlock(x - 1, y, z) || isWallBlock(x, y, z + 1)
+                        && isWallBlock(x - 1, y, z - 1));
 	}
 
-	protected final boolean hasNoDoorway(int x, int z, int y) {
-		return !(isDoorway(x - 1, z, y) || isDoorway(x + 1, z, y) || isDoorway(x, z, y - 1) || isDoorway(x - 1, z, y + 1));
+    protected final boolean hasNoDoorway(int x, int y, int z) {
+        return !(isDoorway(x - 1, y, z) || isDoorway(x + 1, y, z) || isDoorway(x, y, z - 1) || isDoorway(
+                x - 1, y, z + 1));
 	}
 
-	protected boolean isObstructedFrame(int zstart, int ybuffer) {
-		for (int z1 = zstart; z1 < bHeight; z1++) {
-			// for(int x1=0; x1<length; x1++) for(int y1=ybuffer;
-			// y1<width-1;y1++)
-			// if(isWallBlock(x1,z1,y1))
+    protected boolean isObstructedFrame(int ystart, int zbuffer) {
+        for (int y1 = ystart; y1 < bHeight; y1++) {
+            // for(int x1=0; x1<length; x1++) for(int z1=zbuffer;
+            // z1<width-1;z1++)
+            // if(isWallBlock(x1,y1,z1))
 			// return true;
-			for (int x1 = 0; x1 < bWidth; x1++) {
-				if (isArtificialWallBlock(x1, z1, bLength - 1)) {
+            for (int x1 = 0; x1 < bWidth; x1++) {
+                if (isArtificialWallBlock(x1, y1, bLength - 1)) {
 					return true;
 				}
 			}
-			for (int y1 = ybuffer; y1 < bLength - 1; y1++) {
-				if (isArtificialWallBlock(0, z1, y1)) {
+            for (int z1 = zbuffer; z1 < bLength - 1; z1++) {
+                if (isArtificialWallBlock(0, y1, z1)) {
 					return true;
 				}
-				if (isArtificialWallBlock(bWidth - 1, z1, y1)) {
+                if (isArtificialWallBlock(bWidth - 1, y1, z1)) {
 					return true;
 				}
 			}
@@ -384,9 +446,9 @@ public class Building {
 
 	protected boolean isObstructedSolid(int pt1[], int pt2[]) {
 		for (int x1 = pt1[0]; x1 <= pt2[0]; x1++) {
-			for (int z1 = pt1[1]; z1 <= pt2[1]; z1++) {
-				for (int y1 = pt1[2]; y1 <= pt2[2]; y1++) {
-					if (!isWallable(x1, z1, y1)) {
+            for (int y1 = pt1[1]; y1 <= pt2[1]; y1++) {
+                for (int z1 = pt1[2]; z1 <= pt2[2]; z1++) {
+                    if (!isWallable(x1, y1, z1)) {
 						return true;
 					}
 				}
@@ -395,31 +457,31 @@ public class Building {
 		return false;
 	}
 
-	// ******************** LOCAL COORDINATE FUNCTIONS - BLOCK TEST FUNCTIONS
-	// *************************************************************************************************************//
-    // true if block is air, block below is wall block
-    protected final boolean isFloor(int x, int z, int y) {
-        Block blkId1 = getBlockIdLocal(x, z, y), blkId2 = getBlockIdLocal(x, z - 1, y);
-        // return ((blkId1==0 || blkId1==STEP_ID) && IS_WALL_BLOCK[blkId2] &&
-        // blkId2!=LADDER_ID);
-        return blkId1 == Blocks.air && BlockProperties.get(blkId2).isArtificial && blkId2 != Blocks.ladder;
-    }
+    /**
+     * True if block is air, andthe block below is a wall block.
+     */
+    protected final boolean isFloor(int x, int y, int z) {
+        Block blkId1 = getBlockIdLocal(x, y, z), blkId2 = getBlockIdLocal(x, y - 1, z);
+		// return ((blkId1==0 || blkId1==STEP_ID) && IS_WALL_BLOCK[blkId2] &&
+		// blkId2!=LADDER_ID);
+		return blkId1 == Blocks.air && BlockProperties.get(blkId2).isArtificial && blkId2 != Blocks.ladder;
+	}
 
-    protected final boolean isStairBlock(int x, int z, int y) {
-        Block blkId = getBlockIdLocal(x, z, y);
-        return blkId == Blocks.stone_slab || BlockProperties.get(blkId).isStair;
-    }
+    protected final boolean isStairBlock(int x, int y, int z) {
+        Block blkId = getBlockIdLocal(x, y, z);
+		return blkId == Blocks.stone_slab || BlockProperties.get(blkId).isStair;
+	}
 
-	protected final boolean isWallable(int x, int z, int y) {
-		return BlockProperties.get(world.getBlock(i0 + yI * y + xI * x, j0 + z, k0 + yK * y + xK * x)).isWallable;
+    protected final boolean isWallable(int x, int y, int z) {
+        return BlockProperties.get(world.getBlock(getI(x, z), getJ(y), getK(x, z))).isWallable;
 	}
 
 	protected final boolean isWallableIJK(int pt[]) {
 		return pt!=null && BlockProperties.get(world.getBlock(pt[0], pt[1], pt[2])).isWallable;
 	}
 
-	protected final boolean isWallBlock(int x, int z, int y) {
-		return BlockProperties.get(world.getBlock(i0 + yI * y + xI * x, j0 + z, k0 + yK * y + xK * x)).isArtificial;
+    protected final boolean isWallBlock(int x, int y, int z) {
+        return BlockProperties.get(world.getBlock(getI(x, z), getJ(y), getK(x, z))).isArtificial;
 	}
 
     public final void flushDelayed(){
@@ -491,22 +553,22 @@ public class Building {
         return new BlockAndMeta(blc, block[3]);
     }
 
-	// The origin of this building was placed to match a centerline.
-	// The building previously had bWidth=oldWidth, now it has the current
-	// value of bWidth and needs to have origin updated.
+    /**
+     * Recenters the building. The origin of this building was placed to match
+     * a centerline. The building previously had bWidth=oldWidth, now it has
+     * the current value of bWidth and needs to have origin updated.
+     */
 	protected final void recenterFromOldWidth(int oldWidth) {
-		i0 += xI * (oldWidth - bWidth) / 2;
-		k0 += xK * (oldWidth - bWidth) / 2;
+        i0 += xI * (oldWidth - bWidth) / 2;
+        k0 += xK * (oldWidth - bWidth) / 2;
 	}
 
-	// ******************** LOCAL COORDINATE FUNCTIONS - SET BLOCK FUNCTIONS
-	// *************************************************************************************************************//
-	protected final void setBlockLocal(int x, int z, int y, Block blockID) {
-		setBlockLocal(x, z, y, blockID, 0);
+    protected final void setBlockLocal(int x, int y, int z, Block blockID) {
+        setBlockLocal(x, y, z, blockID, 0);
 	}
 
-	protected final void setBlockLocal(int x, int z, int y, Block blockID, int metadata) {
-        int[] pt = getIJKPt(x, z, y);
+    protected final void setBlockLocal(int x, int y, int z, Block blockID, int metadata) {
+        int[] pt = getIJKPt(x, y, z);
         if (blockID == Blocks.air && world.isAirBlock(pt[0], pt[1], pt[2]))
             return;
         if (!(blockID instanceof BlockChest))
@@ -514,7 +576,7 @@ public class Building {
         if (BlockProperties.get(blockID).isDelayed){
             delayedBuildQueue.offer(new PlacedBlock(blockID, rotateMetadata(blockID, metadata),
                     new int[] {pt[0], pt[1], pt[2]}));
-        }else if (randLightingHash[(x & 0x7) | (y & 0x38) | (z & 0x1c0)]) {
+        } else if (randLightingHash[(x & 0x7) | (z & 0x38) | (y & 0x1c0)]) {
             world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 2);
         } else {
             WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
@@ -525,25 +587,26 @@ public class Building {
         }
 	}
 
-	protected final void setBlockLocal(int x, int z, int y, BlockAndMeta block) {
+    protected final void setBlockLocal(int x, int y, int z, BlockAndMeta block) {
         if(block instanceof BlockExtended){
-            setSpecialBlockLocal(x, z, y, block.getBlock(), block.getMeta(),
+            setSpecialBlockLocal(x, y, z, block.getBlock(), block.getMeta(),
                     ((BlockExtended) block).info);
         }else{
-            setBlockLocal(x, z, y, block.getBlock(), block.getMeta());
+            setBlockLocal(x, y, z, block.getBlock(), block.getMeta());
         }
 	}
 
-	protected final void setBlockLocal(int x, int z, int y, TemplateRule rule) {
-		setBlockLocal(x, z, y, rule.getBlockOrHole(random));
+    protected final void setBlockLocal(int x, int y, int z, TemplateRule rule) {
+        setBlockLocal(x, y, z, rule.getBlockOrHole(random));
 	}
 
-    protected final void setBlockWithLightingLocal(int x, int z, int y, TemplateRule rule, boolean lighting) {
-        setBlockWithLightingLocal(x, z, y, rule.getBlockOrHole(random), lighting);
-    }
+    protected final void setBlockWithLightingLocal(int x, int y, int z, TemplateRule rule,
+            boolean lighting) {
+        setBlockWithLightingLocal(x, y, z, rule.getBlockOrHole(random), lighting);
+	}
 
-    protected final void removeBlockWithLighting(int x, int z, int y){
-        setBlockWithLightingLocal(x, z, y, TemplateRule.AIR_RULE, true);
+    protected final void removeBlockWithLighting(int x, int y, int z) {
+        setBlockWithLightingLocal(x, y, z, TemplateRule.AIR_RULE, true);
     }
 
     protected final void setBlockWithLightingLocal(int x, int z, int y, BlockAndMeta block, boolean lighting) {
@@ -558,8 +621,8 @@ public class Building {
     /**
      * Allows control of lighting. Also will build even if replacing air with air.
      */
-	protected final void setBlockWithLightingLocal(int x, int z, int y, Block blockID, int metadata, boolean lighting) {
-		int[] pt = getIJKPt(x, z, y);
+    protected final void setBlockWithLightingLocal(int x, int y, int z, Block blockID, int metadata, boolean lighting) {
+        int[] pt = getIJKPt(x, y, z);
         if (blockID == Blocks.air && world.isAirBlock(pt[0], pt[1], pt[2]))
             return;
 		if (!(blockID instanceof BlockChest))
@@ -583,19 +646,17 @@ public class Building {
 		k0 = k0_;
 	}
 
-	protected final void setOriginLocal(int i1, int j1, int k1, int x, int z, int y) {
-		i0 = i1 + yI * y + xI * x;
-		j0 = j1 + z;
-		k0 = k1 + yK * y + xK * x;
+    protected final void setOriginLocal(int i1, int j1, int k1, int x, int y, int z) {
+        i0 = i1 + zI * z + xI * x;
+        j0 = j1 + y;
+        k0 = k1 + zK * z + xK * x;
 	}
 
-	// ******************** LOCAL COORDINATE FUNCTIONS - SPECIAL BLOCK FUNCTIONS
-	// *************************************************************************************************************//
-	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setSpecialBlockLocal &&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
-	protected final void setSpecialBlockLocal(int x, int z, int y, Block blockID, int metadata, String extra) {
+    protected final void setSpecialBlockLocal(int x, int y, int z, Block blockID, int metadata,
+            String extra) {
 		if (extra.equals(TemplateRule.SPECIAL_AIR))
 			return; // preserve existing world block
-		int[] pt = getIJKPt(x, z, y);
+        int[] pt = getIJKPt(x, y, z);
 		if (blockID instanceof BlockAir) {
             if(extra.equals(TemplateRule.SPECIAL_STAIR) && metadata<=0){
                 world.setBlock(pt[0], pt[1], pt[2], Blocks.stone_slab, rotateMetadata(Blocks.stone_slab, -metadata), 2);

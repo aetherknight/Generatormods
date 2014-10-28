@@ -253,52 +253,52 @@ public class BuildingTower extends Building {
 		//now do a support calculation
 		int[][][] support = new int[xLim][zLim][yLim];
 		for (int x = 0; x < xLim; x++)
-			for (int z = 1; z < zLim; z++)
-				for (int y = 0; y < yLim; y++)
-					support[x][z][y] = 0;
+            for (int y = 1; y < zLim; y++)
+                for (int z = 0; z < yLim; z++)
+                    support[x][y][z] = 0;
 		for (int x = 0; x < xLim; x++)
-			for (int y = 0; y < yLim; y++)
-                if (buffer[x][0][y].getBlock() != Blocks.air)
-					support[x][0][y] = 2;
-		for (int z = 1; z < zLim; z++) {
+            for (int z = 0; z < yLim; z++)
+                if (buffer[x][0][z].getBlock() != Blocks.air)
+                    support[x][0][z] = 2;
+        for (int y = 1; y < zLim; y++) {
 			boolean levelCollapsed = true;
 			for (int x = 0; x < xLim; x++) {
-				for (int y = 0; y < yLim; y++) {
-                    if (buffer[x][z][y].getBlock() != Blocks.air
-                            && BlockProperties.get(buffer[x][z - 1][y].getBlock()).isLoaded
-                            && support[x][z - 1][y] > 0) {
-						support[x][z][y] = 2;
+                for (int z = 0; z < yLim; z++) {
+                    if (buffer[x][y][z].getBlock() != Blocks.air
+                            && BlockProperties.get(buffer[x][y - 1][z].getBlock()).isLoaded
+                            && support[x][y - 1][z] > 0) {
+                        support[x][y][z] = 2;
 						levelCollapsed = false;
 					}
 				}
 			}
 			if (levelCollapsed)
-				return z;
+                return y;
 			for (int m = 0; m < 4; m++) {
 				for (int x = 0; x < xLim; x++) {
-					for (int y = 0; y < yLim; y++) {
-                        if (buffer[x][z][y].getBlock() != Blocks.air && support[x][z][y] == 0) {
+                    for (int z = 0; z < yLim; z++) {
+                        if (buffer[x][y][z].getBlock() != Blocks.air && support[x][y][z] == 0) {
 							int neighbors = 0;
-                            if (x < xLim - 1 && BlockProperties.get(buffer[x + 1][z][y].getBlock()).isLoaded)
-								neighbors += support[x + 1][z][y];
-                            if (x > 0 && BlockProperties.get(buffer[x - 1][z][y].getBlock()).isLoaded)
-								neighbors += support[x - 1][z][y];
-                            if (y < yLim - 1 && BlockProperties.get(buffer[x][z][y + 1].getBlock()).isLoaded)
-								neighbors += support[x][z][y + 1];
-                            if (y > 0 && BlockProperties.get(buffer[x][z][y - 1].getBlock()).isLoaded)
-								neighbors += support[x][z][y - 1];
+                            if (x < xLim - 1 && BlockProperties.get(buffer[x + 1][y][z].getBlock()).isLoaded)
+                                neighbors += support[x + 1][y][z];
+                            if (x > 0 && BlockProperties.get(buffer[x - 1][y][z].getBlock()).isLoaded)
+                                neighbors += support[x - 1][y][z];
+                            if (z < yLim - 1 && BlockProperties.get(buffer[x][y][z + 1].getBlock()).isLoaded)
+                                neighbors += support[x][y][z + 1];
+                            if (z > 0 && BlockProperties.get(buffer[x][y][z - 1].getBlock()).isLoaded)
+                                neighbors += support[x][y][z - 1];
 							if (neighbors > random.nextInt(4))
-								support[x][z][y] = 1;
+                                support[x][y][z] = 1;
 						}
 					}
 				}
 			}
 			//remove blocks if no support
 			for (int x = 0; x < xLim; x++) {
-				for (int y = 0; y < yLim; y++) {
-                    if (support[x][z][y] == 0 && !buffer[x][z][y].equals(BlockAndMeta.PRESERVE_BLOCK))
-                        buffer[x][z][y] = BlockAndMeta.AIR_WITH_LIGHTING;
-					//else buffer[x][z][y]=new int[]{40+support[x][z][y],0};
+                for (int z = 0; z < yLim; z++) {
+                    if (support[x][y][z] == 0 && !buffer[x][y][z].equals(BlockAndMeta.PRESERVE_BLOCK))
+                        buffer[x][y][z] = BlockAndMeta.AIR_WITH_LIGHTING;
+                    //else buffer[x][y][z]=new int[]{40+support[x][y][z],0};
 				}
 			}
 		}
@@ -579,60 +579,62 @@ public class BuildingTower extends Building {
 		}
 	}
 
-	private void populateBookshelves(int z) {
+    private void populateBookshelves(int y) {
 		int x1 = random.nextInt(bWidth - 2) + 1;
-		int y1 = random.nextInt(bLength - 2) + 1;
+		int z1 = random.nextInt(bLength - 2) + 1;
 		Dir dir = Dir.randomDir(random);
 		int xinc = dir.x;
-		int yinc = dir.y;
+		int zinc = dir.z;
 		//find a wall
 		while (true) {
-			if (x1 < 1 || x1 >= bWidth - 1 || y1 < 1 || y1 >= bLength - 1 || !isFloor(x1, z, y1))
+            if (x1 < 1 || x1 >= bWidth - 1 || z1 < 1 || z1 >= bLength - 1 || !isFloor(x1, y, z1))
 				return;
-			if (BlockProperties.get(getBlockIdLocal(x1 + xinc, z, y1 + yinc)).isArtificial && BlockProperties.get(getBlockIdLocal(x1 + xinc, z - 1, y1 + yinc)).isArtificial
-					&& getBlockIdLocal(x1 + xinc, z - 1, y1 + yinc) != Blocks.ladder) {
+            if (BlockProperties.get(getBlockIdLocal(x1 + xinc, y, z1 + zinc)).isArtificial
+                    && BlockProperties.get(getBlockIdLocal(x1 + xinc, y - 1, z1 + zinc)).isArtificial
+                    && getBlockIdLocal(x1 + xinc, y - 1, z1 + zinc) != Blocks.ladder) {
 				break;
 			}
 			x1 += xinc;
-			y1 += yinc;
+			z1 += zinc;
 		}
 		for (int m = 0; m < 2; m++) {
-			for (int z1 = z; z1 < z + 1 + random.nextInt(3); z1++) {
-				if (getBlockIdLocal(x1, z1, y1) != Blocks.air || !isWallBlock(x1 + xinc, z1, y1 + yinc))
+            for (int y1 = y; y1 < y + 1 + random.nextInt(3); y1++) {
+                if (getBlockIdLocal(x1, y1, z1) != Blocks.air
+                        || !isWallBlock(x1 + xinc, y1, z1 + zinc))
 					break;
-				setBlockLocal(x1, z1, y1, Blocks.bookshelf);
+                setBlockLocal(x1, y1, z1, Blocks.bookshelf);
 			}
 			x1 += dir.rotate(1).x;
-			y1 += dir.rotate(1).y;
-			if (!isFloor(x1, z, y1))
+            z1 += dir.rotate(1).z;
+            if (!isFloor(x1, y, z1))
 				break;
 		}
 	}
 
-	private boolean populatePortal(int z) {
+	private boolean populatePortal(int y) {
 		if (world.provider.isHellWorld) {
 			if (random.nextInt(NETHER_PORTAL_ODDS) != 0)
 				return false;
 		} else if (random.nextInt(SURFACE_PORTAL_ODDS) != 0)
 			return false;
 		boolean hasSupport = false;
-		for (int y1 = bLength / 2 - 2; y1 < bLength / 2 + 2; y1++) {
-			if (getBlockIdLocal(bWidth / 2, z, y1) != Blocks.air)
+        for (int z1 = bLength / 2 - 2; z1 < bLength / 2 + 2; z1++) {
+            if (getBlockIdLocal(bWidth / 2, y, z1) != Blocks.air)
 				return false;
-			if (getBlockIdLocal(bWidth / 2, z - 1, y1) != Blocks.air)
+            if (getBlockIdLocal(bWidth / 2, y - 1, z1) != Blocks.air)
 				hasSupport = true;
 		}
 		if (!hasSupport)
 			return false;
-		for (int y1 = bLength / 2 - 2; y1 < bLength / 2 + 2; y1++) {
-			setBlockLocal(bWidth / 2, z, y1, Blocks.obsidian);
-			setBlockLocal(bWidth / 2, z + 4, y1, Blocks.obsidian);
+        for (int z1 = bLength / 2 - 2; z1 < bLength / 2 + 2; z1++) {
+            setBlockLocal(bWidth / 2, y, z1, Blocks.obsidian);
+            setBlockLocal(bWidth / 2, y + 4, z1, Blocks.obsidian);
 		}
-		for (int z1 = z + 1; z1 < z + 4; z1++) {
-			setBlockLocal(bWidth / 2, z1, bLength / 2 - 2, Blocks.obsidian);
-			setBlockLocal(bWidth / 2, z1, bLength / 2 - 1, Blocks.portal);
-			setBlockLocal(bWidth / 2, z1, bLength / 2, Blocks.portal);
-			setBlockLocal(bWidth / 2, z1, bLength / 2 + 1, Blocks.obsidian);
+        for (int y1 = y + 1; y1 < y + 4; y1++) {
+            setBlockLocal(bWidth / 2, y1, bLength / 2 - 2, Blocks.obsidian);
+            setBlockLocal(bWidth / 2, y1, bLength / 2 - 1, Blocks.portal);
+            setBlockLocal(bWidth / 2, y1, bLength / 2, Blocks.portal);
+            setBlockLocal(bWidth / 2, y1, bLength / 2 + 1, Blocks.obsidian);
 		}
 		return true;
 	}
@@ -704,40 +706,44 @@ public class BuildingTower extends Building {
 			bLength = bWidth = minHorizDim; //enforce equal horizontal dimensions if circular
 	}
 
-	//****************************************  FUNCTION  - buildWindowOrDoor *************************************************************************************//
-	//builds either a window or a door depending on whether there is a floor outside of the aperture.
-	private void buildWindowOrDoor(int x, int z, int y, int xFace, int yFace, int height) {
+    /**
+     * builds either a window or a door depending on whether there is a floor
+     * outside of the aperture.
+     */
+	private void buildWindowOrDoor(int x, int y, int z, int xFace, int zFace, int height) {
 		boolean buildWoodDoor = false;
-		if (isFloor(x + xFace, z - 1, y + yFace) || isFloor(x + xFace, z - 2, y + yFace)) {
-			z--;
+        if (isFloor(x + xFace, y - 1, z + zFace) || isFloor(x + xFace, y - 2, z + zFace)) {
+            y--;
 			if (MakeDoors)
 				buildWoodDoor = true;
 		}
-		if (!BlockProperties.get(getBlockIdLocal(x, z + height - 2, y + yFace)).isWallable)
+        if (!BlockProperties.get(getBlockIdLocal(x, y + height - 2, z + zFace)).isWallable)
 			return;
 		if (buildWoodDoor) {
             int metadata =
-                    xFace == 0 ? (yFace > 0 ? DOOR_DIR_TO_META.get(Dir.SOUTH) : DOOR_DIR_TO_META
+                    xFace == 0 ? (zFace > 0 ? DOOR_DIR_TO_META.get(Dir.SOUTH) : DOOR_DIR_TO_META
                             .get(Dir.NORTH)) : (xFace > 0 ? DOOR_DIR_TO_META.get(Dir.WEST)
                             : DOOR_DIR_TO_META.get(Dir.EAST));
-			buffer[x + 1][z + 1][y + 1] = new BlockAndMeta(Blocks.wooden_door, metadata);
-			buffer[x + 1][z + 1 + 1][y + 1] = new BlockAndMeta(Blocks.wooden_door, random.nextBoolean() ? 8 : 9);
-			if (isFloor(x + xFace, z - 1, y + yFace) && x + xFace + 1 >= 0 && x + xFace + 1 < buffer.length && y + yFace + 1 >= 0 && y + yFace + 1 < buffer[0][0].length) {
-				buffer[x + xFace + 1][z - 1 + 1][y + yFace + 1] = bRule.primaryBlock.toStep();//build a step-up
+            buffer[x + 1][y + 1][z + 1] = new BlockAndMeta(Blocks.wooden_door, metadata);
+            buffer[x + 1][y + 1 + 1][z + 1] =
+                    new BlockAndMeta(Blocks.wooden_door, random.nextBoolean() ? 8 : 9);
+            if (isFloor(x + xFace, y - 1, z + zFace) && x + xFace + 1 >= 0
+                    && x + xFace + 1 < buffer.length && z + zFace + 1 >= 0
+                    && z + zFace + 1 < buffer[0][0].length) {
+                buffer[x + xFace + 1][y - 1 + 1][z + zFace + 1] = bRule.primaryBlock.toStep(); //build a step-up
 			}
 		} else
-			for (int z1 = z; z1 < z + height; z1++)
-                buffer[x + 1][z1 + 1][y + 1] = BlockAndMeta.AIR_WITH_LIGHTING; //carve out the aperture
-        //clear a step in front of window if there is a floor at z+1
-		if (isFloor(x + xFace, z + 2, y + yFace) && isWallBlock(x + xFace, z, y + yFace) && x + xFace + 1 >= 0 && x + xFace + 1 < buffer.length && y + yFace + 1 >= 0
-				&& y + yFace + 1 < buffer[0][0].length)
-            buffer[x + xFace + 1][z + 1 + 1][y + yFace + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
+            for (int z1 = y; z1 < y + height; z1++)
+                buffer[x + 1][z1 + 1][z + 1] = BlockAndMeta.AIR_WITH_LIGHTING; //carve out the aperture
+        //clear a step in front of window if there is a floor at y+1
+        if (isFloor(x + xFace, y + 2, z + zFace) && isWallBlock(x + xFace, y, z + zFace)
+                && x + xFace + 1 >= 0 && x + xFace + 1 < buffer.length && z + zFace + 1 >= 0
+                && z + zFace + 1 < buffer[0][0].length)
+            buffer[x + xFace + 1][y + 1 + 1][z + zFace + 1] = BlockAndMeta.AIR_WITH_LIGHTING;
 	}
 
-	//****************************************  FUNCTIONS  - populators *************************************************************************************//
-
     /**
-     * Creates a bed at the specified local z level. Beds are made of 2 blocks:
+     * Creates a bed at the specified local y level. Beds are made of 2 blocks:
      * the head of the bed and the foot of the bed. Bed metadata meanings (from
      * <a href="http://minecraft.gamepedia.com/Data_values#Beds">Minecraft
      * Wiki</a>):
@@ -753,38 +759,38 @@ public class BuildingTower extends Building {
      * </table>
      *
      * TODO: The logic in this method appears to create invalid beds. The
-     * direction chosen here, and the "y" value of the Dir (which is inverted
-     * for north-south/z-axis only) don't seem to agree. Should probably be
+     * direction chosen here, and the "z" value of the Dir (which is inverted
+     * for north-south/y-axis only) don't seem to agree. Should probably be
      * fixed, but want to try to unit test as much as possible first.
      * BED_DIR_TO_META might also be useful here.
      */
-	private void populateBeds(int z) {
+    private void populateBeds(int y) {
         Dir dir = Dir.randomDir(random);
 		int x1 = random.nextInt(bWidth - 2) + 1;
-		int y1 = random.nextInt(bLength - 2) + 1;
+		int z1 = random.nextInt(bLength - 2) + 1;
         int x2 = x1 + dir.x;
-        int y2 = y1 + dir.y;
-		if (isFloor(x1, z, y1) && hasNoDoorway(x1, z, y1) && isFloor(x2, z, y2) && hasNoDoorway(x2, z, y2)) {
-            setBlockLocal(x1, z, y1, Blocks.bed, dir.ordinal() + 8); //head of the bed?
-            setBlockLocal(x2, z, y2, Blocks.bed, dir.ordinal());
+        int z2 = z1 + dir.z;
+        if (isFloor(x1, y, z1) && hasNoDoorway(x1, y, z1) && isFloor(x2, y, z2) && hasNoDoorway(x2, y, z2)) {
+            setBlockLocal(x1, y, z1, Blocks.bed, dir.ordinal() + 8); //head of the bed?
+            setBlockLocal(x2, y, z2, Blocks.bed, dir.ordinal());
 		}
 	}
 
-	private void populateFurnitureColumn(int z, BlockAndMeta[] block) {
+    private void populateFurnitureColumn(int y, BlockAndMeta[] block) {
 		int x1 = random.nextInt(bWidth - 2) + 1;
-		int y1 = random.nextInt(bLength - 2) + 1;
-		if (isFloor(x1, z, y1) && hasNoDoorway(x1, z, y1)) {
-			for (int z1 = 0; z1 < block.length; z1++)
-				setBlockLocal(x1, z + z1, y1, block[z1]);
+		int z1 = random.nextInt(bLength - 2) + 1;
+		if (isFloor(x1, y, z1) && hasNoDoorway(x1, y, z1)) {
+			for (int y1 = 0; y1 < block.length; y1++)
+				setBlockLocal(x1, y + y1, z1, block[y1]);
 		}
 	}
 
-	private boolean populateGhastSpawner(int z) {
+    private boolean populateGhastSpawner(int y) {
 		for (int tries = 0; tries < 5; tries++) {
 			int x1 = random.nextInt(bWidth - 2) + 1;
-			int y1 = random.nextInt(bLength - 2) + 1;
-			if (isFloor(x1, z, y1)) {
-                setBlockLocal(x1, z, y1, BlockAndMeta.GHAST_SPAWNER);
+            int z1 = random.nextInt(bLength - 2) + 1;
+			if (isFloor(x1, y, z1)) {
+                setBlockLocal(x1, y, z1, BlockAndMeta.GHAST_SPAWNER);
 				return true;
 			}
 		}

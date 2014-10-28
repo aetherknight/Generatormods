@@ -67,11 +67,11 @@ public class BuildingDoubleWall extends Building {
 		int[] tempz = new int[a + b];
 		for (int m = 0; m < b; m++) {
 			tempx[m] = wall2.xArray[b - m - 1];
-			tempz[m] = wall2.zArray[b - m - 1];
+            tempz[m] = wall2.yArray[b - m - 1];
 		}
 		for (int m = 0; m < a; m++) {
 			tempx[m + b] = wall1.xArray[m];
-			tempz[m + b] = wall1.zArray[m];
+            tempz[m + b] = wall1.yArray[m];
 		}
         logger.debug("SMOOTHING X");
         BuildingWall.smooth(logger, tempx, 0, a + b - 1, ws.LateralSmoothingScale,
@@ -81,11 +81,11 @@ public class BuildingDoubleWall extends Building {
                 ws.ConcaveUpSmoothingScale, true);
 		for (int m = 0; m < b; m++) {
 			wall2.xArray[b - m - 1] = tempx[m];
-			wall2.zArray[b - m - 1] = tempz[m];
+            wall2.yArray[b - m - 1] = tempz[m];
 		}
 		for (int m = 0; m < a; m++) {
 			wall1.xArray[m] = tempx[m + b];
-			wall1.zArray[m] = tempz[m + b];
+            wall1.yArray[m] = tempz[m + b];
 		}
 		return true;
 	}

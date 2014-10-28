@@ -63,11 +63,11 @@ public class BuildingWall extends Building {
 	public int n0 = 0;
 	public int WalkHeight; //this is absolute, same as WallStyle
 	public int maxLength;
-	public int[] xArray, zArray;
+    public int[] xArray, yArray;
 	public int gatewayStart = NO_GATEWAY, gatewayEnd = NO_GATEWAY;
 	public TemplateWall ws;
 	public boolean target = false, circular = false;
-	public int x_targ, z_targ, y_targ;
+    public int x_targ, y_targ, z_targ;
 	public int minJ = NO_MIN_J;
 	private boolean hitMaxDepth = false;
 	public FailType failCode = FailType.NOTHING;
@@ -85,8 +85,8 @@ public class BuildingWall extends Building {
         Backtrack = bw.Backtrack;
 		target = bw.target;
 		x_targ = bw.x_targ;
-		z_targ = bw.z_targ;
-		y_targ = bw.y_targ;
+        y_targ = bw.y_targ;
+        z_targ = bw.z_targ;
 	}
 
     public BuildingWall(int ID_, IBuildingConfig config, TemplateWall ws_, Dir dir_,
@@ -98,7 +98,7 @@ public class BuildingWall extends Building {
         Backtrack = config.getBacktrackLength();
 		if (maxLength > 0) {
 			xArray[0] = 0;
-			zArray[0] = 0;
+            yArray[0] = 0;
 		}
 	}
 
@@ -111,7 +111,7 @@ public class BuildingWall extends Building {
         Backtrack = config.getBacktrackLength();
 		if (maxLength > 0) {
 			xArray[0] = 0;
-			zArray[0] = 0;
+            yArray[0] = 0;
 		}
 	}
 
@@ -125,8 +125,9 @@ public class BuildingWall extends Building {
 		}
 		setCursor(0);
         if (bLength > 0) {
-            logger.debug("Built " + ws.name + " wall " + IDString() + ", length " + (bLength) + " from " + localCoordString(xArray[0], zArray[0], 0) + " to "
-                    + localCoordString(xArray[bLength - 1], zArray[bLength - 1], bLength - 1));
+            logger.debug("Built " + ws.name + " wall " + IDString() + ", length " + (bLength)
+                    + " from " + localCoordString(xArray[0], yArray[0], 0) + " to "
+                    + localCoordString(xArray[bLength - 1], yArray[bLength - 1], bLength - 1));
         } else {
             logger.warn("Wall too short to build! " + IDString() + "length=" + bLength + " at " + localCoordString(0, 0, 0));
         }
@@ -152,11 +153,12 @@ public class BuildingWall extends Building {
 				layer = shiftedRight;
 			else if (xArray[n0 - 1] > xArray[n0])
 				layer = shiftedLeft;
-			else if (zArray[n0 - 1] < zArray[n0])
+            else if (yArray[n0 - 1] < yArray[n0])
 				layer = shiftedUp;
-			else if (zArray[n0 - 1] > zArray[n0])
+            else if (yArray[n0 - 1] > yArray[n0])
 				layer = shiftedDown;
-			else if (n0 == bLength - 1 || xArray[n0 + 1] != xArray[n0] || zArray[n0 + 1] != zArray[n0])
+            else if (n0 == bLength - 1 || xArray[n0 + 1] != xArray[n0]
+                    || yArray[n0 + 1] != yArray[n0])
 				layer = shifted;
 			else
 				layer = ws.template[lN];
@@ -181,14 +183,17 @@ public class BuildingWall extends Building {
                     if (idAndMeta.getBlock() == Blocks.air && idAndMeta instanceof BlockExtended
                             && ((BlockExtended) idAndMeta).info.equals(TemplateRule.SPECIAL_STAIR)) {
 						if (!wallBlockPresent && !BlockProperties.get(getBlockIdLocal(x1, z1, 0)).isWater) {
-							if (n0 > 0 && zArray[n0 - 1] > zArray[n0]) { //stairs, going down
-								if ((n0 == 1 || zArray[n0 - 2] == zArray[n0 - 1]) && (n0 == bLength - 1 || zArray[n0] == zArray[n0 + 1]))
+                            if (n0 > 0 && yArray[n0 - 1] > yArray[n0]) { // stairs, going down
+                                if ((n0 == 1 || yArray[n0 - 2] == yArray[n0 - 1])
+                                        && (n0 == bLength - 1 || yArray[n0] == yArray[n0 + 1]))
                                     setSpecialBlockLocal(x1, z1, 0, idAndMeta.getBlock(),
                                             idAndMeta.getMeta(), ((BlockExtended) idAndMeta).info);
 								else
 									setBlockLocal(x1, z1, 0, STEP_TO_STAIRS[-idAndMeta.getMeta() > 7 ? -idAndMeta.getMeta() - 8 : -idAndMeta.getMeta()], 2);
-							} else if (n0 < bLength - 1 && zArray[n0] < zArray[n0 + 1]) { //stairs, going up
-								if ((n0 == 0 || zArray[n0 - 1] == zArray[n0]) && (n0 == bLength - 2 || zArray[n0 + 1] == zArray[n0 + 2]))
+                            } else if (n0 < bLength - 1 && yArray[n0] < yArray[n0 + 1]) {
+                                //stairs, going up
+                                if ((n0 == 0 || yArray[n0 - 1] == yArray[n0])
+                                        && (n0 == bLength - 2 || yArray[n0 + 1] == yArray[n0 + 2]))
                                     setSpecialBlockLocal(x1, z1, 0, idAndMeta.getBlock(),
                                             idAndMeta.getMeta(), ((BlockExtended) idAndMeta).info);
 								else
@@ -276,7 +281,9 @@ public class BuildingWall extends Building {
 				scanB += 3;
 			}
 			if (n0 - gateWidth - 1 >= 0) {
-				if (curvature(zArray[n0], zArray[n0 - gateWidth / 2], zArray[n0 - gateWidth - 1], 1) == 0 && curvature(xArray[n0], xArray[n0 - gateWidth / 2], xArray[n0 - gateWidth - 1], 0) == 0) {
+                if (curvature(yArray[n0], yArray[n0 - gateWidth / 2], yArray[n0 - gateWidth - 1], 1) == 0
+                        && curvature(xArray[n0], xArray[n0 - gateWidth / 2], xArray[n0 - gateWidth
+                                - 1], 0) == 0) {
 					int tw = ws.pickTWidth(circular, world.rand), th = ws.getTMaxHeight(circular);
 					if (rs != null) {
                         avenues =
@@ -356,9 +363,9 @@ public class BuildingWall extends Building {
                             new BuildingTower(0, this, bDir.rotate(flankTHand), bHand, true, tw,
                                     th, tw, getIJKPtAtN(tnMid1, x1, 0, 0)).build(0, 0, false);
 							//following tower
-                            new BuildingTower(0, this, bDir.rotate(flankTHand), bHand.opposite(), true, tw,
-                                    th + zArray[tnMid1] - zArray[tnMid2], tw, getIJKPtAtN(tnMid2,
-                                            x1, 0, 0)).build(0, 0, false);
+                            new BuildingTower(0, this, bDir.rotate(flankTHand), bHand.opposite(),
+                                    true, tw, th + yArray[tnMid1] - yArray[tnMid2], tw,
+                                    getIJKPtAtN(tnMid2, x1, 0, 0)).build(0, 0, false);
 						}
                         flushDelayed();
 						//stairs up to wall
@@ -370,7 +377,8 @@ public class BuildingWall extends Building {
                                     (flankTHand == null || flankTHand == bHand) ? 1 - ws.TowerXOffset
                                             : bWidth - 2 + ws.TowerXOffset;
 							for (int n1 = ngw1; n1 > ngw1 - 5; n1--) {
-								if (zArray[n1 - 3] == zArray[n1] && xArray[n1 - 3] == xArray[ngw1 + 1]) {
+                                if (yArray[n1 - 3] == yArray[n1]
+                                        && xArray[n1 - 3] == xArray[ngw1 + 1]) {
                                     new BuildingSpiralStaircase(config, bRule, bDir, bHand, false,
                                             -WalkHeight, getIJKPtAtN(n1, x2, WalkHeight - 2, -3))
                                             .build(1, ngw1 - n1 + 4);
@@ -379,7 +387,8 @@ public class BuildingWall extends Building {
 								}
 							}
 							for (int n1 = ngw2; n1 < ngw2 + 5; n1++) {
-								if (zArray[n1 + 3] == zArray[n1] && xArray[n1 + 3] == xArray[ngw2 - 1]) {
+                                if (yArray[n1 + 3] == yArray[n1]
+                                        && xArray[n1 + 3] == xArray[ngw2 - 1]) {
                                     new BuildingSpiralStaircase(config, bRule, bDir.opposite(),
                                             bHand.opposite(), false, -WalkHeight, getIJKPtAtN(n1, x2,
                                                     WalkHeight - 2, 3)).build(1, n1 - ngw2 + 5);
@@ -423,11 +432,10 @@ public class BuildingWall extends Building {
 		}
 	}
 
-	//****************************************  FUNCTION  - getIJKPtAtN *************************************************************************************//
-	public int[] getIJKPtAtN(int n, int x, int z, int y) {
+    public int[] getIJKPtAtN(int n, int x, int y, int z) {
 		if (n == n0)
-			return getIJKPt(x, z, y);
-		return getIJKPt(x + xArray[n] - xArray[n0], z + zArray[n] - zArray[n0], y + n - n0);
+            return getIJKPt(x, y, z);
+		return getIJKPt(x + xArray[n] - xArray[n0], y + yArray[n] - yArray[n0], z + n - n0);
 	}
 
 	//****************************************  FUNCTION - makeBuildings *************************************************************************************//
@@ -468,7 +476,8 @@ public class BuildingWall extends Building {
                     clearSide = buildOnL ? Handedness.L_HAND : Handedness.R_HAND;
 			}
 			//try tower types
-			if (makeGatehouseTowers && curvature(zArray[nBack], zArray[nMid], zArray[n0], 0) == 0 && curvature(xArray[nBack], xArray[nMid], xArray[n0], 2) == 0) {
+            if (makeGatehouseTowers && curvature(yArray[nBack], yArray[nMid], yArray[n0], 0) == 0
+                    && curvature(xArray[nBack], xArray[nMid], xArray[n0], 2) == 0) {
 				//FMLLog.getLogger().info("Building gatehouse for "+IDString()+" at n="+n0+" "+globalCoordString(0,0,0)+" width "+tw);
                 BuildingTower tower =
                         new BuildingTower(bID + n0, this, bDir.opposite(), bHand.opposite(), true,
@@ -532,7 +541,7 @@ public class BuildingWall extends Building {
 			return 0;
 		}
 		int fails = 0;
-		setOriginLocal(i1, j1, k1, xArray[startN - 1], zArray[startN - 1], startN);
+        setOriginLocal(i1, j1, k1, xArray[startN - 1], yArray[startN - 1], startN);
 		bLength = startN;
         logger.debug("planWall " + IDString() + ", depth=" + depth + " n=" + startN + " maxlLen="
                 + maxLength + " at " + (new ChunkCoordinates(i0, j0, k0)));
@@ -567,7 +576,7 @@ public class BuildingWall extends Building {
 			if (failCode == FailType.NOTHING && gradz > 4)
 				failCode = FailType.TOOSTEEPUP;
 			gradz = Integer.signum(gradz);
-			if (minJ != NO_MIN_J && zArray[bLength - 1] + gradz + j1 < minJ)
+            if (minJ != NO_MIN_J && yArray[bLength - 1] + gradz + j1 < minJ)
 				gradz = 0; //don't go below minJ
 			if (gradz == 0) {
 				int HorizForceThreshold = bWidth / 2;
@@ -577,14 +586,14 @@ public class BuildingWall extends Building {
 				gradx = 0;
 			setOriginLocal(i0, j0, k0, gradx, gradz, 1);
 			xArray[bLength] = xArray[bLength - 1] + gradx;
-			zArray[bLength] = zArray[bLength - 1] + gradz;
+            yArray[bLength] = yArray[bLength - 1] + gradz;
 			bLength++;
 			//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   TERMINATION / BACKTRACKING   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			if (failCode == FailType.NOTHING)
 				fails = 0;
 			else
 				fails++;
-			if (target && bLength > y_targ) {
+            if (target && bLength > z_targ) {
 				failCode = FailType.HITTARGET;
 				break;
 			} else if (bLength >= maxLength) {
@@ -602,17 +611,21 @@ public class BuildingWall extends Building {
 					hitMaxDepth = true; //may still be able to proceed, note this so we can do so from root
 					break; //loop termination condition 3
 				} else {
-					logger.debug("\nTrying branches for "+IDString()+", depth="+depth+" at n="+bLength+" x="+(xArray[bLength])+" z="+(zArray[bLength]));
+                    logger.debug("Trying branches for " + IDString() + ", depth=" + depth
+                            + " at n=" + bLength + " x=" + (xArray[bLength]) + " y="
+                            + (yArray[bLength]));
 					int improvement, bestImprovement = 0;
 					BuildingWall branch, bestBranch = null;
 					//String[] branchNames={"Down","Minus","Straight","Plus","Up"};
-					for (int zAx = 0; zAx <= 1; zAx++) {
+                    for (int yAx = 0; yAx <= 1; yAx++) {
 						for (int d = -1; d <= 1; d++) {
-							if (!(zAx == 0 && d == 0)) {
+                            if (!(yAx == 0 && d == 0)) {
 								branch = new BuildingWall(this, maxLength, i1, j1, k1);
 								for (int m = 0; m < Backtrack; m++) {
-									branch.xArray[bLength - Backtrack + m] = xArray[bLength - Backtrack] + (1 - zAx) * (d * m);
-									branch.zArray[bLength - Backtrack + m] = zArray[bLength - Backtrack] + zAx * (d * m);
+                                    branch.xArray[bLength - Backtrack + m] =
+                                            xArray[bLength - Backtrack] + (1 - yAx) * (d * m);
+                                    branch.yArray[bLength - Backtrack + m] =
+                                            yArray[bLength - Backtrack] + yAx * (d * m);
 								}
 								improvement = branch.plan(bLength, depth + 1, lookahead, stopAtWall);
 								if (improvement > bestImprovement) {
@@ -628,7 +641,7 @@ public class BuildingWall extends Building {
 						//if(DEBUG==3) System.out.println("Chose branch="+bestBranch.branchName+" for wall "+IDString()+"depth="+depth+" at n="+planL+" with added length="+bestImprovement);
 						for (int m = bLength - Backtrack; m < bLength + bestImprovement; m++) {
 							xArray[m] = bestBranch.xArray[m];
-							zArray[m] = bestBranch.zArray[m];
+                            yArray[m] = bestBranch.yArray[m];
 							//failString=bestBranch.failString;
 							failCode = bestBranch.failCode;
 						}
@@ -679,8 +692,8 @@ public class BuildingWall extends Building {
                 temp += "|";
             if (m % 100 == 0)
                 temp += "||";
-            temp += zArray[m] + ",";
-            if (m > 0 && Math.abs(zArray[m] - zArray[m - 1]) > 1)
+            temp += yArray[m] + ",";
+            if (m > 0 && Math.abs(yArray[m] - yArray[m - 1]) > 1)
                 temp += "(ERROR: Z-slope>1 at n=" + m + ")";
         }
         logger.debug(temp);
@@ -690,12 +703,12 @@ public class BuildingWall extends Building {
 		setCursor(0);
 		if (ws.TowerXOffset < 0)
 			buffer -= ws.TowerXOffset;
-		int ptY = getY(pt);
-		if (ptY < 0)
+        int ptZ = getZ(pt);
+        if (ptZ < 0)
 			return getX(pt) >= buffer;
-		if (ptY >= bLength)
+        if (ptZ >= bLength)
 			return getX(pt) >= xArray[bLength - 1] + buffer;
-		return getX(pt) >= xArray[ptY] + buffer;
+        return getX(pt) >= xArray[ptZ] + buffer;
 	}
 
     public boolean queryLayout(LayoutCode layoutCode) {
@@ -717,7 +730,8 @@ public class BuildingWall extends Building {
 	public void setCursor(int n) {
 		n0 = n;
 		if (n0 >= 0 && (n0 < bLength || bLength == 0)) {
-			setOriginLocal(i1, j1, k1, bLength == 0 ? 0 : xArray[n0], bLength == 0 ? 0 : zArray[n0], n0);
+            setOriginLocal(i1, j1, k1, bLength == 0 ? 0 : xArray[n0],
+                    bLength == 0 ? 0 : yArray[n0], n0);
 		}
 	}
 
@@ -754,9 +768,10 @@ public class BuildingWall extends Building {
                     : (targ[2] > k1 ? Dir.SOUTH : Dir.NORTH)));
 			setCursor(0);
 			x_targ = getX(targ);
-			z_targ = getZ(targ);
-			y_targ = getY(targ);
-            logger.debug("Set target for "+IDString()+"to "+localCoordString(x_targ,z_targ,y_targ)+"!");
+            y_targ = getY(targ);
+            z_targ = getZ(targ);
+            logger.debug("Set target for " + IDString() + "to "
+                    + localCoordString(x_targ, y_targ, z_targ) + "!");
         } else {
             logger.debug("Could not set target for " + IDString() + ", targ=" + localTarget
                     + " (i,j,k)=" + (new ChunkCoordinates(i1, j1, k1)));
@@ -777,7 +792,7 @@ public class BuildingWall extends Building {
 	//****************************************  FUNCTION - smooth  *************************************************************************************//
 	public void smooth(int convexWindow, int concaveWindow, boolean flattenEnds) {
 		smooth(logger, xArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
-		smooth(logger, zArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
+        smooth(logger, yArray, 0, bLength - 1, convexWindow, concaveWindow, flattenEnds);
 	}
 
 	//****************************************  FUNCTION - clearTrees *************************************************************************************//
@@ -798,7 +813,7 @@ public class BuildingWall extends Building {
 		WalkHeight = ws.WalkHeight;
 		maxLength = maxLength_;
 		xArray = new int[maxLength];
-		zArray = new int[maxLength];
+        yArray = new int[maxLength];
 		bLength = 0;
 		halfStairValue = bRule.primaryBlock.toStep();
 	}

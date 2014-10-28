@@ -68,9 +68,13 @@ public class WorldGenGreatWall extends WorldGeneratorThread {
 			//Test formula considers both length and curvature, bias is towards longer and curvier walls.
 			double curviness = 0;
 			for (int m = 1; m < dw.wall1.bLength; m++)
-				curviness += (dw.wall1.xArray[m] == dw.wall1.xArray[m - 1] ? 0 : 1) + (dw.wall1.zArray[m] == dw.wall1.zArray[m - 1] ? 0 : 1);
+                curviness +=
+                        (dw.wall1.xArray[m] == dw.wall1.xArray[m - 1] ? 0 : 1)
+                                + (dw.wall1.yArray[m] == dw.wall1.yArray[m - 1] ? 0 : 1);
 			for (int m = 1; m < dw.wall2.bLength; m++)
-				curviness += (dw.wall2.xArray[m] == dw.wall2.xArray[m - 1] ? 0 : 1) + (dw.wall2.zArray[m] == dw.wall2.zArray[m - 1] ? 0 : 1);
+                curviness +=
+                        (dw.wall2.xArray[m] == dw.wall2.xArray[m - 1] ? 0 : 1)
+                                + (dw.wall2.yArray[m] == dw.wall2.yArray[m - 1] ? 0 : 1);
 			curviness /= (double) (2 * (dw.wall1.bLength + dw.wall2.bLength - 1));
 			//R plotting - sigmoid function
 			/*

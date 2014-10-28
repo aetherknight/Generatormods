@@ -47,25 +47,25 @@ public class BuildingTML extends Building {
 		tmlt.setFixedRules(world.rand);
 		//build base
 		int[][] base = tmlt.namedLayers.get("base");
-		for (int y = 0; y < bLength; y++)
+        for (int z = 0; z < bLength; z++)
 			for (int x = 0; x < bWidth; x++) {
 				if (base != null)
-					buildDown(x, -1, y, tmlt.rules[base[y][x]], tmlt.leveling, 0, 0);
+                    buildDown(x, -1, z, tmlt.rules[base[z][x]], tmlt.leveling, 0, 0);
 				else
-                    WorldHelper.fillDown(getSurfaceIJKPt(x, y, j0 - 1, true, IGNORE_WATER), j0 - 1,
+                    WorldHelper.fillDown(getSurfaceIJKPt(x, z, j0 - 1, true, IGNORE_WATER), j0 - 1,
                             world);
 			}
 		//clear overhead
-		for (int z = bHeight; z < tmlt.cutIn + tmlt.embed; z++)
-			for (int y = 0; y < bLength; y++)
+        for (int y = bHeight; y < tmlt.cutIn + tmlt.embed; y++)
+            for (int z = 0; z < bLength; z++)
 				for (int x = 0; x < bWidth; x++) {
-					setBlockLocal(x, z, y, Blocks.air);
+                    setBlockLocal(x, y, z, Blocks.air);
 				}
 		//build
-		for (int z = 0; z < bHeight; z++)
-			for (int y = 0; y < bLength; y++)
+        for (int y = 0; y < bHeight; y++)
+            for (int z = 0; z < bLength; z++)
 				for (int x = 0; x < bWidth; x++) {
-					setBlockLocal(x, z, y, tmlt.rules[tmlt.template[z][y][x]]);
+                    setBlockLocal(x, y, z, tmlt.rules[tmlt.template[y][z][x]]);
 				}
         flushDelayed();
 	}
@@ -74,9 +74,9 @@ public class BuildingTML extends Building {
 		if (j0 <= 0)
 			return false;
 		//Don't build if it would require leveling greater than tmlt.leveling
-		for (int y = 0; y < bLength; y++)
+        for (int z = 0; z < bLength; z++)
 			for (int x = 0; x < bWidth; x++)
-				if (j0 - getSurfaceIJKPt(x, y, j0 - 1, true, 3)[1] > tmlt.leveling + 1)
+                if (j0 - getSurfaceIJKPt(x, z, j0 - 1, true, 3)[1] > tmlt.leveling + 1)
 					return false;
 		//check to see if we are underwater
 		if (tmlt.waterHeight != TemplateTML.NO_WATER_CHECK) {

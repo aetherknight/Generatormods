@@ -20,8 +20,11 @@ package generatormods.common;
 
 public class Shape {
     public final static int MAX_SPHERE_DIAM = 40;
+    /* [diam][] */
     public final static int[][] SPHERE_SHAPE = new int[MAX_SPHERE_DIAM + 1][];
+    /* [diam][y][x] */
     public final static int[][][] CIRCLE_SHAPE = new int[MAX_SPHERE_DIAM + 1][][];
+    /* [diam][y][x] */
     public final static int[][][] CIRCLE_CRENEL = new int[MAX_SPHERE_DIAM + 1][][];
 
     static {

@@ -204,7 +204,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		jmean = 0;
 		for (BuildingWall w : walls)
 			for (int n = 0; n < w.bLength; n++)
-				jmean += w.zArray[n] + w.j1;
+                jmean += w.yArray[n] + w.j1;
 		jmean /= (Lmean * 4);
 		for (BuildingWall w : walls) {
 			if (Math.abs(w.j1 - jmean) > w.bLength / JMEAN_DEVIATION_SLOPE) {
@@ -274,7 +274,8 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 			w.buildFromTML();
             Handedness radialAvenueHand =
                     w.bDir == dir[0] || w.bDir == dir[1] ? Handedness.L_HAND : Handedness.R_HAND;
-			int startScan = w.getY(cityCenter) + (radialAvenueHand == w.bHand ? (avenueWS.WWidth - 1) : 0);
+            int startScan =
+                    w.getZ(cityCenter) + (radialAvenueHand == w.bHand ? (avenueWS.WWidth - 1) : 0);
             BuildingWall[] avenues =
                     w.buildGateway(new int[] {w.bLength / 4, 3 * w.bLength / 4}, startScan,
                             GATE_HEIGHT, avenueWS.WWidth, avenueWS,
@@ -309,7 +310,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		if (ows.MakeEndTowers) { //allow MakeEndTowers to control corner towers so we can have an "invisible wall"...
 			for (int w = 0; w < 4; w++) {
 				if (walls[(w + 3) % 4].bLength > 2) {
-					int zmean = (walls[w].zArray[2] - walls[w].j1 + walls[(w + 3) % 4].zArray[walls[(w + 3) % 4].bLength - 3] + walls[(w + 3) % 4].j1) / 2;
+                    int zmean =
+                            (walls[w].yArray[2] - walls[w].j1
+                                    + walls[(w + 3) % 4].yArray[walls[(w + 3) % 4].bLength - 3] + walls[(w + 3) % 4].j1) / 2;
 					int minCornerWidth = ows.WWidth + 2 + (ows.TowerXOffset < 0 ? 2 * ows.TowerXOffset : 0);
 					int TWidth = ows.getTMaxWidth(walls[w].circular) < minCornerWidth ? minCornerWidth : ows.getTMaxWidth(walls[w].circular);
                     BuildingTower tower =
@@ -473,9 +476,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
         int jmin = world.provider.isHellWorld ? jmean : Math.max(jmean, SEA_LEVEL);
 		for (BuildingWall w : walls) {
 			for (int n = 0; n < w.bLength; n++)
-                if (w.zArray[n] + w.j1 + w.WalkHeight - 1 < jmin
+                if (w.yArray[n] + w.j1 + w.WalkHeight - 1 < jmin
                         && (world.provider.isHellWorld || jmin >= SEA_LEVEL))
-					jmin = w.zArray[n] + w.j1 + w.WalkHeight - 1;
+                    jmin = w.yArray[n] + w.j1 + w.WalkHeight - 1;
 		}
 		int jmax = Math.max(jmean + Lmean / LEVELLING_DEVIATION_SLOPE, jmin);
 		for (pt[0] = corner1[0]; (corner2[0] - pt[0]) * incI > 0; pt[0] += incI) {

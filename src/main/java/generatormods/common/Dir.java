@@ -70,10 +70,8 @@ public enum Dir {
      * The "local" Z-direction for this Dir. Oddly, this is inverted from the
      * value of k. 1 means north, -1 means south. Note that Generatormods
      * currently swaps the "y" and "z" axis labels from Minecraft.
-     *
-     * TODO: Make Generatormods' axis names consistant with Minecraft.
      */
-    public final int y;
+    public final int z;
 
     Dir(int x, int z) {
         // currently, we start with north instead of south.
@@ -82,7 +80,7 @@ public enum Dir {
         this.k = z;
 
         this.x = x;
-        this.y = -z;
+        this.z = -z;
     }
 
     /**
