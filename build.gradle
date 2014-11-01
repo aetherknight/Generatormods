@@ -16,6 +16,7 @@ buildscript {
 }
 
 apply plugin: 'forge'
+apply plugin: 'jacoco' // code coverage reporting
 
 version = "0.1.6"
 group = "generatormods" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -63,4 +64,16 @@ compileJava {
             //options.compilerArgs << "-Werror"
             options.compilerArgs << "-Xlint:deprecation"
             //options.compilerArgs << "-Xlint:unchecked"
+}
+
+dependencies {
+        testCompile 'junit:junit:4.11'
+}
+
+test {
+    useJUnit()
+    testLogging {
+        // Show that tests are run in the command-line output
+        events 'started', 'passed'
+    }
 }

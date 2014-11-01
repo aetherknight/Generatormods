@@ -274,7 +274,7 @@ public class Building {
      * then it would mirror dir the other way.
      */
     public Dir orientDirToBDir(Dir dir) {
-        return bDir.reorient(bHand == Handedness.R_HAND, dir);
+        return bDir.reorient(bHand, dir);
     }
 
 	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setPainting
@@ -961,7 +961,8 @@ public class Building {
 			if (metadata == 0)
 				return 0;
 			else if (metadata == 1 || metadata == 2 || metadata == 4 || metadata == 8)
-                return VINES_DIR_TO_META.get(bDir.reorient(true, VINES_META_TO_DIR[metadata]));
+                return VINES_DIR_TO_META.get(bDir.reorient(Handedness.R_HAND,
+                        VINES_META_TO_DIR[metadata]));
 			else
 				return 1; // default case since vine do not have to have correct
 			// metadata

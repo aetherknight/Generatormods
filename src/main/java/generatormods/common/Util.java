@@ -166,6 +166,19 @@ public class Util {
         return n < 0 ? -1 : 1;
     }
 
+    /**
+     * Integer modulo (%) that always returns a nonnegative value. <a
+     * href="http://docs.oracle.com/javase/specs/jls/se5.0/html/expressions.html#15.17.3">Java's
+     * modulo math might return a negative value when the dividend (lhs) is negative</a>. However,
+     * when doing array indices, we need negative values to wrap around to positive values.
+     */
+    public static int nonnegativeModulo(int lhs, int rhs) {
+        int res = lhs % rhs;
+        if (res < 0)
+            res = res + rhs;
+        return res;
+    }
+
     public static File getWorldSaveDir(World world) {
         ISaveHandler worldSaver = world.getSaveHandler();
         if (worldSaver.getChunkLoader(world.provider) instanceof AnvilChunkLoader) {

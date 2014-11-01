@@ -288,10 +288,10 @@ public class BuildingWall extends Building {
 					if (rs != null) {
                         avenues =
                                 new BuildingWall[] {
-                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand.num),
+                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand),
                                                 XHand, XMaxLen, false, getIJKPt(bWidth, 0,
                                                         XHand != bHand ? 1 - gateWidth : 0)),
-                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand.num),
+                                        new BuildingWall(bID, config, rs, bDir.rotate(bHand),
                                                 antiXHand, antiXMaxLen, false, getIJKPt(-1, 0,
                                                         antiXHand == bHand ? 1 - gateWidth : 0))};
                         avenues[0].setTarget(XTarget == null ? getIJKPt(bWidth + tw, 0,

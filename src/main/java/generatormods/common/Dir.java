@@ -19,16 +19,17 @@
 package generatormods.common;
 
 import java.util.Random;
-    
+
+import static generatormods.common.Util.nonnegativeModulo;
+
 /**
- * <p>Direction, as Generatormods currently uses them.</p>
- *
- * <p>At present, Generatormods' directions start with NORTH(0), then go clockwise
- * until WEST(3). This is different from Minecraft's Direction class, which
- * starts with South(0) and then goes clockwise unitl East(3). Also note that
- * Minecraft's notion of Facings also has a completely different ordering for
- * its directions. The following table provides some help understanding how
- * various directions are mapped to index values:</p>
+ * Direction, as Generatormods currently uses them.
+ * <p>
+ * At present, Generatormods' directions start with NORTH(0), then go clockwise until WEST(3). This
+ * is different from Minecraft's Direction class, which starts with South(0) and then goes clockwise
+ * unitl East(3). Also note that Minecraft's notion of Facings also has a completely different
+ * ordering for its directions. The following table provides some help understanding how various
+ * directions are mapped to index values:
  *
  * <table>
  * <tr><th>Direction</th><th>Minecraft Direction</th><th>Minecraft Facing/ForgeDirection</th><th>Vine Metadata</th><th>Generatormods Dir ordinal</th></tr>
@@ -41,17 +42,16 @@ import java.util.Random;
  * </table>
  */
 public enum Dir {
-	NORTH(0, -1), EAST(1,0), SOUTH(0,1), WEST(-1,0);
+    NORTH(0, -1), EAST(1, 0), SOUTH(0, 1), WEST(-1, 0);
 
-    private static final Dir[] directions = new Dir[] { NORTH, EAST, SOUTH, WEST };
-    private static final Dir[] opposite = new Dir[] { SOUTH, WEST, NORTH, EAST };
+    private static final Dir[] directions = new Dir[] {NORTH, EAST, SOUTH, WEST};
+    private static final Dir[] opposite = new Dir[] {SOUTH, WEST, NORTH, EAST};
 
     @Deprecated
     public final int minecraftDirection;
 
     /**
-     * The X-axis direction for this Dir. -1 means west, and +1 means east,
-     * just like in Minecraft.
+     * The X-axis direction for this Dir. -1 means west, and +1 means east, just like in Minecraft.
      */
     public final int i;
 
@@ -61,15 +61,15 @@ public enum Dir {
     public final int k;
 
     /**
-     * The "local" X-axis direction for this Dir. -1 means west, and +1 means
-     * east, just like in Minecraft.
+     * The "local" X-axis direction for this Dir. -1 means west, and +1 means east, just like in
+     * Minecraft.
      */
     public final int x;
 
     /**
-     * The "local" Z-direction for this Dir. Oddly, this is inverted from the
-     * value of k. 1 means north, -1 means south. Note that Generatormods
-     * currently swaps the "y" and "z" axis labels from Minecraft.
+     * The "local" Z-direction for this Dir. Oddly, this is inverted from the value of k. 1 means
+     * north, -1 means south. Note that Generatormods currently swaps the "y" and "z" axis labels
+     * from Minecraft.
      */
     public final int z;
 
@@ -84,30 +84,32 @@ public enum Dir {
     }
 
     /**
-     * Reorient dir in relation to this direction. Basically, it treats "this"
-     * as the new "north" for dir, which is then reoriented. If clockwise is
-     * true, then it reorients normally, but if it is false, then it is as if
-     * dir is mirror first.
+     * Reorient dir in relation to this direction. Basically, it treats "this" as the new "north"
+     * for dir, which is then reoriented. If clockwise is true, then it reorients normally, but if
+     * it is false, then it is as if dir is mirror first.
      *
      * For example:
-     *
-     *     EAST.reorient(true, WEST)
+     * <pre>{@code
+     * EAST.reorient(R_HAND, WEST)
+     * }</pre>
      *
      * will return NORTH, while:
      *
-     *     EAST.reorient(false, WEST)
+     * <pre>{@code
+     * EAST.reorient(L_HAND, WEST)
+     * }</pre>
      *
      * will return SOUTH.
      */
-    public Dir reorient(boolean clockwise, Dir dir) {
-        return this.rotate(clockwise, dir.ordinal());
+    public Dir reorient(Handedness handedness, Dir dir) {
+        return this.rotate(handedness, dir.ordinal());
     }
 
     /**
      * Rotate numTurns clockwise from this.
      */
     public Dir rotate(int numTurns) {
-        return rotate(true, numTurns);
+        return rotate(Handedness.R_HAND, numTurns);
     }
 
     /**
@@ -124,25 +126,21 @@ public enum Dir {
     }
 
     /**
-     * Rotates the current Dir numTurns*90 degrees. If clockwise is true, it
-     * rotates clockwise, if it is false it rotates counterclockwise.
+     * Return a direction rotated numTurns*90 degrees in the specified direction.
+     *
+     * @param handedness R_HAND is 1 rotation clockwise, L_HAND is 1 rotation counterclockwise, and
+     *        null is don't rotate.
+     * @param numTurns the number of 90 degree turns to take.
      */
-    public Dir rotate(boolean clockwise, int numTurns) {
-        return directions[(this.ordinal() + (clockwise ? 1 : -1) * numTurns) % 4];
+    public Dir rotate(Handedness handedness, int numTurns) {
+        if (handedness == null)
+            return this;
+        else
+            return directions[nonnegativeModulo((this.ordinal() + handedness.num * numTurns), 4)];
     }
 
     public static Dir randomDir(Random random) {
         return Dir.directions[random.nextInt(4)];
-    }
-
-    @Deprecated
-    public Dir rotateClockwise() {
-        return rotate(true, 1);
-    }
-
-    @Deprecated
-    public Dir rotateCounterClockwise() {
-        return rotate(false, 1);
     }
 
     public Dir opposite() {
