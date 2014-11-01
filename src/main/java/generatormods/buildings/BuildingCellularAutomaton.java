@@ -28,8 +28,8 @@ import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
-import generatormods.common.Util;
 import generatormods.common.config.ChestType;
+import generatormods.util.IntUtil;
 import generatormods.walledcity.LayoutCode;
 
 import java.util.ArrayList;
@@ -365,10 +365,10 @@ public class BuildingCellularAutomaton extends Building {
 			}
 		}
 		//now resize building dimensions and shift down
-        int minX = Util.min(BB[0]);
-        int maxX = Util.max(BB[1]);
-        int minZ = Util.min(BB[2]);
-        int maxZ = Util.max(BB[3]);
+        int minX = IntUtil.min(BB[0]);
+        int maxX = IntUtil.max(BB[1]);
+        int minZ = IntUtil.min(BB[2]);
+        int maxZ = IntUtil.max(BB[3]);
 
 		bWidth = maxX - minX + 1;
         bLength = maxZ - minZ + 1;
@@ -444,8 +444,8 @@ public class BuildingCellularAutomaton extends Building {
 				findSurfaceJ(world, getI(0, bLength - 1), getK(0, bLength - 1), j0 + 10, false, IGNORE_WATER),
 				findSurfaceJ(world, getI(bWidth - 1, bLength - 1), getK(bWidth - 1, bLength - 1), j0 + 10, false, IGNORE_WATER),
 				findSurfaceJ(world, getI(bWidth / 2, bLength / 2), getK(bWidth / 2, bLength / 2), j0 + 10, false, IGNORE_WATER) };
-        int minHeight = Util.min(heights);
-        if (Util.max(heights) - minHeight > maxShift)
+        int minHeight = IntUtil.min(heights);
+        if (IntUtil.max(heights) - minHeight > maxShift)
 			return false;
 		else
 			j0 = minHeight;

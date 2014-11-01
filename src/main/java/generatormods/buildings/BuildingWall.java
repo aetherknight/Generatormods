@@ -18,9 +18,9 @@
  */
 package generatormods.buildings;
 
+import generatormods.caruins.config.CARule;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.SymmetricSeed;
-import generatormods.caruins.config.CARule;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
 import generatormods.common.BlockProperties;
@@ -31,12 +31,11 @@ import generatormods.common.RoofStyle;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateTML;
 import generatormods.common.TemplateWall;
-import generatormods.common.Util;
+import generatormods.util.IntUtil;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
-
 import org.apache.logging.log4j.Logger;
 
 import static generatormods.common.DirMeta.STAIRS_META_TO_DIR;
@@ -982,8 +981,8 @@ public class BuildingWall extends Building {
      * </ul>
      */
 	private static int curvature(int a, int b, int c, int wiggle) {
-        int d1 = Util.signum(a - b, wiggle);
-        int d2 = Util.signum(c - b, wiggle);
+        int d1 = IntUtil.signum(a - b, wiggle);
+        int d2 = IntUtil.signum(c - b, wiggle);
 		if (d1 * d2 < 0)
 			return 2 * d2;
         return Integer.signum(d1 + d2);

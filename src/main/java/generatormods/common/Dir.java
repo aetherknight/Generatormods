@@ -18,9 +18,8 @@
  */
 package generatormods.common;
 
+import generatormods.util.IntUtil;
 import java.util.Random;
-
-import static generatormods.common.Util.nonnegativeModulo;
 
 /**
  * Direction, as Generatormods currently uses them.
@@ -136,7 +135,7 @@ public enum Dir {
         if (handedness == null)
             return this;
         else
-            return directions[nonnegativeModulo((this.ordinal() + handedness.num * numTurns), 4)];
+            return directions[IntUtil.nonnegativeModulo((this.ordinal() + handedness.num * numTurns), 4)];
     }
 
     public static Dir randomDir(Random random) {
