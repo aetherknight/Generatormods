@@ -42,7 +42,7 @@ public class WalledCityConfig extends AbstractConfig {
     public void initialize() {
         Configuration config = new Configuration(configFile);
 
-        String section = "CARuins";
+        String section = "WalledCity";
 
         initCommonConfig(config, section);
 

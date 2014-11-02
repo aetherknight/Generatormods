@@ -39,7 +39,7 @@ public class GreatWallConfig extends AbstractConfig {
     public void initialize() {
         Configuration config = new Configuration(configFile);
 
-        String section = "CARuins";
+        String section = "GreatWall";
 
         initCommonConfig(config, section);
 
