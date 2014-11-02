@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -67,7 +68,8 @@ compileJava {
 }
 
 dependencies {
-        testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.11'
+    testCompile "org.mockito:mockito-core:1.+"
 }
 
 test {

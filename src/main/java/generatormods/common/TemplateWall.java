@@ -20,6 +20,7 @@ package generatormods.common;
 
 import generatormods.buildings.BuildingTower;
 import generatormods.caruins.config.CARule;
+import generatormods.util.ParseUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -99,103 +100,172 @@ public class TemplateWall extends TemplateTML {
 	public void readTowerParameters() throws Exception {
 		float mobProb = 0.0F, pigZombieProb = 0.0F, endermanProb = 0.0F, caveSpiderProb = 0.0F; //deprecated, for backwards compatibility
 		if (extraOptions.containsKey("biomes"))
-			Biomes = Util.readNamedCheckList(logger, Biomes, "=", extraOptions.get("biomes"), BiomeNames.getBiomeNames(), "ALL");
+            Biomes =
+                    ParseUtil.readNamedCheckList(logger, Biomes, "=", extraOptions.get("biomes"),
+                            BiomeNames.getBiomeNames(), "ALL");
 		if (extraOptions.containsKey("street_density"))
-			StreetDensity = Util.readIntParam(logger, StreetDensity, "=", extraOptions.get("street_density"));
+            StreetDensity =
+                    ParseUtil.readIntParam(logger, StreetDensity, "=",
+                            extraOptions.get("street_density"));
 		if (extraOptions.containsKey("level_interior"))
-			LevelInterior = Util.readIntParam(logger, 1, "=", extraOptions.get("level_interior")) == 1;
+            LevelInterior =
+                    ParseUtil.readIntParam(logger, 1, "=", extraOptions.get("level_interior")) == 1;
 		if (extraOptions.containsKey("walk_height"))
-			WalkHeight = Util.readIntParam(logger, WalkHeight, "=", extraOptions.get("walk_height"));
+            WalkHeight =
+                    ParseUtil
+                            .readIntParam(logger, WalkHeight, "=", extraOptions.get("walk_height"));
 		if (extraOptions.containsKey("min_length"))
-			MinL = Util.readIntParam(logger, MinL, "=", extraOptions.get("min_length"));
+            MinL = ParseUtil.readIntParam(logger, MinL, "=", extraOptions.get("min_length"));
 		if (extraOptions.containsKey("max_length"))
-			MaxL = Util.readIntParam(logger, MaxL, "=", extraOptions.get("max_length"));
+            MaxL = ParseUtil.readIntParam(logger, MaxL, "=", extraOptions.get("max_length"));
 		if (extraOptions.containsKey("tower_rule"))
-			TowerRule = Util.readRuleIdOrRule("=", extraOptions.get("tower_rule"), rules);
+            TowerRule = ParseUtil.readRuleIdOrRule("=", extraOptions.get("tower_rule"), rules);
 		if (extraOptions.containsKey("building_interval"))
-			BuildingInterval = Util.readIntParam(logger, BuildingInterval, "=", extraOptions.get("building_interval"));
+            BuildingInterval =
+                    ParseUtil.readIntParam(logger, BuildingInterval, "=",
+                            extraOptions.get("building_interval"));
 		if (extraOptions.containsKey("make_buildings"))
-			MakeBuildings = Util.readIntParam(logger, 1, "=", extraOptions.get("make_buildings")) == 1;
+            MakeBuildings =
+                    ParseUtil.readIntParam(logger, 1, "=", extraOptions.get("make_buildings")) == 1;
 		if (extraOptions.containsKey("make_gatehouse_towers"))
-			MakeGatehouseTowers = Util.readIntParam(logger, 1, "=", extraOptions.get("make_gatehouse_towers")) == 1;
+            MakeGatehouseTowers =
+                    ParseUtil.readIntParam(logger, 1, "=",
+                            extraOptions.get("make_gatehouse_towers")) == 1;
 		if (extraOptions.containsKey("make_end_towers"))
-			MakeEndTowers = Util.readIntParam(logger, 1, "=", extraOptions.get("make_end_towers")) == 1;
+            MakeEndTowers =
+                    ParseUtil.readIntParam(logger, 1, "=", extraOptions.get("make_end_towers")) == 1;
 		if (extraOptions.containsKey("make_underground_entranceways"))
-			MakeUndergroundEntranceways = Util.readIntParam(logger, 1, "=", extraOptions.get("make_underground_entranceways")) == 1;
+            MakeUndergroundEntranceways =
+                    ParseUtil.readIntParam(logger, 1, "=",
+                            extraOptions.get("make_underground_entranceways")) == 1;
 		if (extraOptions.containsKey("merge_walls"))
-			MergeWalls = Util.readIntParam(logger, 0, "=", extraOptions.get("merge_walls")) == 1;
+            MergeWalls =
+                    ParseUtil.readIntParam(logger, 0, "=", extraOptions.get("merge_walls")) == 1;
 		if (extraOptions.containsKey("lateral_smoothing_scale"))
-			LateralSmoothingScale = Util.readIntParam(logger, LateralSmoothingScale, "=", extraOptions.get("lateral_smoothing_scale"));
+            LateralSmoothingScale =
+                    ParseUtil.readIntParam(logger, LateralSmoothingScale, "=",
+                            extraOptions.get("lateral_smoothing_scale"));
 		if (extraOptions.containsKey("concave_up_smoothing_scale"))
-			ConcaveUpSmoothingScale = Util.readIntParam(logger, ConcaveUpSmoothingScale, "=", extraOptions.get("concave_up_smoothing_scale"));
+            ConcaveUpSmoothingScale =
+                    ParseUtil.readIntParam(logger, ConcaveUpSmoothingScale, "=",
+                            extraOptions.get("concave_up_smoothing_scale"));
 		if (extraOptions.containsKey("concave_down_smoothing_scale"))
-			ConcaveDownSmoothingScale = Util.readIntParam(logger, ConcaveDownSmoothingScale, "=", extraOptions.get("concave_down_smoothing_scale"));
+            ConcaveDownSmoothingScale =
+                    ParseUtil.readIntParam(logger, ConcaveDownSmoothingScale, "=",
+                            extraOptions.get("concave_down_smoothing_scale"));
 		//default tower variables
 		if (extraOptions.containsKey("default_tower_weight"))
-			DefaultTowerWeight = Util.readIntParam(logger, DefaultTowerWeight, "=", extraOptions.get("default_tower_weight"));
+            DefaultTowerWeight =
+                    ParseUtil.readIntParam(logger, DefaultTowerWeight, "=",
+                            extraOptions.get("default_tower_weight"));
 		if (extraOptions.containsKey("tower_offset"))
-			TowerXOffset = Util.readIntParam(logger, TowerXOffset, "=", extraOptions.get("tower_offset"));
+            TowerXOffset =
+                    ParseUtil.readIntParam(logger, TowerXOffset, "=",
+                            extraOptions.get("tower_offset"));
 		if (extraOptions.containsKey("spawner_rule"))
-			SpawnerRule = Util.readRuleIdOrRule("=", extraOptions.get("spawner_rule"), rules);
+            SpawnerRule = ParseUtil.readRuleIdOrRule("=", extraOptions.get("spawner_rule"), rules);
 		if (extraOptions.containsKey("populate_furniture"))
-			PopulateFurniture = Util.readFloatParam(logger, 0, "=", extraOptions.get("populate_furniture")) == 1;
+            PopulateFurniture =
+                    ParseUtil
+                            .readFloatParam(logger, 0, "=", extraOptions.get("populate_furniture")) == 1;
 		if (extraOptions.containsKey("make_doors"))
-			MakeDoors = Util.readFloatParam(logger, 0, "=", extraOptions.get("make_doors")) == 1;
+            MakeDoors =
+                    ParseUtil.readFloatParam(logger, 0, "=", extraOptions.get("make_doors")) == 1;
 		if (extraOptions.containsKey("circular_probability"))
-			CircularProb = Util.readFloatParam(logger, CircularProb, "=", extraOptions.get("circular_probability"));
+            CircularProb =
+                    ParseUtil.readFloatParam(logger, CircularProb, "=",
+                            extraOptions.get("circular_probability"));
 		if (extraOptions.containsKey("chest_rule"))
-			ChestRule = Util.readRuleIdOrRule("=", extraOptions.get("chest_rule"), rules);
+            ChestRule = ParseUtil.readRuleIdOrRule("=", extraOptions.get("chest_rule"), rules);
 		if (extraOptions.containsKey("square_min_height"))
-			SqrMinHeight = Util.readIntParam(logger, SqrMinHeight, "=", extraOptions.get("square_min_height"));
+            SqrMinHeight =
+                    ParseUtil.readIntParam(logger, SqrMinHeight, "=",
+                            extraOptions.get("square_min_height"));
 		if (extraOptions.containsKey("square_max_height"))
-			SqrMaxHeight = Util.readIntParam(logger, SqrMaxHeight, "=", extraOptions.get("square_max_height"));
+            SqrMaxHeight =
+                    ParseUtil.readIntParam(logger, SqrMaxHeight, "=",
+                            extraOptions.get("square_max_height"));
 		if (extraOptions.containsKey("square_min_width"))
-			SqrMinWidth = Util.readIntParam(logger, SqrMinWidth, "=", extraOptions.get("square_min_width"));
+            SqrMinWidth =
+                    ParseUtil.readIntParam(logger, SqrMinWidth, "=",
+                            extraOptions.get("square_min_width"));
 		if (extraOptions.containsKey("square_max_width"))
-			SqrMaxWidth = Util.readIntParam(logger, SqrMaxWidth, "=", extraOptions.get("square_max_width"));
+            SqrMaxWidth =
+                    ParseUtil.readIntParam(logger, SqrMaxWidth, "=",
+                            extraOptions.get("square_max_width"));
 		if (extraOptions.containsKey("square_roof_styles"))
             SqrRoofStyles =
-                    Util.readNamedCheckList(logger, SqrRoofStyles, "=",
+                    ParseUtil.readNamedCheckList(logger, SqrRoofStyles, "=",
                             extraOptions.get("square_roof_styles"), RoofStyle.names, "");
 		if (extraOptions.containsKey("square_roof_rule"))
-			SqrRoofRule = Util.readRuleIdOrRule("=", extraOptions.get("square_roof_rule"), rules);
+            SqrRoofRule =
+                    ParseUtil.readRuleIdOrRule("=", extraOptions.get("square_roof_rule"), rules);
 		if (extraOptions.containsKey("circular_tower_min_height"))
-			CircMinHeight = Util.readIntParam(logger, CircMinHeight, "=", extraOptions.get("circular_tower_min_height"));
+            CircMinHeight =
+                    ParseUtil.readIntParam(logger, CircMinHeight, "=",
+                            extraOptions.get("circular_tower_min_height"));
 		if (extraOptions.containsKey("circular_tower_max_height"))
-			CircMaxHeight = Util.readIntParam(logger, CircMaxHeight, "=", extraOptions.get("circular_tower_max_height"));
+            CircMaxHeight =
+                    ParseUtil.readIntParam(logger, CircMaxHeight, "=",
+                            extraOptions.get("circular_tower_max_height"));
 		if (extraOptions.containsKey("circular_tower_min_width"))
-			CircMinWidth = Util.readIntParam(logger, CircMinWidth, "=", extraOptions.get("circular_tower_min_width"));
+            CircMinWidth =
+                    ParseUtil.readIntParam(logger, CircMinWidth, "=",
+                            extraOptions.get("circular_tower_min_width"));
 		if (extraOptions.containsKey("circular_tower_max_width"))
-			CircMaxWidth = Util.readIntParam(logger, CircMaxWidth, "=", extraOptions.get("circular_tower_max_width"));
+            CircMaxWidth =
+                    ParseUtil.readIntParam(logger, CircMaxWidth, "=",
+                            extraOptions.get("circular_tower_max_width"));
 		if (extraOptions.containsKey("circular_tower_roof_styles"))
             CircRoofStyles =
-                    Util.readNamedCheckList(logger, CircRoofStyles, "=",
+                    ParseUtil.readNamedCheckList(logger, CircRoofStyles, "=",
                             extraOptions.get("circular_tower_roof_styles"), RoofStyle.names, "");
 		if (extraOptions.containsKey("circular_tower_roof_rule"))
-			CircRoofRule = Util.readRuleIdOrRule("=", extraOptions.get("circular_tower_roof_rule"), rules);
+            CircRoofRule =
+                    ParseUtil.readRuleIdOrRule("=", extraOptions.get("circular_tower_roof_rule"),
+                            rules);
 		//default tower variables (deprecated)
 		if (extraOptions.containsKey("mob_probability"))
-			mobProb = Util.readFloatParam(logger, mobProb, "=", extraOptions.get("mob_probability"));
+            mobProb =
+                    ParseUtil.readFloatParam(logger, mobProb, "=",
+                            extraOptions.get("mob_probability"));
 		if (extraOptions.containsKey("pig_zombie_probability"))
-			pigZombieProb = Util.readFloatParam(logger, pigZombieProb, "=", extraOptions.get("pig_zombie_probability"));
+            pigZombieProb =
+                    ParseUtil.readFloatParam(logger, pigZombieProb, "=",
+                            extraOptions.get("pig_zombie_probability"));
 		if (extraOptions.containsKey("enderman_probability"))
-			endermanProb = Util.readFloatParam(logger, endermanProb, "=", extraOptions.get("enderman_probability"));
+            endermanProb =
+                    ParseUtil.readFloatParam(logger, endermanProb, "=",
+                            extraOptions.get("enderman_probability"));
 		if (extraOptions.containsKey("cave_spider_probability"))
-			caveSpiderProb = Util.readFloatParam(logger, caveSpiderProb, "=", extraOptions.get("cave_spider_probability"));
+            caveSpiderProb =
+                    ParseUtil.readFloatParam(logger, caveSpiderProb, "=",
+                            extraOptions.get("cave_spider_probability"));
 		//caruin variables
 		if (extraOptions.containsKey("ca_ruin_rule"))
-			CARuinRule = Util.readRuleIdOrRule("=", extraOptions.get("ca_ruin_rule"), rules);
+            CARuinRule = ParseUtil.readRuleIdOrRule("=", extraOptions.get("ca_ruin_rule"), rules);
 		if (extraOptions.containsKey("ca_ruin_weight"))
-			CARuinWeight = Util.readIntParam(logger, CARuinWeight, "=", extraOptions.get("ca_ruin_weight"));
+            CARuinWeight =
+                    ParseUtil.readIntParam(logger, CARuinWeight, "=",
+                            extraOptions.get("ca_ruin_weight"));
 		if (extraOptions.containsKey("ca_ruin_min_height"))
-			CARuinMinHeight = Util.readIntParam(logger, CARuinMinHeight, "=", extraOptions.get("ca_ruin_min_height"));
+            CARuinMinHeight =
+                    ParseUtil.readIntParam(logger, CARuinMinHeight, "=",
+                            extraOptions.get("ca_ruin_min_height"));
 		if (extraOptions.containsKey("ca_ruin_max_height"))
-			CARuinMaxHeight = Util.readIntParam(logger, CARuinMaxHeight, "=", extraOptions.get("ca_ruin_max_height"));
+            CARuinMaxHeight =
+                    ParseUtil.readIntParam(logger, CARuinMaxHeight, "=",
+                            extraOptions.get("ca_ruin_max_height"));
 		if (extraOptions.containsKey("ca_ruin_max_width"))
-			CARuinContainerWidth = Util.readIntParam(logger, CARuinContainerWidth, "=", extraOptions.get("ca_ruin_max_width"));
+            CARuinContainerWidth =
+                    ParseUtil.readIntParam(logger, CARuinContainerWidth, "=",
+                            extraOptions.get("ca_ruin_max_width"));
 		if (extraOptions.containsKey("ca_ruin_automata_rules"))
-			CARuinAutomataRules = Util.readAutomataList(logger, "=", extraOptions.get("ca_ruin_automata_rules"));
-		//&&&&&&&&&&&&&&&&&&&&&&  post-processing  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+            CARuinAutomataRules =
+                    ParseUtil.readAutomataList(logger, "=",
+                            extraOptions.get("ca_ruin_automata_rules"));
+
+		// post-processing
 		if (MaxL <= MinL)
 			MaxL = MinL + 1;
 		if (StreetDensity < 0)

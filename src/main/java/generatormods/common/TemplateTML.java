@@ -18,17 +18,16 @@
  */
 package generatormods.common;
 
+import generatormods.util.ParseUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
 import org.apache.logging.log4j.Logger;
 
 /*
@@ -123,30 +122,30 @@ public class TemplateTML {
 				String[] parts = line.split("=");
 				rulesArrayList.add(new TemplateRule(parts[1], true));
 			} else if (line.startsWith("dimensions")) {
-				Integer[] dim = Util.readIntList(logger, null, "=", line);
+                Integer[] dim = ParseUtil.readIntList(logger, null, "=", line);
 				if (dim == null || dim.length != 3)
 					throw new Exception("Bad dimension input!" + line);
 				height = dim[0];
 				length = dim[1];
 				width = dim[2];
 			}
-			//else if(line.startsWith("acceptable_target_blocks" )) targets=Util.readIntList(logger,targets,"=",line);
+            //else if(line.startsWith("acceptable_target_blocks" )) targets=ParseUtil.readIntList(logger,targets,"=",line);
 			else if (line.startsWith("weight")) {
-				weight = Util.readIntParam(logger, weight, "=", line);
+                weight = ParseUtil.readIntParam(logger, weight, "=", line);
 				if (weight <= 0)
 					throw ZERO_WEIGHT_EXCEPTION;
 			} else if (line.startsWith("embed_into_distance"))
-				embed = Util.readIntParam(logger, embed, "=", line);
+                embed = ParseUtil.readIntParam(logger, embed, "=", line);
 			else if (line.startsWith("max_cut_in"))
-				cutIn = Util.readIntParam(logger, cutIn, "=", line);
+                cutIn = ParseUtil.readIntParam(logger, cutIn, "=", line);
 			else if (line.startsWith("max_leveling"))
-				leveling = Util.readIntParam(logger, leveling, "=", line);
+                leveling = ParseUtil.readIntParam(logger, leveling, "=", line);
 			else if (line.startsWith("water_height")) {
 				readInWaterHeight = true;
 				if (line.contains(NO_WATER_CHECK_STR))
 					waterHeight = NO_WATER_CHECK;
 				else
-					waterHeight = Util.readIntParam(logger, waterHeight, "=", line);
+                    waterHeight = ParseUtil.readIntParam(logger, waterHeight, "=", line);
 			} else if (line.length() > 0) {
 				String[] spl = line.split("=");
 				if (spl.length == 2 && !spl[0].equals("") && !spl[1].equals(""))
