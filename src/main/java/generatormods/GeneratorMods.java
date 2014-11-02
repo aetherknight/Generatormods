@@ -33,11 +33,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = GeneratorMods.modId, name = "Formivore's GeneratorMods", version = GeneratorMods.modVersion,
+@Mod(modid = GeneratorMods.modId, name = "Formivore's GeneratorMods", version = "${version}",
         dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class GeneratorMods {
     public final static String modId = "GeneratorMods";
-    protected final static String modVersion = "0.1.6";
+    public final static String modVersion = "${version}";
 
     @Instance(modId)
     public static GeneratorMods instance;
