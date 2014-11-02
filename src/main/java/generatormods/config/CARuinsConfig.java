@@ -20,7 +20,6 @@ package generatormods.config;
 
 import generatormods.caruins.SeedType;
 import generatormods.caruins.WeightedCARule;
-import generatormods.caruins.SeedType.Weighted;
 import generatormods.config.templates.TemplateRule;
 import generatormods.util.exceptions.ParseError;
 
