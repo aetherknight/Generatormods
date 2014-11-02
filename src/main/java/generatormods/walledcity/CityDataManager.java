@@ -18,7 +18,7 @@
  */
 package generatormods.walledcity;
 
-import generatormods.PopulatorWalledCity;
+import generatormods.modules.WalledCity;
 import generatormods.util.WorldUtil;
 
 import java.io.BufferedReader;
@@ -93,7 +93,7 @@ public class CityDataManager {
     public boolean isCitySeparated(World world, int i, int k, int cityType) {
         if (cityLocations.containsKey(world)) {
             for (int[] location : cityLocations.get(world)) {
-                if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == PopulatorWalledCity.CITY_TYPE_UNDERGROUND ? undergroundMinCitySeparation : minCitySeparation)) {
+                if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == WalledCity.CITY_TYPE_UNDERGROUND ? undergroundMinCitySeparation : minCitySeparation)) {
                     return false;
                 }
             }

@@ -16,69 +16,58 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.modules;
 
-import generatormods.builders.GreatWallBuilder;
-import generatormods.config.GreatWallConfig;
-import generatormods.config.templates.TemplateWall;
+import generatormods.builders.CARuinsBuilder;
+import generatormods.config.CARuinsConfig;
 
-import java.io.File;
-import java.util.List;
+import org.apache.logging.log4j.LogManager;
+
 import java.util.Random;
 
 import net.minecraft.world.World;
 
-import org.apache.logging.log4j.LogManager;
-
-/*
- * PopulatorGreatWall is the main class that hooks into ModLoader for the Great
- * Wall Mod. It reads the globalSettings file and runs WorldGenWalledCities.
+/**
+ * Main class that hooks into Forge for CARuins. It loads configuration and
+ * sets up the world generation it adds.
  */
-public class PopulatorGreatWall extends BuildingExplorationHandler {
-	public static PopulatorGreatWall instance;
-	//DATA VARIABLES
-    public List<TemplateWall> wallStyles = null;
-	public int[] placedCoords = null;
-	public World placedWorld = null;
+public class CARuins extends AbstractModule {
+	public static CARuins instance;
 
-    public GreatWallConfig config;
+    public CARuinsConfig config;
 
-    public PopulatorGreatWall(String parentModName) {
+    public CARuins(String parentModName) {
         this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 
     public final void loadConfiguration() {
 		try {
-            logger.info("Loading config and templates for GreatWall");
+            logger.info("Loading config for CARuins");
 
-            config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
+            config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 
-            File stylesDirectory = new File(CONFIG_DIRECTORY, "greatwall");
-            wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
-            logger.info("Template loading complete.");
-
             logger.info(
-                    "Probability of wall generation attempt per chunk explored is {}, with {} tries per chunk.",
+                    "Probability of CARuin generation attempt per chunk explored is {}, with {} tries per chunk.",
                     config.getGlobalFrequency(), config.getTriesPerChunk());
 		} catch (Exception e) {
             disable("Ran into an error while loading configuration", e);
 		}
         if (config.getGlobalFrequency() < 0.000001)
             disable("global frequency is less than 0.000001");
+        if (config.caRules == null || config.caRules.size() == 0)
+            disable("no CA Rules loaded");
 	}
 
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
         if (random.nextFloat() < config.getGlobalFrequency())
-            (new GreatWallBuilder(world, random, i, k, config.getTriesPerChunk(),
-                    config.getGlobalFrequency(), logger, config.getChestConfigs(), wallStyles,
-                    config.getCurveBias())).run();
+            (new CARuinsBuilder(world, random, i, k, logger, config)).run();
 	}
 
 	@Override
 	public String toString() {
-        return "GreatWall";
+        return "CARuins";
 	}
 }

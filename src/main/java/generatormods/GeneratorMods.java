@@ -20,10 +20,14 @@ package generatormods;
 
 import generatormods.commands.CommandBuild;
 import generatormods.commands.CommandScan;
+import generatormods.modules.CARuins;
+import generatormods.modules.GreatWall;
+import generatormods.modules.WalledCity;
 import generatormods.util.ModUpdateDetectorWrapper;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -39,21 +43,26 @@ public class GeneratorMods {
     public static GeneratorMods instance;
 
 
-    protected PopulatorCARuins caRuins;
-    protected PopulatorGreatWall greatWall;
-    protected PopulatorWalledCity walledCity;
+    protected CARuins caRuins;
+    protected GreatWall greatWall;
+    protected WalledCity walledCity;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        caRuins = new PopulatorCARuins(modId);
-        greatWall = new PopulatorGreatWall(modId);
-        walledCity = new PopulatorWalledCity(modId);
 
-        PopulatorCARuins.instance = caRuins;
-        PopulatorGreatWall.instance = greatWall;
-        PopulatorWalledCity.instance = walledCity;
+        caRuins = new CARuins(modId);
+        greatWall = new GreatWall(modId);
+        walledCity = new WalledCity(modId);
+
+        CARuins.instance = caRuins;
+        GreatWall.instance = greatWall;
+        WalledCity.instance = walledCity;
 
         ModUpdateDetectorWrapper.checkForUpdates(this, event);
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
     }
 
     @EventHandler

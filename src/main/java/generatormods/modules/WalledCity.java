@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.modules;
 
 import generatormods.builders.UndergroundCityBuilder;
 import generatormods.builders.WalledCityBuilder;
@@ -33,21 +33,19 @@ import java.util.Random;
 
 import net.minecraft.world.World;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import static generatormods.util.WorldUtil.IGNORE_WATER;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
 
-
 /*
  * PopulatorWalledCity is the main class that hooks into ModLoader for the
  * Walled City Mod. It reads the globalSettings file, keeps track of city
  * locations, and runs WorldGenWalledCitys and WorldGenUndergroundCities.
  */
-public class PopulatorWalledCity extends BuildingExplorationHandler {
-	public static PopulatorWalledCity instance;
+public class WalledCity extends AbstractModule {
+	public static WalledCity instance;
 
     public final static int MAX_FOG_HEIGHT = 27;
 	public final static int CITY_TYPE_UNDERGROUND = 1;//TheEnd dimension id, since we don't generate there
@@ -60,7 +58,7 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
     public WalledCityConfig config;
 
-    public PopulatorWalledCity(String parentModName) {
+    public WalledCity(String parentModName) {
         this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 

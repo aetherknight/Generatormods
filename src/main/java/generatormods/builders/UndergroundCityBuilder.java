@@ -18,12 +18,12 @@
  */
 package generatormods.builders;
 
-import generatormods.PopulatorWalledCity;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingUndergroundEntranceway;
 import generatormods.config.chests.ChestContentsSpec;
 import generatormods.config.chests.ChestType;
 import generatormods.config.templates.TemplateWall;
+import generatormods.modules.WalledCity;
 import generatormods.util.WorldUtil;
 import generatormods.util.build.BlockProperties;
 import generatormods.util.build.Dir;
@@ -83,7 +83,7 @@ public class UndergroundCityBuilder extends AbstractBuilder {
         pws = TemplateWall.pickBiomeWeightedWallStyle(undergroundCityStyles, world, i0, k0, world.rand, true);
 		if (pws == null)
 			return false;
-        if (!cityDataManager.isCitySeparated(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND)) {
+        if (!cityDataManager.isCitySeparated(world, i0, k0, WalledCity.CITY_TYPE_UNDERGROUND)) {
             logger.debug("Too close to another UndergroundCity");
 			return false;
         }
@@ -91,7 +91,7 @@ public class UndergroundCityBuilder extends AbstractBuilder {
 		hollow(i0, j0, k0, MAX_DIAM);
 		if (hollows.size() == 0)
 			return false;
-        cityDataManager.addCity(world, i0, k0, PopulatorWalledCity.CITY_TYPE_UNDERGROUND);
+        cityDataManager.addCity(world, i0, k0, WalledCity.CITY_TYPE_UNDERGROUND);
         cityDataManager.saveCityLocations(world);
         logger.debug("Building: {} UndergroundCity with {} hollows at ({},{},{})", pws.name,
                 hollows.size(), i0, k0, k0);

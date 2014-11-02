@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods;
+package generatormods.modules;
 
 import generatormods.util.WorldUtil;
 import cpw.mods.fml.common.IWorldGenerator;
@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
  * and PopulatorGreatWall. It loads settings files and runs
  * WorldGeneratorThreads.
  */
-public abstract class BuildingExplorationHandler implements IWorldGenerator {
+public abstract class AbstractModule implements IWorldGenerator {
 	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
 
 	public Logger logger;

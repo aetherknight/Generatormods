@@ -19,7 +19,7 @@
 package generatormods.commands;
 
 import cpw.mods.fml.common.registry.GameData;
-import generatormods.BuildingExplorationHandler;
+import generatormods.modules.AbstractModule;
 import generatormods.util.blocks.BlockAndMeta;
 
 import java.io.BufferedWriter;
@@ -74,7 +74,7 @@ public class CommandScan extends CommandBase{
             b = parseInt(var1, command[4].split(",")[1]);
             int maxZ = Math.max(a,b);
             int minZ = Math.min(a,b);
-            File template = new File(BuildingExplorationHandler.CONFIG_DIRECTORY, command[1]+".tml");
+            File template = new File(AbstractModule.CONFIG_DIRECTORY, command[1]+".tml");
             try{
             if(template.createNewFile()){
                 List<BlockAndMeta> blocks = new ArrayList<BlockAndMeta>();
