@@ -28,6 +28,11 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.init.Blocks;
 
+/**
+ * Specifies a single block rule in a template. A block rule describes how to
+ * specify a single block. It has a condition, a chance to appear, and a list
+ * of one or more possible block specs (blockID or name and metadata).
+ */
 public class TemplateRule {
 	public final static int FIXED_FOR_BUILDING = 5;
 	public final static TemplateRule RULE_NOT_PROVIDED = null;
