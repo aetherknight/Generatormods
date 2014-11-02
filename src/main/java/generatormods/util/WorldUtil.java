@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util;
 
 import java.io.File;
 
@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.ISaveHandler;
 
-public class Util {
+public class WorldUtil {
     public static File getWorldSaveDir(World world) {
         ISaveHandler worldSaver = world.getSaveHandler();
         if (worldSaver.getChunkLoader(world.provider) instanceof AnvilChunkLoader) {

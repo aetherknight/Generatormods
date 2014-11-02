@@ -18,14 +18,12 @@
  */
 package generatormods;
 
-import generatormods.common.Util;
 import generatormods.common.config.SharedConfig;
-
+import generatormods.util.WorldUtil;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -81,10 +79,10 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 		} else if (currentWorld.contains(world)) {
 			return false;
 		} else {
-            File newdir = Util.getWorldSaveDir(world);
+            File newdir = WorldUtil.getWorldSaveDir(world);
 			for (World w : currentWorld) {
 				//check the filename in case we changed of dimension
-                File olddir = Util.getWorldSaveDir(w);
+                File olddir = WorldUtil.getWorldSaveDir(w);
 				if (newdir != null && olddir != null && olddir.compareTo(newdir) != 0) {
 					// new world has definitely been created.
 					currentWorld.add(world);

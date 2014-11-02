@@ -19,7 +19,7 @@
 package generatormods.walledcity;
 
 import generatormods.PopulatorWalledCity;
-import generatormods.common.Util;
+import generatormods.util.WorldUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,7 +28,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,7 +120,9 @@ public class CityDataManager {
     }
 
     public void updateWorldExplored(World world) throws IOException {
-        File cityFile = new File(Util.getWorldSaveDir(world), world.provider.getDimensionName() + CITY_FILE_SAVE);
+        File cityFile =
+                new File(WorldUtil.getWorldSaveDir(world), world.provider.getDimensionName()
+                        + CITY_FILE_SAVE);
         if (cityFiles.isEmpty() || !cityFiles.containsKey(world))
             cityFiles.put(world, cityFile);
         if (!cityFile.createNewFile() && !cityLocations.containsKey(world))
