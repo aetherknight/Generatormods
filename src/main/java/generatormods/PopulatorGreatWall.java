@@ -19,8 +19,8 @@
 package generatormods;
 
 import generatormods.builders.GreatWallBuilder;
-import generatormods.common.TemplateWall;
 import generatormods.config.GreatWallConfig;
+import generatormods.config.templates.TemplateWall;
 
 import java.io.File;
 import java.util.List;

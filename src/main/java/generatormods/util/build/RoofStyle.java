@@ -1,4 +1,4 @@
-package generatormods.common;
+package generatormods.util.build;
 
 public enum RoofStyle {
     CRENEL("Crenel"), STEEP("Steep"), TRIM("Seep Trim"), SHALLOW("Shallow"), DOME("Dome"), CONE(

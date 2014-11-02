@@ -16,12 +16,37 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util.blocks;
 
-public class ParseError extends Exception {
-    public static final long serialVersionUID = 1;
+import net.minecraft.block.Block;
 
-    public ParseError(String message, Throwable cause) {
-        super(message, cause);
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+/**
+ * Sub-type of BlockAndMeta that represents a block placed in the world.
+ */
+public class PlacedBlock extends BlockAndMeta {
+    public final int x, y, z;
+    public PlacedBlock(Block block, int meta, int[] data) {
+        super(block, meta);
+        this.x = data[0];
+        this.y = data[1];
+        this.z = data[2];
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(!super.equals(obj))
+            return false;
+        if(!(obj instanceof PlacedBlock))
+            return false;
+        PlacedBlock other = (PlacedBlock) obj;
+        return this.x == other.x && this.y == other.y && this.z == other.z;
+    }
+
+    @Override
+    public int hashCode(){
+        return new HashCodeBuilder().append(getMeta()).append(getBlock()).append(x).append(y)
+                .append(z).toHashCode();
     }
 }

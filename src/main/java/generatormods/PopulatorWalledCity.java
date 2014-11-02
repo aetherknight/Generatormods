@@ -20,8 +20,8 @@ package generatormods;
 
 import generatormods.builders.UndergroundCityBuilder;
 import generatormods.builders.WalledCityBuilder;
-import generatormods.common.TemplateWall;
 import generatormods.config.WalledCityConfig;
+import generatormods.config.templates.TemplateWall;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 

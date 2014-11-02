@@ -16,13 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.config.templates;
 
 import generatormods.buildings.BuildingTower;
 import generatormods.caruins.CARule;
-import generatormods.codex.BiomeNames;
+import generatormods.util.BiomeNames;
 import generatormods.util.ParseUtil;
 import generatormods.util.PickWeighted;
+import generatormods.util.build.RoofStyle;
+import generatormods.util.build.Shape;
 
 import java.io.File;
 import java.util.ArrayList;

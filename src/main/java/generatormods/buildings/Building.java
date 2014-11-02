@@ -18,18 +18,18 @@
  */
 package generatormods.buildings;
 
-import generatormods.codex.BlockProperties;
-import generatormods.common.BlockAndMeta;
-import generatormods.common.BlockExtended;
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.PlacedBlock;
-import generatormods.common.TemplateRule;
 import generatormods.config.chests.ChestContentsSpec;
 import generatormods.config.chests.ChestItemSpec;
 import generatormods.config.chests.ChestType;
+import generatormods.config.templates.TemplateRule;
 import generatormods.util.PickWeighted;
 import generatormods.util.WorldUtil;
+import generatormods.util.blocks.BlockAndMeta;
+import generatormods.util.blocks.BlockExtended;
+import generatormods.util.blocks.PlacedBlock;
+import generatormods.util.build.BlockProperties;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.ILayoutGenerator;
 
@@ -51,21 +51,21 @@ import net.minecraft.world.World;
 
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.codex.DirToMetaMappings.BED_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.BED_META_TO_DIR;
-import static generatormods.codex.DirToMetaMappings.BUTTON_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.DOOR_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.DOOR_META_TO_DIR;
-import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.LADDER_META_TO_DIR;
-import static generatormods.codex.DirToMetaMappings.PAINTING_DIR_TO_FACEDIR;
-import static generatormods.codex.DirToMetaMappings.STAIRS_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.STAIRS_META_TO_DIR;
-import static generatormods.codex.DirToMetaMappings.TRAPDOOR_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.TRAPDOOR_META_TO_DIR;
-import static generatormods.codex.DirToMetaMappings.VINES_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.VINES_META_TO_DIR;
 import static generatormods.util.WorldUtil.findSurfaceJ;
+import static generatormods.util.build.DirToMetaMappings.BED_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.BED_META_TO_DIR;
+import static generatormods.util.build.DirToMetaMappings.BUTTON_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.DOOR_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.DOOR_META_TO_DIR;
+import static generatormods.util.build.DirToMetaMappings.LADDER_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.LADDER_META_TO_DIR;
+import static generatormods.util.build.DirToMetaMappings.PAINTING_DIR_TO_FACEDIR;
+import static generatormods.util.build.DirToMetaMappings.STAIRS_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.STAIRS_META_TO_DIR;
+import static generatormods.util.build.DirToMetaMappings.TRAPDOOR_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.TRAPDOOR_META_TO_DIR;
+import static generatormods.util.build.DirToMetaMappings.VINES_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.VINES_META_TO_DIR;
 
 /**
  * Building is a general class for buildings. Classes can inherit from Building

@@ -18,8 +18,10 @@
  */
 package generatormods.util;
 
-import generatormods.codex.BlockProperties;
+import generatormods.util.build.BlockProperties;
+
 import java.io.File;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;

@@ -19,7 +19,7 @@
 package generatormods.caruins.seeds;
 
 import generatormods.caruins.CAState;
-import generatormods.common.Shape;
+import generatormods.util.build.Shape;
 
 import java.util.Random;
 

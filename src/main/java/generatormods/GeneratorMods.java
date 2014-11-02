@@ -20,8 +20,7 @@ package generatormods;
 
 import generatormods.commands.CommandBuild;
 import generatormods.commands.CommandScan;
-import generatormods.common.ModUpdateDetectorWrapper;
-
+import generatormods.util.ModUpdateDetectorWrapper;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod;

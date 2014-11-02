@@ -20,7 +20,7 @@ package generatormods.commands;
 
 import cpw.mods.fml.common.registry.GameData;
 import generatormods.BuildingExplorationHandler;
-import generatormods.common.BlockAndMeta;
+import generatormods.util.blocks.BlockAndMeta;
 
 import java.io.BufferedWriter;
 import java.io.File;

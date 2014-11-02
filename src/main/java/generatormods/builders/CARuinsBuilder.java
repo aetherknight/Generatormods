@@ -27,10 +27,10 @@ import generatormods.caruins.seeds.CruciformSeed;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.LinearSeed;
 import generatormods.caruins.seeds.SymmetricSeed;
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.TemplateRule;
 import generatormods.config.CARuinsConfig;
+import generatormods.config.templates.TemplateRule;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
 
 import java.util.Random;
 

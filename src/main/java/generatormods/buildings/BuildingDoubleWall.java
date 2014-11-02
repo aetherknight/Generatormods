@@ -18,9 +18,9 @@
  */
 package generatormods.buildings;
 
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.TemplateWall;
+import generatormods.config.templates.TemplateWall;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
 import generatormods.walledcity.LayoutCode;
 
 /*

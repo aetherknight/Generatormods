@@ -19,11 +19,11 @@
 package generatormods.builders;
 
 import generatormods.buildings.BuildingDoubleWall;
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.TemplateWall;
 import generatormods.config.chests.ChestContentsSpec;
 import generatormods.config.chests.ChestType;
+import generatormods.config.templates.TemplateWall;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
 
 import java.util.List;
 import java.util.Map;

@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util.build;
 
 import generatormods.util.IntUtil;
+
 import java.util.Random;
 
 /**

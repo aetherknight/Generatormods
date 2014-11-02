@@ -18,18 +18,18 @@
  */
 package generatormods.buildings;
 
-import generatormods.codex.BlockProperties;
-import generatormods.common.BlockAndMeta;
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.RoofStyle;
-import generatormods.common.TemplateRule;
-import generatormods.common.TemplateWall;
+import generatormods.config.templates.TemplateRule;
+import generatormods.config.templates.TemplateWall;
+import generatormods.util.blocks.BlockAndMeta;
+import generatormods.util.build.BlockProperties;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
+import generatormods.util.build.RoofStyle;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import static generatormods.codex.DirToMetaMappings.STAIRS_DIR_TO_META;
 import static generatormods.util.WorldUtil.SEA_LEVEL;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.build.DirToMetaMappings.STAIRS_DIR_TO_META;
 
 /*
  * BuildingUndergroundEntranceway builds a passageway from an underground city to the surface.

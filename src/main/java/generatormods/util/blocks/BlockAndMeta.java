@@ -16,17 +16,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util.blocks;
 
-import generatormods.codex.BlockProperties;
 import generatormods.config.chests.ChestType;
+import generatormods.config.templates.TemplateRule;
+import generatormods.util.build.BlockProperties;
+import generatormods.util.build.Dir;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static generatormods.codex.DirToMetaMappings.BUTTON_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.BUTTON_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.LADDER_DIR_TO_META;
 
 /**
  * Stores a block type, plus a metadata value for that block.

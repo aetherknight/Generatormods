@@ -1,11 +1,11 @@
 package generatormods.test;
 
-import generatormods.common.Dir;
+import generatormods.util.build.Dir;
 
 import org.junit.Test;
 
-import static generatormods.common.Handedness.L_HAND;
-import static generatormods.common.Handedness.R_HAND;
+import static generatormods.util.build.Handedness.L_HAND;
+import static generatormods.util.build.Handedness.R_HAND;
 import static org.junit.Assert.assertEquals;
 
 public class DirTests {

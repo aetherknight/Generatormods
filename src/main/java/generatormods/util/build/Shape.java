@@ -16,15 +16,35 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util.build;
 
+/**
+ * Repository of shapes.
+ * <p>
+ * SPHERE_SHAPE provides references for building a sphere from CIRCLE_SHAPEs.
+ * <p>
+ * CIRCLE_SHAPE and CIRCLE_CRENEL define each shape with the following values at each index:
+ * <ul>
+ * <li>0 -- The interior of the shape.</li>
+ * <li>1 -- The border of the shape.</li>
+ * <li>-1 -- The exterior of the shape.</li>
+ * </ul>
+ * The interior and border are often used to fill in air or to set blocks along the border of the
+ * shape.
+ */
 public class Shape {
     public final static int MAX_SPHERE_DIAM = 40;
-    /* [diam][] */
+    /**
+     * Tracks the diameter of the circle that is a given distance out for a given diameter of
+     * sphere.
+     * <p>
+     * Indices are: [sphere diameter][distance from center of the csphere] =&gt; diameter of the
+     * circle at this cut
+     */
     public final static int[][] SPHERE_SHAPE = new int[MAX_SPHERE_DIAM + 1][];
-    /* [diam][y][x] */
+    /* [diam][x][y] */
     public final static int[][][] CIRCLE_SHAPE = new int[MAX_SPHERE_DIAM + 1][][];
-    /* [diam][y][x] */
+    /* [diam][x][y] */
     public final static int[][][] CIRCLE_CRENEL = new int[MAX_SPHERE_DIAM + 1][][];
 
     static {
@@ -33,11 +53,19 @@ public class Shape {
         }
         // change diam 6 shape to look better
         CIRCLE_SHAPE[6] =
-                new int[][] { {-1, -1, 1, 1, -1, -1}, {-1, 1, 0, 0, 1, -1}, {1, 0, 0, 0, 0, 1},
-                        {1, 0, 0, 0, 0, 1}, {-1, 1, 0, 0, 1, -1}, {-1, -1, 1, 1, -1, -1}};
+                new int[][] { {-1, -1,  1,  1, -1, -1},
+                              {-1,  1,  0,  0,  1, -1},
+                              { 1,  0,  0,  0,  0,  1},
+                              { 1,  0,  0,  0,  0,  1},
+                              {-1,  1,  0,  0,  1, -1},
+                              {-1, -1,  1,  1, -1, -1}};
         CIRCLE_CRENEL[6] =
-                new int[][] { {-1, -1, 1, 0, -1, -1}, {-1, 0, 0, 0, 1, -1}, {1, 0, 0, 0, 0, 0},
-                        {0, 0, 0, 0, 0, 1}, {-1, 1, 0, 0, 0, -1}, {-1, -1, 0, 1, -1, -1}};
+                new int[][] { {-1, -1,  1,  0, -1, -1},
+                              {-1,  0,  0,  0,  1, -1},
+                              { 1,  0,  0,  0,  0,  0},
+                              { 0,  0,  0,  0,  0,  1},
+                              {-1,  1,  0,  0,  0, -1},
+                              {-1, -1,  0,  1, -1, -1}};
     }
 
     private static void circleShape(int diam) {

@@ -1,6 +1,4 @@
-package generatormods.codex;
-
-import generatormods.common.Dir;
+package generatormods.util.build;
 
 import java.util.HashMap;
 import java.util.Map;

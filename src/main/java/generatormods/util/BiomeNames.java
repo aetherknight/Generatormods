@@ -16,24 +16,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import net.minecraft.world.biome.BiomeGenBase;
 
-public class ModUpdateDetectorWrapper {
+/**
+ * Module to defer loading the biome names until needed.
+ */
+public class BiomeNames {
+    private static String[] biomeNames;
 
-    public static void checkForUpdates(Object mod, FMLPreInitializationEvent event) {
-        if(event.getSourceFile().getName().endsWith(".jar") && event.getSide().isClient()){
-            try {
-                Class.forName("mods.mud.ModUpdateDetector").getDeclaredMethod("registerMod", ModContainer.class, String.class, String.class).invoke(null,
-                        FMLCommonHandler.instance().findContainerFor(mod),
-                        "https://raw.github.com/GotoLink/Generatormods/master/update.xml",
-                        "https://raw.github.com/GotoLink/Generatormods/master/changelog.md"
-                        );
-            } catch (Throwable e) {
+    private static void initializeBiomeNames() {
+        if(biomeNames == null) {
+            biomeNames = new String[BiomeGenBase.getBiomeGenArray().length + 1];
+            biomeNames[0] = "Underground";
+        }
+        if (biomeNames[1] == null || biomeNames[1].equals("")) {
+            for (int i = 0; i < biomeNames.length - 1; i++) {
+                if (BiomeGenBase.getBiomeGenArray()[i] != null)
+                    biomeNames[i + 1] = BiomeGenBase.getBiomeGenArray()[i].biomeName;
             }
         }
+    }
+
+    public static String[] getBiomeNames() {
+        initializeBiomeNames();
+        return biomeNames;
     }
 }

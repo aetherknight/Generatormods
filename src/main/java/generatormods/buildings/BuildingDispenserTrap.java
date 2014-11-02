@@ -18,16 +18,16 @@
  */
 package generatormods.buildings;
 
-import generatormods.common.BlockAndMeta;
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.TemplateRule;
+import generatormods.config.templates.TemplateRule;
+import generatormods.util.blocks.BlockAndMeta;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityDispenser;
-import static generatormods.codex.DirToMetaMappings.BUTTON_DIR_TO_META;
-import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.BUTTON_DIR_TO_META;
+import static generatormods.util.build.DirToMetaMappings.LADDER_DIR_TO_META;
 
 /*
  * BuildingDispenserTrap generates a redstone activated dispenser trap

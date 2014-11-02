@@ -18,7 +18,7 @@
  */
 package generatormods.caruins;
 
-import generatormods.common.ParseError;
+import generatormods.util.exceptions.ParseError;
 import static generatormods.caruins.CAState.ALIVE;
 import static generatormods.caruins.CAState.DEAD;
 

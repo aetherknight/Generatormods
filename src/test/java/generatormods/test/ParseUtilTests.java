@@ -3,8 +3,8 @@ package generatormods.test;
 import generatormods.caruins.CARule;
 // import generatormods.common.BlockAndMeta;
 // import generatormods.common.TemplateRule;
-import generatormods.common.ParseError;
 import generatormods.util.ParseUtil;
+import generatormods.util.exceptions.ParseError;
 
 import java.util.List;
 

@@ -18,12 +18,12 @@
  */
 package generatormods.buildings;
 
-import generatormods.codex.BlockProperties;
-import generatormods.common.BlockAndMeta;
-import generatormods.common.Dir;
-import generatormods.common.Handedness;
-import generatormods.common.TemplateTML;
+import generatormods.config.templates.TemplateTML;
 import generatormods.util.WorldUtil;
+import generatormods.util.blocks.BlockAndMeta;
+import generatormods.util.build.BlockProperties;
+import generatormods.util.build.Dir;
+import generatormods.util.build.Handedness;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;

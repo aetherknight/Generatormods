@@ -16,12 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.config.templates;
 
 import cpw.mods.fml.common.registry.GameData;
 import generatormods.buildings.Building;
-import generatormods.common.BlockAndMeta;
+import generatormods.util.blocks.BlockAndMeta;
+import generatormods.util.blocks.BlockExtended;
+
 import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockChest;

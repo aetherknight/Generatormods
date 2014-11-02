@@ -16,31 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.codex;
+package generatormods.util.build;
 
-import net.minecraft.world.biome.BiomeGenBase;
+public enum Handedness {
+    R_HAND(1), L_HAND(-1);
 
-/**
- * Module to defer loading the biome names until needed.
- */
-public class BiomeNames {
-    private static String[] biomeNames;
+    public static final Handedness[] hands = new Handedness[] { L_HAND, R_HAND };
 
-    private static void initializeBiomeNames() {
-        if(biomeNames == null) {
-            biomeNames = new String[BiomeGenBase.getBiomeGenArray().length + 1];
-            biomeNames[0] = "Underground";
-        }
-        if (biomeNames[1] == null || biomeNames[1].equals("")) {
-            for (int i = 0; i < biomeNames.length - 1; i++) {
-                if (BiomeGenBase.getBiomeGenArray()[i] != null)
-                    biomeNames[i + 1] = BiomeGenBase.getBiomeGenArray()[i].biomeName;
-            }
-        }
+    public final int num;
+
+    private Handedness(int num) {
+        this.num = num;
     }
 
-    public static String[] getBiomeNames() {
-        initializeBiomeNames();
-        return biomeNames;
+    public Handedness opposite() {
+        return (this == R_HAND) ? L_HAND : R_HAND;
+    }
+
+    public static Handedness fromInt(int handInt) {
+        if (handInt > 0)
+            return R_HAND;
+        else if (handInt < 0)
+            return L_HAND;
+        else
+            return null;
     }
 }

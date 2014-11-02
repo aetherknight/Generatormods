@@ -16,29 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common;
+package generatormods.util.exceptions;
 
-public enum Handedness {
-    R_HAND(1), L_HAND(-1);
+public class ParseError extends Exception {
+    public static final long serialVersionUID = 1;
 
-    public static final Handedness[] hands = new Handedness[] { L_HAND, R_HAND };
-
-    public final int num;
-
-    private Handedness(int num) {
-        this.num = num;
-    }
-
-    public Handedness opposite() {
-        return (this == R_HAND) ? L_HAND : R_HAND;
-    }
-
-    public static Handedness fromInt(int handInt) {
-        if (handInt > 0)
-            return R_HAND;
-        else if (handInt < 0)
-            return L_HAND;
-        else
-            return null;
+    public ParseError(String message, Throwable cause) {
+        super(message, cause);
     }
 }
