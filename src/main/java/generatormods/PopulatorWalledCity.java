@@ -18,10 +18,10 @@
  */
 package generatormods;
 
+import generatormods.builders.UndergroundCityBuilder;
+import generatormods.builders.WalledCityBuilder;
 import generatormods.common.TemplateWall;
 import generatormods.config.WalledCityConfig;
-import generatormods.gen.WorldGenUndergroundCity;
-import generatormods.gen.WorldGenWalledCity;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
@@ -68,23 +68,23 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
     public final void generate(World world, Random random, int i, int k) {
         if (cityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, world.provider.dimensionId)
                 && random.nextFloat() < config.getGlobalFrequency()) {
-            (new WorldGenWalledCity(world, random, i, k, config.getTriesPerChunk(),
+            (new WalledCityBuilder(world, random, i, k, config.getTriesPerChunk(),
                     config.getGlobalFrequency(), logger, config.getChestConfigs(), chatHandler,
                     cityDataManager, cityStyles, config.getRejectOnPreexistingArtifacts())).run();
         }
         if (undergroundCityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, CITY_TYPE_UNDERGROUND)
                 && random.nextFloat() < config.getUndergroundGlobalFrequency()) {
-            WorldGenUndergroundCity wgt =
-                    new WorldGenUndergroundCity(world, random, i, k, config.getTriesPerChunk(),
+            UndergroundCityBuilder wgt =
+                    new UndergroundCityBuilder(world, random, i, k, config.getTriesPerChunk(),
                             config.getUndergroundGlobalFrequency(), logger,
                             config.getChestConfigs(), chatHandler, cityDataManager,
                             undergroundCityStyles);
             // 44 at sea level
             int maxSpawnHeight =
                     findSurfaceJ(world, i, k, WORLD_MAX_Y, false, IGNORE_WATER)
-                            - WorldGenUndergroundCity.MAX_DIAM / 2 - 5;
+                            - UndergroundCityBuilder.MAX_DIAM / 2 - 5;
             // 34, a pretty thin margin. Too thin for underocean cities?
-            int minSpawnHeight = MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8;
+            int minSpawnHeight = MAX_FOG_HEIGHT + UndergroundCityBuilder.MAX_DIAM / 2 - 8;
             if (minSpawnHeight <= maxSpawnHeight)
                 wgt.setSpawnHeight(minSpawnHeight, maxSpawnHeight, false);
             (wgt).run();

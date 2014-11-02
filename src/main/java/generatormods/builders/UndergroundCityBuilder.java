@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.gen;
+package generatormods.builders;
 
 import generatormods.PopulatorWalledCity;
 import generatormods.buildings.BuildingDoubleWall;
@@ -48,12 +48,11 @@ import static generatormods.util.WorldUtil.IGNORE_WATER;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
 
-/*
- * WorldGenUndergroundCity generates a city in a large underground cavern. The
- * cavern is made from many recursively created spherical voids. These are
- * filled with street template BuildingDoubleWalls to create the city.
+/**
+ * Generates a city in a large underground cavern. The cavern is made from many recursively created
+ * spherical voids. These are filled with street template BuildingDoubleWalls to create the city.
  */
-public class WorldGenUndergroundCity extends WorldGeneratorThread {
+public class UndergroundCityBuilder extends AbstractBuilder {
 	private final static float P_CHILDREN = 0.80F;
 	private final static int MAX_CHILDREN = 3;
 	public final static int MIN_DIAM = 11, MAX_DIAM = 30;
@@ -68,7 +67,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
     private CityDataManager cityDataManager;
     private List<TemplateWall> undergroundCityStyles;
 
-    public WorldGenUndergroundCity(World world, Random random, int chunkI, int chunkK,
+    public UndergroundCityBuilder(World world, Random random, int chunkI, int chunkK,
             int triesPerChunk, double chunkTryProb, Logger logger,
             Map<ChestType, ChestContentsSpec> chestConfigs, WalledCityChatHandler chatHandler,
             CityDataManager cityDataManager, List<TemplateWall> undergroundCityStyles) {

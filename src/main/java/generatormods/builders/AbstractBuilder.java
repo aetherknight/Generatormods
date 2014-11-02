@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.gen;
+package generatormods.builders;
 
 import generatormods.buildings.IBuildingConfig;
 import generatormods.config.chests.ChestContentsSpec;
@@ -36,12 +36,35 @@ import static generatormods.util.WorldUtil.HIT_WATER;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
 
-/*
- * WorldGeneratorThread is a thread that generates structures in the Minecraft
- * world. It is intended to serially hand back and forth control with a
- * BuildingExplorationHandler (not to run parallel).
+/**
+ * Builders manage the effort involved in constructing a larger structure, or set of structures.
+ * They orchestrate the planning and placement of buildings.
+ * <p>
+ * Historically, this was called WorldGeneratorThread, which was implemented as a thread separate
+ * from the main server thread, in order to improve performance by avoiding blocking the main thread
+ * for larger structures. It was supposed to serially hand control back and forth between itself and
+ * the mod class/IWorldGenerator that launched the given WorldGeneratorThread (not to be run truly
+ * in parallel). However this approach was not compatible with MCPC.
+ * <p>
+ * At present, the approach taken by the Builders is rather different from the structures generated
+ * by Minecraft:
+ * <p>
+ * Minecraft breaks a structure up into several smaller components, and it plans out and stores the
+ * metadata for those components. It then only builds the components that reside on a given chunk,
+ * avoiding the need to build the entire structure in the world all at once.
+ * <p>
+ * GeneratorMods currently builds an entire structure all at once, which currently causes a few
+ * problems:
+ * <ul>
+ * <li>The entire structure is built all at once, causing a negative impact on performance when a
+ * large structure is built (such as a greatwall or walledcity).</li>
+ * <li>Currently, if the generated structure builds far enough into chunks loaded by a client, then
+ * the client sees visual glitches where not all the blocks of the building are loaded by the
+ * client. This synchronization issue currently requires the client reconnecting to the server to
+ * reload the chunks.</li>
+ * </ul>
  */
-public abstract class WorldGeneratorThread implements IBuildingConfig {
+public abstract class AbstractBuilder implements IBuildingConfig {
     public final Logger logger;
 	public final World world;
 	public final Random random;
@@ -62,7 +85,7 @@ public abstract class WorldGeneratorThread implements IBuildingConfig {
     /* All WorldGeneratorThreads will have these, even if not used. */
 	public int backtrackLength = 9;
 
-    public WorldGeneratorThread(World world, Random random,
+    public AbstractBuilder(World world, Random random,
             int chunkI, int chunkK, int TriesPerChunk, double ChunkTryProb, Logger logger,
             Map<ChestType, ChestContentsSpec> chestItems) {
         this.world = world;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.gen;
+package generatormods.builders;
 
 import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.caruins.CARule;
@@ -42,12 +42,17 @@ import org.apache.logging.log4j.Logger;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
 
-public class WorldGenCARuins extends WorldGeneratorThread {
+/**
+ * Generates 1 or more CARuins. It starts by attempting to build a single ruin. If it succeeds, it
+ * then may perform up to 10 additional attempts at recursively building other buildings (which may
+ * then also trigger their own recursive building attempts).
+ */
+public class CARuinsBuilder extends AbstractBuilder {
 	private CARule caRule = null;
 
     private final CARuinsConfig config;
 
-    public WorldGenCARuins(World world, Random random, int chunkI, int chunkK, Logger logger,
+    public CARuinsBuilder(World world, Random random, int chunkI, int chunkK, Logger logger,
             CARuinsConfig config) {
         super(world, random, chunkI, chunkK, config.getTriesPerChunk(),
                 config.getGlobalFrequency(), logger, config.getChestConfigs());

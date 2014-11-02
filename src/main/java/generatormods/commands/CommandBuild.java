@@ -21,10 +21,10 @@ package generatormods.commands;
 import generatormods.PopulatorCARuins;
 import generatormods.PopulatorGreatWall;
 import generatormods.PopulatorWalledCity;
-import generatormods.gen.WorldGenCARuins;
-import generatormods.gen.WorldGenGreatWall;
-import generatormods.gen.WorldGenUndergroundCity;
-import generatormods.gen.WorldGenWalledCity;
+import generatormods.builders.CARuinsBuilder;
+import generatormods.builders.GreatWallBuilder;
+import generatormods.builders.UndergroundCityBuilder;
+import generatormods.builders.WalledCityBuilder;
 
 import java.util.List;
 import java.util.Random;
@@ -71,42 +71,34 @@ public class CommandBuild extends CommandBase {
 			int posZ = parseInt(var1, coordinate[coordinate.length - 1]);
 			World world = MinecraftServer.getServer().worldServers[coordinate.length == 3 ? 0 : Integer.parseInt(coordinate[1])];
 			if ("ruin".equalsIgnoreCase(coordinate[0])) {
-                (new WorldGenCARuins(world, new Random(), posX, posZ,
+                (new CARuinsBuilder(world, new Random(), posX, posZ,
                         PopulatorCARuins.instance.logger, PopulatorCARuins.instance.config)).run();
 			} else if ("wall".equalsIgnoreCase(coordinate[0])) {
-                (new WorldGenGreatWall(world, new Random(), posX, posZ, 1, 1.0,
+                (new GreatWallBuilder(world, new Random(), posX, posZ, 1, 1.0,
                         PopulatorGreatWall.instance.logger,
                         PopulatorGreatWall.instance.config.getChestConfigs(),
                         PopulatorGreatWall.instance.wallStyles,
                         PopulatorGreatWall.instance.config.getCurveBias())).run();
 			}
-			/*
-			 * else if ("monowall".equalsIgnoreCase(coordinate[0])) {
-			 * wall=PopulatorGreatWall.instance; if(wall.placedCoords==null ||
-			 * wall.placedWorld!=world){ wall.placedCoords=new
-			 * int[]{posX,world.getHeightValue(posX, posZ),posZ};
-			 * wall.placedWorld=world;
-			 * var1.sendChatToPlayer("First set of wall coordinates stored."); }
-			 * else{ wall.master.exploreThreads.add(new WorldGenSingleWall(
-			 * wall, world, world.rand, new int[]{posX,
-			 * world.getHeightValue(posX, posZ), posZ}));
-			 * wall.placedCoords=null; wall.placedWorld=null; } }
-			 */
 			else if ("city".equalsIgnoreCase(coordinate[0])) {
                 PopulatorWalledCity cityMod = PopulatorWalledCity.instance;
-                (new WorldGenWalledCity(world, new Random(), posX, posZ, 1, 1.0, cityMod.logger,
+                (new WalledCityBuilder(world, new Random(), posX, posZ, 1, 1.0, cityMod.logger,
                         cityMod.config.getChestConfigs(), cityMod.chatHandler,
                         cityMod.cityDataManager, cityMod.cityStyles,
                         cityMod.config.getRejectOnPreexistingArtifacts())).run();
 			} else if ("undcity".equalsIgnoreCase(coordinate[0])) {
                 PopulatorWalledCity cityMod = PopulatorWalledCity.instance;
-                WorldGenUndergroundCity wgt =
-                        new WorldGenUndergroundCity(world, new Random(), posX, posZ, 1, 1.0,
+                UndergroundCityBuilder wgt =
+                        new UndergroundCityBuilder(world, new Random(), posX, posZ, 1, 1.0,
                                 cityMod.logger, cityMod.config.getChestConfigs(),
                                 cityMod.chatHandler, cityMod.cityDataManager,
                                 cityMod.undergroundCityStyles);
-                int maxSpawnHeight = findSurfaceJ(world, posX, posZ, WORLD_MAX_Y, false, IGNORE_WATER) - WorldGenUndergroundCity.MAX_DIAM / 2 - 5; //44 at sea level
-				int minSpawnHeight = PopulatorWalledCity.MAX_FOG_HEIGHT + WorldGenUndergroundCity.MAX_DIAM / 2 - 8; //34, a pretty thin margin. Too thin for underocean cities?
+                int maxSpawnHeight =
+                        findSurfaceJ(world, posX, posZ, WORLD_MAX_Y, false, IGNORE_WATER)
+                                - UndergroundCityBuilder.MAX_DIAM / 2 - 5; // 44 at sea level
+                int minSpawnHeight =
+                        PopulatorWalledCity.MAX_FOG_HEIGHT + UndergroundCityBuilder.MAX_DIAM / 2
+                                - 8; // 34, a pretty thin margin. Too thin for underocean cities?
 				if (minSpawnHeight <= maxSpawnHeight)
 					wgt.setSpawnHeight(minSpawnHeight, maxSpawnHeight, false);
 				(wgt).run();

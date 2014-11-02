@@ -18,9 +18,9 @@
  */
 package generatormods;
 
+import generatormods.builders.GreatWallBuilder;
 import generatormods.common.TemplateWall;
 import generatormods.config.GreatWallConfig;
-import generatormods.gen.WorldGenGreatWall;
 
 import java.io.File;
 import java.util.List;
@@ -72,7 +72,7 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
         if (random.nextFloat() < config.getGlobalFrequency())
-            (new WorldGenGreatWall(world, random, i, k, config.getTriesPerChunk(),
+            (new GreatWallBuilder(world, random, i, k, config.getTriesPerChunk(),
                     config.getGlobalFrequency(), logger, config.getChestConfigs(), wallStyles,
                     config.getCurveBias())).run();
 	}

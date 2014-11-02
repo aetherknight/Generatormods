@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.gen;
+package generatormods.builders;
 
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.common.Dir;
@@ -33,16 +33,15 @@ import net.minecraft.world.World;
 
 import org.apache.logging.log4j.Logger;
 
-/*
- * WorldGenGreatWall creates a great wall in Minecraft. This class is chiefly a
- * WorldGeneratorThread wrapper for a BuildingDoubleWall. It also checks
- * curviness and length.
+/**
+ * Creates a great wall in Minecraft. This class is chiefly a Builder wrapper for a
+ * BuildingDoubleWall. It also checks curviness and length.
  */
-public class WorldGenGreatWall extends WorldGeneratorThread {
+public class GreatWallBuilder extends AbstractBuilder {
 	private List<TemplateWall> wallStyles;
     private double curveBias;
 
-    public WorldGenGreatWall(World world, Random random, int chunkI, int chunkK, int triesPerChunk,
+    public GreatWallBuilder(World world, Random random, int chunkI, int chunkK, int triesPerChunk,
             double chunkTryProb, Logger logger, Map<ChestType, ChestContentsSpec> chestConfigs,
             List<TemplateWall> wallStyles, double curveBias) {
         super(world, random, chunkI, chunkK, triesPerChunk, chunkTryProb, logger, chestConfigs);

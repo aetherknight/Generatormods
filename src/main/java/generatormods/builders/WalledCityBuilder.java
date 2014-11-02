@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.gen;
+package generatormods.builders;
 
 import generatormods.buildings.Building;
 import generatormods.buildings.BuildingDoubleWall;
@@ -57,12 +57,11 @@ import static generatormods.util.WorldUtil.SEA_LEVEL;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
 
-/*
- * WorldGenWalledCity generates walled cities in the Minecraft world. Walled
- * cities are composed of 4 wall template BuildingWalls in a rough rectangle,
- * filled with many street template BuildingDoubleWalls.
+/**
+ * Generates walled cities in the Minecraft world. Walled cities are composed of 4 wall template
+ * BuildingWalls in a rough rectangle, filled with many street template BuildingDoubleWalls.
  */
-public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutGenerator {
+public class WalledCityBuilder extends AbstractBuilder implements ILayoutGenerator {
 	private final static int GATE_HEIGHT = 6;
 	private final static int JMEAN_DEVIATION_SLOPE = 10;
 	private final static int LEVELLING_DEVIATION_SLOPE = 18;
@@ -85,7 +84,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	private List<TemplateWall> cityStyles;
     private boolean rejectOnPreexistingArtifacts;
 
-    public WorldGenWalledCity(World world, Random random, int chunkI, int chunkK,
+    public WalledCityBuilder(World world, Random random, int chunkI, int chunkK,
             int triesPerChunk, double chunkTryProb, Logger logger,
             Map<ChestType, ChestContentsSpec> chestConfigs, WalledCityChatHandler chatHandler,
             CityDataManager cityDataManager, List<TemplateWall> cityStyles,
