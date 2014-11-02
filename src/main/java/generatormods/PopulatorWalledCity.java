@@ -18,13 +18,6 @@
  */
 package generatormods;
 
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
-import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.common.TemplateWall;
 import generatormods.config.WalledCityConfig;
 import generatormods.gen.WorldGenUndergroundCity;
@@ -39,24 +32,26 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.world.World;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import static generatormods.util.WorldUtil.IGNORE_WATER;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
+
 
 /*
  * PopulatorWalledCity is the main class that hooks into ModLoader for the
  * Walled City Mod. It reads the globalSettings file, keeps track of city
  * locations, and runs WorldGenWalledCitys and WorldGenUndergroundCities.
  */
-@Mod(modid = "WalledCityMod", name = "Walled City Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorWalledCity extends BuildingExplorationHandler {
-	@Instance("WalledCityMod")
 	public static PopulatorWalledCity instance;
 
-	public final static int MIN_CITY_LENGTH = 40;
     public final static int MAX_FOG_HEIGHT = 27;
 	public final static int CITY_TYPE_UNDERGROUND = 1;//TheEnd dimension id, since we don't generate there
-    private final static String STREET_TEMPLATES_FOLDER_NAME = "streets";
+
 	//DATA VARIABLES
 	public List<TemplateWall> cityStyles = null;
     public List<TemplateWall> undergroundCityStyles = new ArrayList<TemplateWall>();
@@ -65,25 +60,9 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
     public WalledCityConfig config;
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
-        templateFolderName = "walledcity";
-        ModUpdateDetectorWrapper.checkForUpdates(this, event);
+    public PopulatorWalledCity(String parentModName) {
+        this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
-
-	//Load templates after mods have loaded so we can check whether any modded blockIDs are valid
-	@EventHandler
-	public void modsLoaded(FMLPostInitializationEvent event) {
-        loadConfiguration();
-        cityDataManager =
-                new CityDataManager(logger, config.getUndergroundMinCitySeparation(),
-                        config.getMinCitySeparation());
-        chatHandler = new WalledCityChatHandler(config.getCityBuiltMessage());
-		if (!errFlag) {
-			GameRegistry.registerWorldGenerator(this, 0);
-		}
-	}
 
     @Override
     public final void generate(World world, Random random, int i, int k) {
@@ -113,24 +92,24 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
     }
 
     private void loadTemplates() throws Exception {
-        File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
+        File stylesDirectory = new File(CONFIG_DIRECTORY, "walledcity");
         cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
-        TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, STREET_TEMPLATES_FOLDER_NAME), logger);
+        TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, "streets"), logger);
         // TODO: does this work? I worry that the remove() screws up indices.
         for (int m = 0; m < cityStyles.size(); m++) {
             if (cityStyles.get(m).underground) {
                 TemplateWall uws = cityStyles.remove(m);
                 uws.streets.add(uws); //underground cities have no outer walls, so this should be a street style
                 undergroundCityStyles.add(uws);
-                m--;
+                m--; // this fixes the index?
             }
         }
         logger.info("Template loading complete.");
     }
 
-    private final void loadConfiguration() {
+    public final void loadConfiguration() {
 		try {
-            logger.info("Loading options and templates for the Walled City Generator.");
+            logger.info("Loading config and templates for WalledCity");
 
             config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
@@ -138,21 +117,29 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
             loadTemplates();
 
-            logger.info("Probability of city generation attempt per chunk explored is "
-                    + config.getGlobalFrequency() + ", with " + config.getTriesPerChunk()
-                    + " tries per chunk.");
+            cityDataManager =
+                    new CityDataManager(logger, config.getUndergroundMinCitySeparation(),
+                            config.getMinCitySeparation());
+            chatHandler = new WalledCityChatHandler(config.getCityBuiltMessage());
+
+            logger.info(
+                    "Probability of surface city generation attempt per chunk explored is {}, with {} tries per chunk.",
+                    config.getGlobalFrequency(), config.getTriesPerChunk());
+            logger.info(
+                    "Probability of underground city generation attempt per chunk explored is {}",
+                    config.getUndergroundGlobalFrequency());
 		} catch (Exception e) {
-			errFlag = true;
-            logger.fatal("There was a problem loading the walled city mod", e);
+            disable("Ran into an error while loading configuration", e);
 		}
         if (config.getGlobalFrequency() < 0.000001
-                && config.getUndergroundGlobalFrequency() < 0.000001)
-			errFlag = true;
+                && config.getUndergroundGlobalFrequency() < 0.000001) {
+            disable("both surface city and underground frequencies are below 0.000001");
+        }
 	}
 
 	@Override
 	public String toString() {
-		return "WalledCityMod";
+        return "WalledCity";
 	}
 
 	@Override

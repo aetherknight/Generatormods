@@ -18,18 +18,10 @@
  */
 package generatormods;
 
-import generatormods.commands.CommandBuild;
-import generatormods.commands.CommandScan;
-import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.config.CARuinsConfig;
 import generatormods.gen.WorldGenCARuins;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
+
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Random;
 
@@ -39,51 +31,33 @@ import net.minecraft.world.World;
  * Main class that hooks into Forge for CARuins. It loads configuration and
  * sets up the world generation it adds.
  */
-@Mod(modid = "CARuins", name = "Cellular Automata Generator", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorCARuins extends BuildingExplorationHandler {
-	@Instance("CARuins")
 	public static PopulatorCARuins instance;
 
     public CARuinsConfig config;
 
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		logger = event.getModLog();
-        ModUpdateDetectorWrapper.checkForUpdates(this, event);
-	}
-
-    @EventHandler
-    public void modsLoaded(FMLPostInitializationEvent event) {
-        loadConfiguration();
-        if (!errFlag) {
-            GameRegistry.registerWorldGenerator(this, 2);
-        }
+    public PopulatorCARuins(String parentModName) {
+        this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 
-	@EventHandler
-	public void serverStarting(FMLServerStartingEvent event) {
-		event.registerServerCommand(new CommandBuild());
-        event.registerServerCommand(new CommandScan());
-	}
-
-    private final void loadConfiguration() {
+    public final void loadConfiguration() {
 		try {
-            logger.info("Loading options for the Cellular Automata Generator.");
+            logger.info("Loading config for CARuins");
 
             config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 
-            logger.info("Probability of ruin generation attempt per chunk explored is "
-                    + config.getGlobalFrequency() + ", with " + config.getTriesPerChunk()
-                    + " tries per chunk.");
+            logger.info(
+                    "Probability of CARuin generation attempt per chunk explored is {}, with {} tries per chunk.",
+                    config.getGlobalFrequency(), config.getTriesPerChunk());
 		} catch (Exception e) {
-			errFlag = true;
-            logger.fatal("There was a problem loading the Cellular Automata Generator", e);
+            disable("Ran into an error while loading configuration", e);
 		}
-        if (config.getGlobalFrequency() < 0.000001 || config.caRules == null
-                || config.caRules.size() == 0)
-			errFlag = true;
+        if (config.getGlobalFrequency() < 0.000001)
+            disable("global frequency is less than 0.000001");
+        if (config.caRules == null || config.caRules.size() == 0)
+            disable("no CA Rules loaded");
 	}
 
 	@Override
@@ -94,6 +68,6 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
 	@Override
 	public String toString() {
-		return "CARuins";
+        return "CARuins";
 	}
 }

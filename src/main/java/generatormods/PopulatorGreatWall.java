@@ -18,16 +18,9 @@
  */
 package generatormods;
 
-import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.common.TemplateWall;
 import generatormods.config.GreatWallConfig;
 import generatormods.gen.WorldGenGreatWall;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.io.File;
 import java.util.List;
@@ -35,13 +28,13 @@ import java.util.Random;
 
 import net.minecraft.world.World;
 
+import org.apache.logging.log4j.LogManager;
+
 /*
  * PopulatorGreatWall is the main class that hooks into ModLoader for the Great
  * Wall Mod. It reads the globalSettings file and runs WorldGenWalledCities.
  */
-@Mod(modid = "GreatWallMod", name = "Great Wall Mod", version = BuildingExplorationHandler.VERSION, dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
 public class PopulatorGreatWall extends BuildingExplorationHandler {
-	@Instance("GreatWallMod")
 	public static PopulatorGreatWall instance;
 	//DATA VARIABLES
     public List<TemplateWall> wallStyles = null;
@@ -50,42 +43,30 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
     public GreatWallConfig config;
 
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		logger = event.getModLog();
-		templateFolderName = "greatwall";
-        ModUpdateDetectorWrapper.checkForUpdates(this, event);
-	}
-
-    @EventHandler
-    public void modsLoaded(FMLPostInitializationEvent event) {
-        loadConfiguration();
-        if (!errFlag) {
-            GameRegistry.registerWorldGenerator(this, 1);
-        }
+    public PopulatorGreatWall(String parentModName) {
+        this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 
     public final void loadConfiguration() {
 		try {
-            logger.info("Loading options and templates for the Great Wall Mod.");
+            logger.info("Loading config and templates for GreatWall");
 
             config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 
-			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
+            File stylesDirectory = new File(CONFIG_DIRECTORY, "greatwall");
             wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
             logger.info("Template loading complete.");
 
-            logger.info("Probability of wall generation attempt per chunk explored is "
-                    + config.getGlobalFrequency() + ", with " + config.getTriesPerChunk()
-                    + " tries per chunk.");
+            logger.info(
+                    "Probability of wall generation attempt per chunk explored is {}, with {} tries per chunk.",
+                    config.getGlobalFrequency(), config.getTriesPerChunk());
 		} catch (Exception e) {
-			errFlag = true;
-            logger.fatal("There was a problem loading the great wall mod", e);
+            disable("Ran into an error while loading configuration", e);
 		}
         if (config.getGlobalFrequency() < 0.000001)
-			errFlag = true;
+            disable("global frequency is less than 0.000001");
 	}
 
 	@Override
@@ -98,6 +79,6 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
 	@Override
 	public String toString() {
-		return "GreatWallMod";
+        return "GreatWall";
 	}
 }

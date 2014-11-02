@@ -51,7 +51,6 @@ import net.minecraft.world.World;
 
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.PopulatorWalledCity.MIN_CITY_LENGTH;
 import static generatormods.util.WorldUtil.HIT_WATER;
 import static generatormods.util.WorldUtil.IGNORE_WATER;
 import static generatormods.util.WorldUtil.SEA_LEVEL;
@@ -67,6 +66,7 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	private final static int GATE_HEIGHT = 6;
 	private final static int JMEAN_DEVIATION_SLOPE = 10;
 	private final static int LEVELLING_DEVIATION_SLOPE = 18;
+	private final static int MIN_CITY_LENGTH = 40;
 	private final static int MIN_SIDE_LENGTH = 10; //can be less than MIN_CITY_LENGTH due to squiggles
 	private final static float MAX_WATER_PERCENTAGE = 0.4f;
 

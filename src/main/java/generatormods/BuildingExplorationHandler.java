@@ -39,12 +39,10 @@ import org.apache.logging.log4j.Logger;
  * WorldGeneratorThreads.
  */
 public abstract class BuildingExplorationHandler implements IWorldGenerator {
-    protected final static String VERSION = "0.1.6";
 	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
 
-	protected String templateFolderName;
 	public Logger logger;
-	protected boolean errFlag = false;
+    private boolean isDisabled = false;
 	private List<World> currentWorld = new ArrayList<World>();
 
     protected List<Integer> allowedDimensions;
@@ -52,7 +50,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	//**************************** FORGE WORLD GENERATING HOOK ****************************************************************************//
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        if (errFlag)
+        if (isDisabled())
             return;
 		if (world.getWorldInfo().isMapFeaturesEnabled() && !(world.provider instanceof WorldProviderEnd)) {
             // if structures are enabled can generate in any world except in The End, if id is in
@@ -92,4 +90,23 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 			return false;
 		}
 	}
+
+    protected void disable(String reason) {
+        disable(reason, null);
+    }
+
+    protected void disable(String reason, Throwable e) {
+        isDisabled = true;
+        if (logger != null) {
+            if (e != null)
+                logger.fatal("Disabling " + this.toString() + ": " + reason, e);
+            else
+                logger.fatal("Disabling " + this.toString() + ": " + reason);
+        }
+    }
+
+    /* Whether this component is disabled or not. */
+    public boolean isDisabled() {
+        return isDisabled;
+    }
 }
