@@ -19,10 +19,9 @@
 package generatormods.gen;
 
 import generatormods.buildings.BuildingCellularAutomaton;
-import generatormods.caruins.config.CARuinsConfig;
-import generatormods.caruins.config.CARule;
-import generatormods.caruins.config.SeedType;
-import generatormods.caruins.config.WeightedCARule;
+import generatormods.caruins.CARule;
+import generatormods.caruins.SeedType;
+import generatormods.caruins.WeightedCARule;
 import generatormods.caruins.seeds.CircularSeed;
 import generatormods.caruins.seeds.CruciformSeed;
 import generatormods.caruins.seeds.ISeed;
@@ -31,6 +30,7 @@ import generatormods.caruins.seeds.SymmetricSeed;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
+import generatormods.config.CARuinsConfig;
 
 import java.util.Random;
 

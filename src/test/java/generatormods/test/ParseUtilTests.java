@@ -1,11 +1,13 @@
 package generatormods.test;
 
-import generatormods.caruins.config.CARule;
+import generatormods.caruins.CARule;
 // import generatormods.common.BlockAndMeta;
 // import generatormods.common.TemplateRule;
 import generatormods.common.config.ParseError;
 import generatormods.util.ParseUtil;
+
 import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;

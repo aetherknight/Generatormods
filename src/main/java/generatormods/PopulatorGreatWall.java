@@ -20,8 +20,8 @@ package generatormods;
 
 import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.common.TemplateWall;
+import generatormods.config.GreatWallConfig;
 import generatormods.gen.WorldGenGreatWall;
-import generatormods.greatwall.config.GreatWallConfig;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod;

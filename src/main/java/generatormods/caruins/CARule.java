@@ -16,11 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.caruins.config;
+package generatormods.caruins;
 
-import generatormods.caruins.CAState;
 import generatormods.common.config.ParseError;
-
 import static generatormods.caruins.CAState.ALIVE;
 import static generatormods.caruins.CAState.DEAD;
 

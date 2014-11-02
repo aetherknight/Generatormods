@@ -18,9 +18,8 @@
  */
 package generatormods.buildings;
 
+import generatormods.caruins.CARule;
 import generatormods.caruins.CAState;
-import generatormods.caruins.config.CARuinsConfig;
-import generatormods.caruins.config.CARule;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.codex.BlockProperties;
 import generatormods.common.BlockAndMeta;
@@ -29,6 +28,7 @@ import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
 import generatormods.common.config.ChestType;
+import generatormods.config.CARuinsConfig;
 import generatormods.util.IntUtil;
 import generatormods.walledcity.LayoutCode;
 

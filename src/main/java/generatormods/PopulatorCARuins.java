@@ -18,10 +18,10 @@
  */
 package generatormods;
 
-import generatormods.caruins.config.CARuinsConfig;
 import generatormods.commands.CommandBuild;
 import generatormods.commands.CommandScan;
 import generatormods.common.ModUpdateDetectorWrapper;
+import generatormods.config.CARuinsConfig;
 import generatormods.gen.WorldGenCARuins;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;

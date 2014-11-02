@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.common.config;
+package generatormods.config;
+
+import generatormods.common.config.ChestContentsSpec;
+import generatormods.common.config.ChestType;
+import generatormods.common.config.ChestsConfig;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

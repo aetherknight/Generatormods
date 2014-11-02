@@ -19,7 +19,7 @@
 package generatormods.common;
 
 import generatormods.buildings.BuildingTower;
-import generatormods.caruins.config.CARule;
+import generatormods.caruins.CARule;
 import generatormods.codex.BiomeNames;
 import generatormods.util.ParseUtil;
 import generatormods.util.PickWeighted;

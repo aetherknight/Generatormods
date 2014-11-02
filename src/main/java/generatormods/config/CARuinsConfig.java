@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package generatormods.caruins.config;
+package generatormods.config;
 
+import generatormods.caruins.SeedType;
+import generatormods.caruins.WeightedCARule;
+import generatormods.caruins.SeedType.Weighted;
 import generatormods.common.TemplateRule;
-import generatormods.common.config.AbstractConfig;
 import generatormods.common.config.ParseError;
 
 import java.io.File;

@@ -18,11 +18,13 @@
  */
 package generatormods.util;
 
-import generatormods.caruins.config.CARule;
+import generatormods.caruins.CARule;
 import generatormods.common.TemplateRule;
 import generatormods.common.config.ParseError;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 
 /**

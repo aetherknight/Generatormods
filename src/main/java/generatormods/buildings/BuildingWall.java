@@ -18,7 +18,7 @@
  */
 package generatormods.buildings;
 
-import generatormods.caruins.config.CARule;
+import generatormods.caruins.CARule;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.SymmetricSeed;
 import generatormods.codex.BlockProperties;

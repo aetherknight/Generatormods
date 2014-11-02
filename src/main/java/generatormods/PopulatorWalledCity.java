@@ -26,11 +26,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.common.TemplateWall;
+import generatormods.config.WalledCityConfig;
 import generatormods.gen.WorldGenUndergroundCity;
 import generatormods.gen.WorldGenWalledCity;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
-import generatormods.walledcity.config.WalledCityConfig;
 
 import java.io.File;
 import java.io.IOException;
