@@ -71,6 +71,7 @@ public class CityDataManager {
      *
      * TODO: Make this part of a City object?
      */
+    @SuppressWarnings("unchecked")
     public void addCityToVillages(World world, int id) {
         if (world != null && world.provider.dimensionId != 1) {
             if (world.villageCollectionObj != null) {
