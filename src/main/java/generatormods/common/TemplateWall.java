@@ -415,8 +415,9 @@ public class TemplateWall extends TemplateTML {
                     TemplateTML t = new TemplateTML(f, logger).buildLayout();
 					templates.add(t);
 				} catch (Exception e) {
+                    // TODO: make this an actual exception type
 					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-                        logger.warn("Did not load " + f.getName() + ", weight was zero.");
+                        logger.warn("Did not load template: {}, weight was zero", f.getName());
 					} else {
 						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
                             logger.error("There was a problem loading the .tml file " + f.getName(), e);
@@ -433,7 +434,8 @@ public class TemplateWall extends TemplateTML {
 		if (!stylesDirectory.exists())
 			throw new Exception("Could not find directory /" + stylesDirectory.getName() + " in the config folder " + stylesDirectory.getParent() + "!");
 		//load buildings
-        logger.info("Loading building subfolder in " + stylesDirectory + "/" + BUILDING_DIRECTORY_NAME + "...");
+        logger.info("Loading building subfolder in {}/{} ...", stylesDirectory,
+                BUILDING_DIRECTORY_NAME);
 		HashMap<String, TemplateTML> buildingTemplates = new HashMap<String, TemplateTML>();
 		Iterator<TemplateTML> itr = null;
 		try {
@@ -447,7 +449,7 @@ public class TemplateWall extends TemplateTML {
 				buildingTemplates.put(t.name, t);
 			}
 		//load walls
-        logger.info("Loading wall styles from directory " + stylesDirectory + "...");
+        logger.info("Loading wall styles from directory {} ...", stylesDirectory);
 		ArrayList<TemplateWall> styles = new ArrayList<TemplateWall>();
 		for (File f : stylesDirectory.listFiles()) {
 			if (getFileType(f.getName()).equals("tml")) {
@@ -456,7 +458,7 @@ public class TemplateWall extends TemplateTML {
 					styles.add(ws);
 				} catch (Exception e) {
 					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-                        logger.warn("Did not load " + f.getName() + ", weight was zero.");
+                        logger.warn("Did not load template {}, weight was zero.",f.getName());
 					} else {
 						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
                             logger.error("Error loading wall style " + f.getName(), e);
@@ -498,7 +500,7 @@ public class TemplateWall extends TemplateTML {
 		HashMap<String, TemplateWall> streetTemplateMap = new HashMap<String, TemplateWall>();
 		Iterator<TemplateWall> itr;
 		try {
-            logger.info("Loading streets subfolder in " + streetsDirectory + "...");
+            logger.info("Loading streets subfolder in {} ...", streetsDirectory);
             itr = loadWallStylesFromDir(streetsDirectory, logger).iterator();
 			while (itr.hasNext()) {
 				TemplateWall cs = itr.next();
@@ -513,7 +515,7 @@ public class TemplateWall extends TemplateTML {
 			cs.streets = cs.loadChildStyles("street_templates", streetTemplateMap);
 			if (cs.streets.size() == 0 && !cs.underground) {
 				itr.remove();
-                logger.warn("No valid street styles for " + cs.name + ". Disabling this city style.");
+                logger.warn("No valid street styles for {}. Disabling this city style.", cs.name);
 			}
 			//else cs.streetWeights=buildWeightsAndIndex(cs.streets);
 		}

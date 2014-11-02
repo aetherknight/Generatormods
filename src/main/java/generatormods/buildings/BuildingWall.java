@@ -125,14 +125,15 @@ public class BuildingWall extends Building {
 		}
 		setCursor(0);
         if (bLength > 0) {
-            logger.debug("Built " + ws.name + " wall " + IDString() + ", length " + (bLength)
-                    + " from " + localCoordString(xArray[0], yArray[0], 0) + " to "
-                    + localCoordString(xArray[bLength - 1], yArray[bLength - 1], bLength - 1));
+            logger.debug("Built {} wall: {}, length: {}, from: {} to: {}", ws.name, IDString(),
+                    bLength, localCoordString(xArray[0], yArray[0], 0),
+                    localCoordString(xArray[bLength - 1], yArray[bLength - 1], bLength - 1));
         } else {
-            logger.warn("Wall too short to build! " + IDString() + "length=" + bLength + " at " + localCoordString(0, 0, 0));
+            logger.warn("Wall too short to build! {}, length: {} at {}", IDString(), bLength,
+                    localCoordString(0, 0, 0));
         }
         // TODO: ??? why are we checking this here?
-        logger.debug("Wall planning was terminated due to: " + failString());
+        logger.debug("Wall planning was terminated due to: {}", failString());
 		int lN = 0;
 		BlockAndMeta idAndMeta;
 		int layer[][];
@@ -537,14 +538,14 @@ public class BuildingWall extends Building {
      */
 	public int plan(int startN, int depth, int lookahead, boolean stopAtWall) {
 		if (startN < 1 || startN >= maxLength) {
-            logger.error("Bad start length at BuildingWall.plan:" + startN);
+            logger.error("Bad start length at BuildingWall.plan: {}", startN);
 			return 0;
 		}
 		int fails = 0;
         setOriginLocal(i1, j1, k1, xArray[startN - 1], yArray[startN - 1], startN);
 		bLength = startN;
-        logger.debug("planWall " + IDString() + ", depth=" + depth + " n=" + startN + " maxlLen="
-                + maxLength + " at " + (new ChunkCoordinates(i0, j0, k0)));
+        logger.debug("BuildingWall.plan Wall: {}, depth: {}, startN: {}, maxlLength: {}, at {}",
+                IDString(), depth, startN, maxLength, (new ChunkCoordinates(i0, j0, k0)));
 		//int searchUp=Math.min(Math.max(MIN_SEARCHUP,WalkHeight+1),MAX_SEARCHUP);
 		int searchUp = MIN_SEARCHUP;
 		int obstructionHeight = WalkHeight > 4 ? WalkHeight + 1 : bHeight + 1;
@@ -611,9 +612,8 @@ public class BuildingWall extends Building {
 					hitMaxDepth = true; //may still be able to proceed, note this so we can do so from root
 					break; //loop termination condition 3
 				} else {
-                    logger.debug("Trying branches for " + IDString() + ", depth=" + depth
-                            + " at n=" + bLength + " x=" + (xArray[bLength]) + " y="
-                            + (yArray[bLength]));
+                    logger.debug("Trying branches for {}, depth: {}, at n: {}, x: {}, y: {}",
+                            IDString(), depth, bLength, xArray[bLength], yArray[bLength]);
 					int improvement, bestImprovement = 0;
 					BuildingWall branch, bestBranch = null;
 					//String[] branchNames={"Down","Minus","Straight","Plus","Up"};
@@ -674,7 +674,7 @@ public class BuildingWall extends Building {
 	}
 
 	public void printWall(int start) {
-        logger.debug("Printing " + IDString() + " wall from n=" + start + " to n=" + (bLength - 1));
+        logger.debug("Printing wall: {}, from n: {}, to n:", IDString(), start, (bLength - 1));
         String temp = "";
         for (int m = start; m < bLength; m++) {
             if (m % 10 == 0)
@@ -770,11 +770,11 @@ public class BuildingWall extends Building {
 			x_targ = getX(targ);
             y_targ = getY(targ);
             z_targ = getZ(targ);
-            logger.debug("Set target for " + IDString() + "to "
-                    + localCoordString(x_targ, y_targ, z_targ) + "!");
+            logger.debug("Set target for {} to {}!", IDString(),
+                    localCoordString(x_targ, y_targ, z_targ));
         } else {
-            logger.debug("Could not set target for " + IDString() + ", targ=" + localTarget
-                    + " (i,j,k)=" + (new ChunkCoordinates(i1, j1, k1)));
+            logger.debug("Could not set target for {}, targ: {}, location: {}", IDString(),
+                    localTarget, (new ChunkCoordinates(i1, j1, k1)));
         }
 		return target;
 	}
@@ -943,7 +943,7 @@ public class BuildingWall extends Building {
                     smoothingdebugStr += (arry[m] + ",");
                 logger.debug(smoothingdebugStr);
 				do {
-                    logger.debug("smoothing n=" + n + " " + arry[n - 1] + " " + arry[n] + " " + arry[winEnd]);
+                    logger.debug("smoothing n: {} {} {} {}", n, arry[n - 1], arry[n], arry[winEnd]);
 					arry[n] = arry[winEnd];
 					n--;
 				} while (n > smoothStart && arry[n] != arry[winEnd]);

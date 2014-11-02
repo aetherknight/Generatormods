@@ -118,8 +118,8 @@ public class ParseUtil {
                         }
                     }
                     if (!found)
-                        logger.warn("Warning, named checklist item not found:" + check + ". Line:"
-                                + read);
+                        logger.warn("Warning, named checklist item not found: {}. Line: {}", check,
+                                read);
                 }
             }
             return newVals;

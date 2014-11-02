@@ -91,7 +91,8 @@ public class BuildingDispenserTrap extends Building {
 	public void build(MissileType missileType, boolean multipleTriggers) {
 		if (bLength < 0)
 			bLength = 0;
-        logger.debug("Building dispenser trap at "+i0+","+j0+","+k0+", plateSeparation="+bLength);
+        logger.debug("Building dispenser trap at ({},{},{}), plateSeparation: {}", i0, j0, k0,
+                bLength);
 		for (int x = 0; x < MECHANISM[0][0].length; x++) {
             for (int z = 0; z < MECHANISM[0].length; z++) {
                 for (int y = 0; y < MECHANISM.length; y++) {

@@ -225,7 +225,6 @@ public class BuildingTower extends Building {
         flushDelayed();
 	}
 
-	//****************************************  FUNCTION  - buildXYRotated *************************************************************************************//
 	public void buildXYRotated(int p, int q, int r, BlockAndMeta block, boolean rotated) {
 		if (rotated)
 			buffer[r][q][p] = block;
@@ -234,18 +233,29 @@ public class BuildingTower extends Building {
 	}
 
 	public boolean isObstructedRoof(int ybuffer) {
-        int rBuffer =
-                (roofStyle == RoofStyle.CRENEL ? 1
-                        : (roofStyle == RoofStyle.DOME || roofStyle == RoofStyle.CONE) ? 0 : -1);
-        int rHeight = (roofStyle == RoofStyle.CRENEL ? 2 : minHorizDim / 2);
+        // TODO: move these calulations into the RoofStyle enum?
+        int rBuffer, rHeight;
+        switch (roofStyle) {
+            case CRENEL:
+                rBuffer = 1;
+                rHeight = 2;
+                break;
+            case DOME:
+            case CONE:
+                rBuffer = 0;
+                rHeight = minHorizDim / 2;
+                break;
+            default:
+                rBuffer = -1;
+                rHeight = minHorizDim / 2;
+        }
 		if (isObstructedSolid(new int[] { rBuffer, bHeight, Math.max(rBuffer, ybuffer) }, new int[] { bWidth - 1 - rBuffer, bHeight + rHeight, bLength - 1 - rBuffer })) {
-            logger.warn("Cannot build Tower " + IDString() + ". Obstructed!");
+            logger.warn("Tower: {} is obstructed near its roof!", IDString());
 			return true;
 		}
 		return false;
 	}
 
-	//****************************************  FUNCTION  - propagateCollapse  *************************************************************************************//
 	public int propagateCollapse(int buildChance) {
 		//int buildChance= buildingRule==null ? 100 : buildingRule.chance;
 		int xLim = buffer.length, zLim = buffer[0].length, yLim = buffer[0][0].length;
@@ -315,7 +325,6 @@ public class BuildingTower extends Building {
 		}
 		//check if obstructed at roof
 		if (isObstructedRoof(ybuffer)) {
-			//if(BuildingWall.DEBUG) FMLLog.getLogger().info("Tower blocked in roof.");
 			return false;
 		}
 		//check if obstructed on body

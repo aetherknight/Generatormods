@@ -69,7 +69,7 @@ public class TemplateTML {
 		} catch (IOException io) {
 		}
 		parseFile(lines);
-        logger.debug("Successfully loaded template " + name + " with weight " + weight + ".");
+        logger.debug("Successfully loaded template: {}, with weight: {}", name, weight);
 	}
 
 	//a dummy constructor for use by TemplateWall for default towers/ CARuins
@@ -156,7 +156,8 @@ public class TemplateTML {
 		if (layers.size() == 0)
 			throw new Exception("No layers provided!");
 		if (layers.size() != height) {
-			logger.warn("Warning, number of layers provided " + layers.size() + " did not equal height=" + height + ".");
+            logger.warn("Warning, number of layers provided: {} did not equal height: {}",
+                    layers.size(), height);
 			height = layers.size();
 		}
 		template = new int[height][length][width];

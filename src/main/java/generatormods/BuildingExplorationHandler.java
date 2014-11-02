@@ -66,7 +66,8 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 
 	public void updateWorldExplored(World world) {
 		if (isNewWorld(world)) {
-            logger.info("Starting to survey " + world.provider.getDimensionName() + " for generation...");
+            logger.info("Starting to survey {} for generation...",
+                    world.provider.getDimensionName());
 		}
 	}
 

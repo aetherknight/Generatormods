@@ -50,8 +50,8 @@ public class BuildingDoubleWall extends Building {
 		int a = wall1.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		int b = wall2.plan(1, 0, ws.MergeWalls ? ws.WWidth : BuildingWall.DEFAULT_LOOKAHEAD, !ws.MergeWalls) + 1;
 		if (b + a - 1 < ws.MinL) {
-            logger.debug("Abandoning wall " + wall1.IDString() + "length=" + (b + a - 1)
-                    + ", reason 1)" + wall1.failString() + ". 2)" + wall2.failString() + ".");
+            logger.debug("Abandoning wall: {} length: {}, reason 1) {}. 2) {}.", wall1.IDString(),
+                    (b + a - 1), wall1.failString(), wall2.failString());
 			return false;
 		}
 		wall1.printWall();

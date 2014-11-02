@@ -56,7 +56,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
-        logger.debug("Attempting to generate CARuins near ("+i0+","+j0+","+k0+")");
+        logger.debug("Attempting to generate CARuins near ({},{},{})", i0, j0, k0);
         int ContainerWidth = config.getContainerWidth();
         int ContainerLength = config.getContainerLength();
 
@@ -80,7 +80,7 @@ public class WorldGenCARuins extends WorldGeneratorThread {
                         Handedness.R_HAND, false, ContainerWidth, th, ContainerLength,
                         seed, caRule, null, new int[] {i0, j0, k0});
         if (bca.plan(true, config.getMinHeightBeforeOscillation()) && bca.queryCanBuild(0, true)) {
-            logger.info("Building CARuin at ("+i0+","+j0+","+k0+")");
+            logger.info("Building CARuin at ({},{},{})", i0, j0, k0);
             bca.build(config.getSmoothWithStairs(), config.getMakeFloors());
             if (config.getGlobalFrequency() < 0.05 && random.nextInt(2) != 0) {
 				for (int tries = 0; tries < 10; tries++) {

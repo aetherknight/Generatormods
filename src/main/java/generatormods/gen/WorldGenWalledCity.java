@@ -99,10 +99,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		cityType = world.provider.dimensionId;
 	}
 
-	//****************************************  FUNCTION - generate  *************************************************************************************//
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
-        logger.debug("Attempting to generate WalledCity near ("+i0+","+j0+","+k0+")");
+        logger.debug("Attempting to generate WalledCity near ({},{},{})", i0, j0, k0);
         ows = TemplateWall.pickBiomeWeightedWallStyle(cityStyles, world, i0, k0, world.rand, false);
 		if (ows == null)
 			return false;
@@ -126,7 +125,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		walls[0] = new BuildingWall(ID, this, ows, dir[0], axXHand, ows.MinL + random.nextInt(ows.MaxL - ows.MinL), false, i0, j0, k0).setMinJ(minJ);
 		walls[0].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, true);
         if (walls[0].bLength < ows.MinL) {
-            logger.debug("Abandoning because wall[0]: " + walls[0].IDString() + " planned length " + walls[0].bLength + " is less than targeted length "+ ows.MinL + ". Reason: " + walls[2].failString());
+            logger.debug(
+                    "Abandoning because wall[0]: {} planned length {} is less than targeted length {}. Reason: {}",
+                    walls[0].IDString(), walls[0].bLength, ows.MinL, walls[0].failString());
 			return false;
         }
 		//plan walls[1]
@@ -139,14 +140,17 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
         }
 		walls[1].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
         if (walls[1].bLength < ows.MinL) {
-            logger.debug("Abandoning because wall[1]: " + walls[1].IDString() + " planned length " + walls[1].bLength + " is less than targeted length "+ ows.MinL + ". Reason: " + walls[2].failString());
+            logger.debug(
+                    "Abandoning because wall[1]: {} planned length {} is less than targeted length {}. Reason: {}",
+                    walls[1].IDString(), walls[1].bLength, ows.MinL, walls[1].failString());
 			return false;
         }
 		//plan walls[2]
 		walls[1].setCursor(walls[1].bLength - 1);
 		int distToTarget = walls[0].bLength + walls[1].xArray[walls[1].bLength - 1];
         if (distToTarget < MIN_SIDE_LENGTH) {
-            logger.debug("Rejecting because distToTarget " + distToTarget + " for wall[2] is less than " + MIN_SIDE_LENGTH);
+            logger.debug("Rejecting because distToTarget: {} for wall[2] is less than ",
+                    distToTarget, MIN_SIDE_LENGTH);
 			return false;
         }
 		walls[2] = new BuildingWall(ID + 2, this, ows, dir[2], axXHand, distToTarget + 2, false, walls[1].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset)).setTowers(walls[0]).setMinJ(minJ);
@@ -158,14 +162,17 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		walls[2].setTarget(walls[2].getIJKPt(0, 0, distToTarget));
 		walls[2].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
 		if (walls[2].bLength < walls[2].y_targ) {
-            logger.debug("Abandoning because wall[2]: " + walls[2].IDString() + " planned length " + walls[2].bLength + " is less than targeted length "+ walls[2].y_targ + ". Reason: " + walls[2].failString());
+            logger.debug(
+                    "Abandoning because wall[2]: {} planned length {} is less than targeted length {}. Reason: {}",
+                    walls[2].IDString(), walls[2].bLength, walls[2].y_targ, walls[2].failString());
 			return false;
 		}
 		//plan walls[3]
 		walls[2].setCursor(walls[2].bLength - 1);
 		distToTarget = walls[1].bLength - walls[0].xArray[walls[0].bLength - 1] + walls[1].xArray[walls[1].bLength - 1];
         if (distToTarget < MIN_SIDE_LENGTH) {
-            logger.debug("Rejecting because distToTarget " + distToTarget + " for wall[3] is less than " + MIN_SIDE_LENGTH);
+            logger.debug("Rejecting because distToTarget: {} for wall[3] is less than {}",
+                    distToTarget, MIN_SIDE_LENGTH);
 			return false;
         }
 		walls[3] = new BuildingWall(ID + 3, this, ows, dir[3], axXHand, distToTarget + 2, false, walls[2].getIJKPt(-1 - ows.TowerXOffset, 0, 1 + ows.TowerXOffset)).setTowers(walls[0]).setMinJ(minJ);
@@ -178,13 +185,16 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		walls[3].setTarget(walls[0].getIJKPt(-1 - ows.TowerXOffset, 0, -1 - ows.TowerXOffset));
 		walls[3].plan(1, 0, BuildingWall.DEFAULT_LOOKAHEAD, false);
 		if (walls[3].bLength < walls[3].y_targ) {
-            logger.debug("Abandoning because wall[3]: " + walls[3].IDString() + " planned length " + walls[3].bLength + " is less than targeted length "+ walls[3].y_targ + ". Reason: " + walls[3].failString());
+            logger.debug(
+                    "Abandoning because wall[3]: {} planned length {} is less than targeted length {}. Reason: {}",
+                    walls[3].IDString(), walls[3].bLength, walls[3].y_targ, walls[3].failString());
 			return false;
 		}
-		//if(BuildingWall.DEBUG) FMLLog.getLogger().info("smoothingwalls");
 		//smoothing
-		for (BuildingWall w : walls)
+        for (BuildingWall w : walls) {
+            logger.debug("Smoothing wall {}", w.IDString());
 			w.smooth(ows.ConcaveDownSmoothingScale, ows.ConcaveUpSmoothingScale, true);
+        }
 		//======================= Additional site checks =======================================
 		//calculate the corners
 		int[] xmax = new int[4];
@@ -208,7 +218,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		jmean /= (Lmean * 4);
 		for (BuildingWall w : walls) {
 			if (Math.abs(w.j1 - jmean) > w.bLength / JMEAN_DEVIATION_SLOPE) {
-				logger.debug("Rejected city " + ID + ", height at corner differed from mean by " + (Math.abs(w.j1 - jmean)) + ".");
+                logger.debug(
+                        "Rejected city {}, height at corner differed from mean by {}, which is greater than {}.",
+                        ID, (Math.abs(w.j1 - jmean)), w.bLength / JMEAN_DEVIATION_SLOPE);
 				return false;
 			}
 		}
@@ -227,20 +239,23 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 					if (j2 == HIT_WATER)
 						waterArea++;
                     if (rejectOnPreexistingArtifacts && ows.LevelInterior && BlockProperties.get(world.getBlock(i2, j2, k2)).isArtificial) {
-						logger.debug("Rejected " + ows.name + " city " + ID + ", found previous construction in city zone!");
+                        logger.debug(
+                                "Rejected: {}, city: {}, found previous construction in city zone!",
+                                ows.name, ID);
 						return false;
 					}
 				}
 			}
 		}
 		if (!ows.LevelInterior && (float) waterArea / (float) cityArea > MAX_WATER_PERCENTAGE) {
-			logger.debug("Rejected " + ows.name + " city " + ID + ", too much water! City area was " + (100.0f * waterArea / cityArea) + "% water!");
+            logger.debug("Rejected: {}, city: {}, too much water! City area was {}% water!",
+                    ows.name, ID, (100.0f * waterArea / cityArea));
 			return false;
 		}
 		//query the exploration handler again to see if we've built nearby cities in the meanwhile
 		for (BuildingWall w : walls) {
             if (!cityDataManager.isCitySeparated(world, w.i1, w.k1, cityType)) {
-				logger.debug("Rejected city " + ID + " nearby city was built during planning!");
+                logger.debug("Rejected city: {} nearby city was built during planning!", ID);
 				return false;
 			}
 		}
@@ -251,10 +266,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
         cityDataManager.addCity(world, cityCenter[0], cityCenter[2], cityType);
         cityDataManager.saveCityLocations(world);
 		//=================================== Build it! =========================================
-        logger.info("Building " + ows.name + " city" + ", ID=" + ID + " in "
-                + world.getBiomeGenForCoordsBody(walls[0].i1, walls[0].k1).biomeName
-                + " biome between " + walls[0].localCoordString(0, 0, 0) + " and "
-                + walls[2].localCoordString(0, 0, 0));
+        logger.info("Building: {}, city: {}, in biome: {}, between: {} and {}", ows.name, ID,
+                world.getBiomeGenForCoordsBody(walls[0].i1, walls[0].k1).biomeName,
+                walls[0].localCoordString(0, 0, 0), walls[2].localCoordString(0, 0, 0));
         chatHandler.tellAllPlayers( "Building city...");
 		if (ows.LevelInterior)
 			levelCity();
@@ -388,7 +402,8 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 			street.buildTowers(true, true, sws.MakeGatehouseTowers, cityIsDense, false);
 		}
 
-        logger.info("Built " + (isUnderground() ? "underground city" : "city") + " at " + (new ChunkCoordinates(i0, j0, k0)));
+        logger.info("Built {} at {}", (isUnderground() ? "underground city" : "city"),
+                (new ChunkCoordinates(i0, j0, k0)));
 		chatHandler.chatCityBuilt(new int[] { i0, j0, k0, cityType, Lmean / 2 + 40 }, isUnderground());
 
         cityDataManager.addCityToVillages(world, ID);
@@ -533,7 +548,6 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 		}
 	}
 
-	//****************************************  FUNCTION - randInteriorPoint  *************************************************************************************//
 	/**
 	 * @return Coordinates (i,j,k) of interior surface point, j will be -1 if
 	 *         point was water
@@ -541,7 +555,9 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 	private int[] randInteriorPoint() {
 		int tries = 0;
 		int[] pt = new int[3];
-        logger.debug("Finding random interior point for city seeded at corner (" + walls[0].i1 + "," + walls[0].j1 + "," + walls[0].k1 + ")" + walls[0].IDString());
+        logger.debug(
+                "Finding random interior point for city seeded at corner ({},{},{}) walls[0]: {}",
+                walls[0].i1, walls[0].j1, walls[0].k1, walls[0].IDString());
 		while (tries < 20) {
 			pt[0] = mincorner[0] + random.nextInt(Math.abs(corner1[0] - corner2[0]));
 			pt[2] = mincorner[2] + random.nextInt(Math.abs(corner1[2] - corner2[2]));

@@ -304,10 +304,9 @@ public class BuildingCellularAutomaton extends Building {
 			}
 			if (!layerIsAlive) {
                 if (y <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer "
-                            + y
-                            + " is not alive and is less than or equal to MinHeightBeforeOscillation: "
-                            + MinHeightBeforeOscillation);
+                    logger.debug(
+                            "Rejecting because layer {} is not alive and is less than or equal to MinHeightBeforeOscillation: {}",
+                            y, MinHeightBeforeOscillation);
 					return false;
                 }
                 bHeight = y;
@@ -315,27 +314,27 @@ public class BuildingCellularAutomaton extends Building {
 			}
 			if (layerIsFixed) {
                 if (y - 1 <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer " + y + " is fixed and layer " + (y - 1)
-                            + " is less than or equal to MinHeightBeforeOscillation: "
-                            + MinHeightBeforeOscillation);
+                    logger.debug(
+                            "Rejecting because layer {} is fixed and layer {} is less than or equal to MinHeightBeforeOscillation: {}",
+                            y, (y - 1), MinHeightBeforeOscillation);
 					return false;
                 }
                 crystallizationHeight = y - 1;
 			}
 			if (layerIsPeriod2) {
                 if (y - 2 <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer " + y + " is period2 and layer "
-                            + (y - 2) + " is less than or equal to MinHeightBeforeOscillation: "
-                            + MinHeightBeforeOscillation);
+                    logger.debug(
+                            "Rejecting because layer {} is period2 and layer {} is less than or equal to MinHeightBeforeOscillation: {}",
+                            y, (y - 2), MinHeightBeforeOscillation);
 					return false;
                 }
                 crystallizationHeight = y - 2;
 			}
 			if (layerIsPeriod3) {
                 if (y - 3 <= MinHeightBeforeOscillation) {
-                    logger.debug("Rejecting because layer " + y + " is period3 and layer "
-                            + (y - 3) + " is less than or equal to MinHeightBeforeOscillation: "
-                            + MinHeightBeforeOscillation);
+                    logger.debug(
+                            "Rejecting because layer {} is period3 and layer {} is less than or equal to MinHeightBeforeOscillation: {}",
+                            y, (y - 3), MinHeightBeforeOscillation);
 					return false;
                 }
                 crystallizationHeight = y - 3;
