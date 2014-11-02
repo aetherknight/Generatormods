@@ -24,8 +24,7 @@ import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-
-import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.STAIRS_DIR_TO_META;
 
 /*
  * BuildingSpiralStaircase plans and builds a 3x3 spiral staircase down from origin.

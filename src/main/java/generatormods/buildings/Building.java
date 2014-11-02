@@ -18,18 +18,18 @@
  */
 package generatormods.buildings;
 
+import generatormods.codex.BlockProperties;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
-import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
-import generatormods.common.PickWeighted;
 import generatormods.common.PlacedBlock;
 import generatormods.common.TemplateRule;
-import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestItemSpec;
 import generatormods.common.config.ChestType;
+import generatormods.util.PickWeighted;
+import generatormods.util.WorldUtil;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.ILayoutGenerator;
 
@@ -51,21 +51,21 @@ import net.minecraft.world.World;
 
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.common.DirMeta.BED_DIR_TO_META;
-import static generatormods.common.DirMeta.BED_META_TO_DIR;
-import static generatormods.common.DirMeta.BUTTON_DIR_TO_META;
-import static generatormods.common.DirMeta.DOOR_DIR_TO_META;
-import static generatormods.common.DirMeta.DOOR_META_TO_DIR;
-import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
-import static generatormods.common.DirMeta.LADDER_META_TO_DIR;
-import static generatormods.common.DirMeta.PAINTING_DIR_TO_FACEDIR;
-import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
-import static generatormods.common.DirMeta.STAIRS_META_TO_DIR;
-import static generatormods.common.DirMeta.TRAPDOOR_DIR_TO_META;
-import static generatormods.common.DirMeta.TRAPDOOR_META_TO_DIR;
-import static generatormods.common.DirMeta.VINES_DIR_TO_META;
-import static generatormods.common.DirMeta.VINES_META_TO_DIR;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.codex.DirToMetaMappings.BED_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.BED_META_TO_DIR;
+import static generatormods.codex.DirToMetaMappings.BUTTON_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.DOOR_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.DOOR_META_TO_DIR;
+import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.LADDER_META_TO_DIR;
+import static generatormods.codex.DirToMetaMappings.PAINTING_DIR_TO_FACEDIR;
+import static generatormods.codex.DirToMetaMappings.STAIRS_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.STAIRS_META_TO_DIR;
+import static generatormods.codex.DirToMetaMappings.TRAPDOOR_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.TRAPDOOR_META_TO_DIR;
+import static generatormods.codex.DirToMetaMappings.VINES_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.VINES_META_TO_DIR;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /**
  * Building is a general class for buildings. Classes can inherit from Building
@@ -532,7 +532,7 @@ public class Building {
             if((randLightingHash[(block[0] & 0x7) | (block[1] & 0x38) | (block[2] & 0x1c0)]))
                 world.setBlock(block[0], block[1], block[2], blc, block[3], 3);
             else
-                WorldHelper.setBlockAndMetaNoLighting(world, block[0], block[1], block[2], blc,
+                WorldUtil.setBlockAndMetaNoLighting(world, block[0], block[1], block[2], blc,
                         block[3]);
         }
 	}
@@ -579,7 +579,7 @@ public class Building {
         } else if (randLightingHash[(x & 0x7) | (z & 0x38) | (y & 0x1c0)]) {
             world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 2);
         } else {
-            WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
+            WorldUtil.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
                     rotateMetadata(blockID, metadata));
         }
         if (BlockProperties.get(blockID).isDoor) {
@@ -633,7 +633,7 @@ public class Building {
 		else if (lighting)
 			world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 3);
 		else
-            WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
+            WorldUtil.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
                     rotateMetadata(blockID, metadata));
 		if (BlockProperties.get(blockID).isDoor) {
 			addDoorToNewListIfAppropriate(pt[0], pt[1], pt[2]);

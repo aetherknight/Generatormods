@@ -39,8 +39,8 @@ import net.minecraft.util.WeightedRandom;
 
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 public class WorldGenCARuins extends WorldGeneratorThread {
 	private CARule caRule = null;

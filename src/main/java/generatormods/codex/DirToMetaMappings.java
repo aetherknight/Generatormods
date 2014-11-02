@@ -1,9 +1,11 @@
-package generatormods.common;
+package generatormods.codex;
+
+import generatormods.common.Dir;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DirMeta {
+public class DirToMetaMappings {
 	// maps block metadata to a dir
     public final static Dir[] BED_META_TO_DIR = new Dir[] { Dir.SOUTH, Dir.WEST, Dir.NORTH, Dir.EAST };
     public final static Dir[] STAIRS_META_TO_DIR = new Dir[] { Dir.EAST, Dir.WEST, Dir.SOUTH, Dir.NORTH };

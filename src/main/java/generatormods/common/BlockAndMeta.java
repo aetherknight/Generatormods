@@ -18,13 +18,15 @@
  */
 package generatormods.common;
 
+import generatormods.codex.BlockProperties;
 import generatormods.common.config.ChestType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static generatormods.common.DirMeta.BUTTON_DIR_TO_META;
-import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.BUTTON_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
 
 /**
  * Stores a block type, plus a metadata value for that block.

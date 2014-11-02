@@ -22,13 +22,13 @@ import generatormods.buildings.Building;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingTower;
 import generatormods.buildings.BuildingWall;
-import generatormods.common.BlockProperties;
+import generatormods.codex.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateWall;
-import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
+import generatormods.util.WorldUtil;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.ILayoutGenerator;
 import generatormods.walledcity.LayoutCode;
@@ -52,11 +52,11 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 
 import static generatormods.PopulatorWalledCity.MIN_CITY_LENGTH;
-import static generatormods.common.WorldHelper.HIT_WATER;
-import static generatormods.common.WorldHelper.IGNORE_WATER;
-import static generatormods.common.WorldHelper.SEA_LEVEL;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.util.WorldUtil.HIT_WATER;
+import static generatormods.util.WorldUtil.IGNORE_WATER;
+import static generatormods.util.WorldUtil.SEA_LEVEL;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /*
  * WorldGenWalledCity generates walled cities in the Minecraft world. Walled
@@ -496,14 +496,14 @@ public class WorldGenWalledCity extends WorldGeneratorThread implements ILayoutG
 						pt[1] += 10; //just to try to catch any overhanging blocks
 						for (; pt[1] > jmax; pt[1]--)
 							if (!world.isAirBlock(pt[0], pt[1], pt[2]))
-                                WorldHelper.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2],
+                                WorldUtil.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2],
                                         Blocks.air, 0);
 						if (!world.isAirBlock(pt[0], jmax - 1, pt[2]))
-                            WorldHelper.setBlockAndMetaNoLighting(world, pt[0], jmax, pt[2],
+                            WorldUtil.setBlockAndMetaNoLighting(world, pt[0], jmax, pt[2],
                                     oldSurfaceBlockId, 0);
 					}
 					if (pt[1] < jmin)
-                        WorldHelper.fillDown(pt, jmin, world);
+                        WorldUtil.fillDown(pt, jmin, world);
 				}
 			}
 		}

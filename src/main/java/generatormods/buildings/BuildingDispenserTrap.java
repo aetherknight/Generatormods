@@ -26,9 +26,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityDispenser;
-
-import static generatormods.common.DirMeta.BUTTON_DIR_TO_META;
-import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.BUTTON_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
 
 /*
  * BuildingDispenserTrap generates a redstone activated dispenser trap

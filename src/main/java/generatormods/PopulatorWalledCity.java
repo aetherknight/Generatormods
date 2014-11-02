@@ -32,16 +32,17 @@ import generatormods.gen.WorldGenWalledCity;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 import generatormods.walledcity.config.WalledCityConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.world.World;
 
-import static generatormods.common.WorldHelper.IGNORE_WATER;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import net.minecraft.world.World;
+import static generatormods.util.WorldUtil.IGNORE_WATER;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /*
  * PopulatorWalledCity is the main class that hooks into ModLoader for the

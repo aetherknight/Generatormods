@@ -18,8 +18,8 @@
  */
 package generatormods.buildings;
 
+import generatormods.codex.BlockProperties;
 import generatormods.common.BlockAndMeta;
-import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.RoofStyle;
@@ -28,10 +28,9 @@ import generatormods.common.TemplateRule;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-
-import static generatormods.common.DirMeta.DOOR_DIR_TO_META;
-import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
+import static generatormods.codex.DirToMetaMappings.DOOR_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.STAIRS_DIR_TO_META;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 
 /*
  * BuildingTower builds a procedurally generated tower.

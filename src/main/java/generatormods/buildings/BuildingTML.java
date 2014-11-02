@@ -18,16 +18,16 @@
  */
 package generatormods.buildings;
 
+import generatormods.codex.BlockProperties;
 import generatormods.common.BlockAndMeta;
-import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateTML;
-import generatormods.common.WorldHelper;
+import generatormods.util.WorldUtil;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import static generatormods.common.WorldHelper.IGNORE_WATER;
+import static generatormods.util.WorldUtil.IGNORE_WATER;
 
 /*
  * BuildingTML generates a building from a .tml template.
@@ -52,7 +52,7 @@ public class BuildingTML extends Building {
 				if (base != null)
                     buildDown(x, -1, z, tmlt.rules[base[z][x]], tmlt.leveling, 0, 0);
 				else
-                    WorldHelper.fillDown(getSurfaceIJKPt(x, z, j0 - 1, true, IGNORE_WATER), j0 - 1,
+                    WorldUtil.fillDown(getSurfaceIJKPt(x, z, j0 - 1, true, IGNORE_WATER), j0 - 1,
                             world);
 			}
 		//clear overhead

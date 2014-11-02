@@ -26,18 +26,19 @@ import generatormods.gen.WorldGenCARuins;
 import generatormods.gen.WorldGenGreatWall;
 import generatormods.gen.WorldGenUndergroundCity;
 import generatormods.gen.WorldGenWalledCity;
+
 import java.util.List;
 import java.util.Random;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-
-import static generatormods.common.WorldHelper.IGNORE_WATER;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.util.WorldUtil.IGNORE_WATER;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /**
  * Build command for players to try to build structures city/wall/ruin at the specified location

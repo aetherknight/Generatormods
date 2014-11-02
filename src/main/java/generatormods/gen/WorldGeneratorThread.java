@@ -32,9 +32,9 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.common.WorldHelper.HIT_WATER;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.util.WorldUtil.HIT_WATER;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /*
  * WorldGeneratorThread is a thread that generates structures in the Minecraft

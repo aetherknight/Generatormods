@@ -22,9 +22,9 @@ import generatormods.caruins.CAState;
 import generatormods.caruins.config.CARuinsConfig;
 import generatormods.caruins.config.CARule;
 import generatormods.caruins.seeds.ISeed;
+import generatormods.codex.BlockProperties;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
-import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
@@ -42,16 +42,15 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
-
 import static generatormods.caruins.CAState.ALIVE;
 import static generatormods.caruins.CAState.DEAD;
-import static generatormods.common.DirMeta.LADDER_DIR_TO_META;
-import static generatormods.common.DirMeta.STAIRS_DIR_TO_META;
-import static generatormods.common.WorldHelper.HIT_WATER;
-import static generatormods.common.WorldHelper.IGNORE_WATER;
-import static generatormods.common.WorldHelper.SEA_LEVEL;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.codex.DirToMetaMappings.LADDER_DIR_TO_META;
+import static generatormods.codex.DirToMetaMappings.STAIRS_DIR_TO_META;
+import static generatormods.util.WorldUtil.HIT_WATER;
+import static generatormods.util.WorldUtil.IGNORE_WATER;
+import static generatormods.util.WorldUtil.SEA_LEVEL;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /*
  * BuildingCellularAutomaton creates Cellular Automata-derived towers.

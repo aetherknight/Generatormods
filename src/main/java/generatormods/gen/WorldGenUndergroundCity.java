@@ -21,14 +21,14 @@ package generatormods.gen;
 import generatormods.PopulatorWalledCity;
 import generatormods.buildings.BuildingDoubleWall;
 import generatormods.buildings.BuildingUndergroundEntranceway;
-import generatormods.common.BlockProperties;
+import generatormods.codex.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.Shape;
 import generatormods.common.TemplateWall;
-import generatormods.common.WorldHelper;
 import generatormods.common.config.ChestContentsSpec;
 import generatormods.common.config.ChestType;
+import generatormods.util.WorldUtil;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
 
@@ -44,9 +44,9 @@ import net.minecraft.world.World;
 
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.common.WorldHelper.IGNORE_WATER;
-import static generatormods.common.WorldHelper.WORLD_MAX_Y;
-import static generatormods.common.WorldHelper.findSurfaceJ;
+import static generatormods.util.WorldUtil.IGNORE_WATER;
+import static generatormods.util.WorldUtil.WORLD_MAX_Y;
+import static generatormods.util.WorldUtil.findSurfaceJ;
 
 /*
  * WorldGenUndergroundCity generates a city in a large underground cavern. The
@@ -139,7 +139,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
                                                     : (hollow[3] - diam) / 2 + 1))};
 			boolean separated = true;
 			for (BuildingUndergroundEntranceway entranceway : entranceways)
-                if (WorldHelper.distance(entranceway.getIJKPt(0, 0, 0), pt) < 400)
+                if (WorldUtil.distance(entranceway.getIJKPt(0, 0, 0), pt) < 400)
 					separated = false;
 			BuildingUndergroundEntranceway entranceway = new BuildingUndergroundEntranceway(attempts, this, pws, axDir, pt);
 			if (separated && entranceway.build()) {
@@ -190,7 +190,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 		int[] farthestHollow = null;
 		int maxDist = -1;
 		for (int[] h : hollows) {
-            int dist = WorldHelper.distance(pt, h);
+            int dist = WorldUtil.distance(pt, h);
 			if (dist > maxDist) {
 				maxDist = dist;
 				farthestHollow = h;
@@ -221,7 +221,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 			for (int y1 = 0; y1 < top_diam; y1++) {
 				for (int x1 = 0; x1 < top_diam; x1++) {
                     if (Shape.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
-                        WorldHelper.setBlockAndMetaNoLighting(world, i + offset + x1, j + z1, k
+                        WorldUtil.setBlockAndMetaNoLighting(world, i + offset + x1, j + z1, k
                                 + offset + y1, Blocks.air, 0);
                     }
 				}
@@ -244,7 +244,7 @@ public class WorldGenUndergroundCity extends WorldGeneratorThread {
 				for (int y1 = 0; y1 < bottom_diam; y1++) {
 					for (int x1 = 0; x1 < bottom_diam; x1++) {
                         if (Shape.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
-                            WorldHelper.setBlockAndMetaNoLighting(world, i + offset + x1, j - z1, k
+                            WorldUtil.setBlockAndMetaNoLighting(world, i + offset + x1, j - z1, k
                                     + offset + y1, Blocks.air, 0);
                         }
 					}

@@ -21,24 +21,25 @@ package generatormods.buildings;
 import generatormods.caruins.config.CARule;
 import generatormods.caruins.seeds.ISeed;
 import generatormods.caruins.seeds.SymmetricSeed;
+import generatormods.codex.BlockProperties;
 import generatormods.common.BlockAndMeta;
 import generatormods.common.BlockExtended;
-import generatormods.common.BlockProperties;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
-import generatormods.common.PickWeighted;
 import generatormods.common.RoofStyle;
 import generatormods.common.TemplateRule;
 import generatormods.common.TemplateTML;
 import generatormods.common.TemplateWall;
 import generatormods.util.IntUtil;
+import generatormods.util.PickWeighted;
 import generatormods.walledcity.LayoutCode;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ChunkCoordinates;
+
 import org.apache.logging.log4j.Logger;
 
-import static generatormods.common.DirMeta.STAIRS_META_TO_DIR;
+import static generatormods.codex.DirToMetaMappings.STAIRS_META_TO_DIR;
 
 /*
  * BuildingWall plans and builds a wall that flows along Minecraft's terrain.
