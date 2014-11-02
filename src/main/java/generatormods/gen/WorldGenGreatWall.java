@@ -22,8 +22,8 @@ import generatormods.buildings.BuildingDoubleWall;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateWall;
-import generatormods.common.config.ChestContentsSpec;
-import generatormods.common.config.ChestType;
+import generatormods.config.chests.ChestContentsSpec;
+import generatormods.config.chests.ChestType;
 
 import java.util.List;
 import java.util.Map;

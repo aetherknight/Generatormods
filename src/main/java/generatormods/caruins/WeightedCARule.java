@@ -18,7 +18,7 @@
  */
 package generatormods.caruins;
 
-import generatormods.common.config.ParseError;
+import generatormods.common.ParseError;
 
 import java.util.ArrayList;
 import java.util.List;

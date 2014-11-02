@@ -19,7 +19,7 @@
 package generatormods.common;
 
 import generatormods.codex.BlockProperties;
-import generatormods.common.config.ChestType;
+import generatormods.config.chests.ChestType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 

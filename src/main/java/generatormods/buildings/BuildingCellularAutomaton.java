@@ -27,8 +27,8 @@ import generatormods.common.BlockExtended;
 import generatormods.common.Dir;
 import generatormods.common.Handedness;
 import generatormods.common.TemplateRule;
-import generatormods.common.config.ChestType;
 import generatormods.config.CARuinsConfig;
+import generatormods.config.chests.ChestType;
 import generatormods.util.IntUtil;
 import generatormods.walledcity.LayoutCode;
 

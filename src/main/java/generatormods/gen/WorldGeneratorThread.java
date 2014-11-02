@@ -19,8 +19,8 @@
 package generatormods.gen;
 
 import generatormods.buildings.IBuildingConfig;
-import generatormods.common.config.ChestContentsSpec;
-import generatormods.common.config.ChestType;
+import generatormods.config.chests.ChestContentsSpec;
+import generatormods.config.chests.ChestType;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.ILayoutGenerator;
 

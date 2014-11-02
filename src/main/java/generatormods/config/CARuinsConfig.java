@@ -21,8 +21,8 @@ package generatormods.config;
 import generatormods.caruins.SeedType;
 import generatormods.caruins.WeightedCARule;
 import generatormods.caruins.SeedType.Weighted;
+import generatormods.common.ParseError;
 import generatormods.common.TemplateRule;
-import generatormods.common.config.ParseError;
 
 import java.io.File;
 import java.util.ArrayList;

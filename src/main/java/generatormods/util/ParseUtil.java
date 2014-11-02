@@ -19,8 +19,8 @@
 package generatormods.util;
 
 import generatormods.caruins.CARule;
+import generatormods.common.ParseError;
 import generatormods.common.TemplateRule;
-import generatormods.common.config.ParseError;
 
 import java.util.ArrayList;
 import java.util.List;
