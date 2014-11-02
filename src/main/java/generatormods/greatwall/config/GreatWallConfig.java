@@ -27,9 +27,9 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
 
 public class GreatWallConfig extends AbstractConfig {
-    public double curveBias = 0.5;
-    public int lengthBiasNorm = 200;
-    public int backtrackLength = 9;
+    private double curveBias;
+    private int lengthBiasNorm;
+    private int backtrackLength;
 
     public GreatWallConfig(File configDir, Logger logger) {
         super(configDir, "GreatWall", logger);
@@ -64,7 +64,19 @@ public class GreatWallConfig extends AbstractConfig {
                         "Wall length at which there is no penalty for generation").getInt();
 
         backtrackLength =
-                config.get(section, "Backtrack Length", 0,
+                config.get(section, "Backtrack Length", 9,
                         "Length of backtracking for wall planning if a dead end is hit").getInt();
+    }
+
+    public double getCurveBias() {
+        return curveBias;
+    }
+
+    public int getLengthBiasNorm() {
+        return lengthBiasNorm;
+    }
+
+    public int getBacktrackLength() {
+        return backtrackLength;
     }
 }

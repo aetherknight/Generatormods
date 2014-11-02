@@ -27,12 +27,12 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
 
 public class WalledCityConfig extends AbstractConfig {
-    public double undergroundGlobalFrequency = 0.015;
-    public int minCitySeparation = 500;
-    public int undergroundMinCitySeparation = 500;
-    public boolean cityBuiltMessage = false;
-    public int backtrackLength = 9;
-    public boolean rejectOnPreexistingArtifacts = true;
+    private double undergroundGlobalFrequency;
+    private int minCitySeparation;
+    private int undergroundMinCitySeparation;
+    private boolean cityBuiltMessage;
+    private int backtrackLength;
+    private boolean rejectOnPreexistingArtifacts;
 
     public WalledCityConfig(File configDir, Logger logger) {
         super(configDir, "WalledCity", logger);
@@ -88,5 +88,29 @@ public class WalledCityConfig extends AbstractConfig {
                         true,
                         "Determines whether the planner rejects city sites that contain preexisting\nman-made blocks. Set to true to do this check.")
                         .getBoolean();
+    }
+
+    public double getUndergroundGlobalFrequency() {
+        return undergroundGlobalFrequency;
+    }
+
+    public int getMinCitySeparation() {
+        return minCitySeparation;
+    }
+
+    public int getUndergroundMinCitySeparation() {
+        return undergroundMinCitySeparation;
+    }
+
+    public boolean getCityBuiltMessage() {
+        return cityBuiltMessage;
+    }
+
+    public int getBacktrackLength() {
+        return backtrackLength;
+    }
+
+    public boolean getRejectOnPreexistingArtifacts() {
+        return rejectOnPreexistingArtifacts;
     }
 }

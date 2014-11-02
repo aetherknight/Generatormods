@@ -36,7 +36,7 @@ public class WorldGenSingleWall extends WorldGeneratorThread {
 	private int[] placedCoords = null;
 
 	public WorldGenSingleWall(PopulatorGreatWall gw, World world, Random random, int[] pt) {
-        super(world, random, pt[0] >> 4, pt[2] >> 4, 0, 0.0, gw.logger, gw.sharedConfig.chestConfigs);
+        super(world, random, pt[0] >> 4, pt[2] >> 4, 0, 0.0, gw.logger, gw.config.getChestConfigs());
 		this.pt = pt;
         wallStyles = gw.wallStyles;
         placedCoords = gw.placedCoords;

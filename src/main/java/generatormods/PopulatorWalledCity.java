@@ -24,7 +24,6 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
-import generatormods.buildings.Building;
 import generatormods.common.ModUpdateDetectorWrapper;
 import generatormods.common.TemplateWall;
 import generatormods.gen.WorldGenUndergroundCity;
@@ -78,9 +77,9 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 	public void modsLoaded(FMLPostInitializationEvent event) {
         loadConfiguration();
         cityDataManager =
-                new CityDataManager(logger, config.undergroundMinCitySeparation,
-                        config.minCitySeparation);
-        chatHandler = new WalledCityChatHandler(config.cityBuiltMessage);
+                new CityDataManager(logger, config.getUndergroundMinCitySeparation(),
+                        config.getMinCitySeparation());
+        chatHandler = new WalledCityChatHandler(config.getCityBuiltMessage());
 		if (!errFlag) {
 			GameRegistry.registerWorldGenerator(this, 0);
 		}
@@ -89,17 +88,18 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
     @Override
     public final void generate(World world, Random random, int i, int k) {
         if (cityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, world.provider.dimensionId)
-                && random.nextFloat() < config.globalFrequency) {
-            (new WorldGenWalledCity(world, random, i, k, config.triesPerChunk,
-                    config.globalFrequency, logger, config.chestConfigs, chatHandler,
-                    cityDataManager, cityStyles, config.rejectOnPreexistingArtifacts)).run();
+                && random.nextFloat() < config.getGlobalFrequency()) {
+            (new WorldGenWalledCity(world, random, i, k, config.getTriesPerChunk(),
+                    config.getGlobalFrequency(), logger, config.getChestConfigs(), chatHandler,
+                    cityDataManager, cityStyles, config.getRejectOnPreexistingArtifacts())).run();
         }
         if (undergroundCityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, CITY_TYPE_UNDERGROUND)
-                && random.nextFloat() < config.undergroundGlobalFrequency) {
+                && random.nextFloat() < config.getUndergroundGlobalFrequency()) {
             WorldGenUndergroundCity wgt =
-                    new WorldGenUndergroundCity(world, random, i, k, config.triesPerChunk,
-                            config.undergroundGlobalFrequency, logger, config.chestConfigs,
-                            chatHandler, cityDataManager, undergroundCityStyles);
+                    new WorldGenUndergroundCity(world, random, i, k, config.getTriesPerChunk(),
+                            config.getUndergroundGlobalFrequency(), logger,
+                            config.getChestConfigs(), chatHandler, cityDataManager,
+                            undergroundCityStyles);
             // 44 at sea level
             int maxSpawnHeight =
                     findSurfaceJ(world, i, k, WORLD_MAX_Y, false, IGNORE_WATER)
@@ -134,16 +134,19 @@ public class PopulatorWalledCity extends BuildingExplorationHandler {
 
             config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
-            sharedConfig = config.sharedConfig;
+            allowedDimensions = config.getAllowedDimensions();
 
             loadTemplates();
 
-            logger.info("Probability of city generation attempt per chunk explored is " + sharedConfig.globalFrequency + ", with " + sharedConfig.triesPerChunk + " tries per chunk.");
+            logger.info("Probability of city generation attempt per chunk explored is "
+                    + config.getGlobalFrequency() + ", with " + config.getTriesPerChunk()
+                    + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
             logger.fatal("There was a problem loading the walled city mod", e);
 		}
-		if (config.globalFrequency < 0.000001 && config.undergroundGlobalFrequency < 0.000001)
+        if (config.getGlobalFrequency() < 0.000001
+                && config.getUndergroundGlobalFrequency() < 0.000001)
 			errFlag = true;
 	}
 

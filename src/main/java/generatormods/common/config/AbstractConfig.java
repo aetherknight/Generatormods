@@ -37,16 +37,10 @@ public abstract class AbstractConfig {
     private static final int[] DEFAULT_DIM_LIST = {-1, 0};
 
     // Config options common to all the mods
-    public double globalFrequency;
-    public int triesPerChunk;
-    public List<Integer> allowedDimensions;
-
-    public Map<ChestType, ChestContentsSpec> chestConfigs;
-
-    // sharedConfig provides a common way to provide type-safe access to the
-    // global configs across all 3 mods without having to pass the mod
-    // instances around everywhere as the bearer of configuration.
-    public SharedConfig sharedConfig;
+    private double globalFrequency;
+    private int triesPerChunk;
+    private List<Integer> allowedDimensions;
+    private Map<ChestType, ChestContentsSpec> chestConfigs;
 
     public AbstractConfig(File configDir, String configName, Logger logger) {
         this.configDir = configDir;
@@ -84,15 +78,31 @@ public abstract class AbstractConfig {
         }
 
         initChestConfigs();
-
-        sharedConfig =
-                new SharedConfig(globalFrequency, triesPerChunk, allowedDimensions, chestConfigs,
-                        logger);
     }
 
     private void initChestConfigs() {
         ChestsConfig cc = new ChestsConfig(configDir, logger);
         cc.initialize();
         chestConfigs = cc.chestConfigs;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public double getGlobalFrequency() {
+        return globalFrequency;
+    }
+
+    public int getTriesPerChunk() {
+        return triesPerChunk;
+    }
+
+    public List<Integer> getAllowedDimensions() {
+        return allowedDimensions;
+    }
+
+    public Map<ChestType, ChestContentsSpec> getChestConfigs() {
+        return chestConfigs;
     }
 }

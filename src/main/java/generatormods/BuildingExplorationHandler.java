@@ -18,7 +18,6 @@
  */
 package generatormods;
 
-import generatormods.common.config.SharedConfig;
 import generatormods.util.WorldUtil;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
@@ -48,7 +47,7 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
 	protected boolean errFlag = false;
 	private List<World> currentWorld = new ArrayList<World>();
 
-    public SharedConfig sharedConfig;
+    protected List<Integer> allowedDimensions;
 
 	//**************************** FORGE WORLD GENERATING HOOK ****************************************************************************//
 	@Override
@@ -56,8 +55,9 @@ public abstract class BuildingExplorationHandler implements IWorldGenerator {
         if (errFlag)
             return;
 		if (world.getWorldInfo().isMapFeaturesEnabled() && !(world.provider instanceof WorldProviderEnd)) {
-			//if structures are enabled can generate in any world except in The End, if id is in AllowedDimensions list
-			if (sharedConfig.allowedDimensions.contains(world.provider.dimensionId)) {
+            // if structures are enabled can generate in any world except in The End, if id is in
+            // AllowedDimensions list
+            if (allowedDimensions.contains(world.provider.dimensionId)) {
                 updateWorldExplored(world);
                 generate(world, random, chunkX * 16, chunkZ * 16);
 			}

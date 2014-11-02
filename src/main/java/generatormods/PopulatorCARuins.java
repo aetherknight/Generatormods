@@ -72,20 +72,23 @@ public class PopulatorCARuins extends BuildingExplorationHandler {
 
             config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
-            sharedConfig = config.sharedConfig;
+            allowedDimensions = config.getAllowedDimensions();
 
-            logger.info("Probability of ruin generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
+            logger.info("Probability of ruin generation attempt per chunk explored is "
+                    + config.getGlobalFrequency() + ", with " + config.getTriesPerChunk()
+                    + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
             logger.fatal("There was a problem loading the Cellular Automata Generator", e);
 		}
-		if (config.globalFrequency < 0.000001 || config.caRules == null || config.caRules.size() == 0)
+        if (config.getGlobalFrequency() < 0.000001 || config.caRules == null
+                || config.caRules.size() == 0)
 			errFlag = true;
 	}
 
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
-		if (random.nextFloat() < config.globalFrequency)
+        if (random.nextFloat() < config.getGlobalFrequency())
             (new WorldGenCARuins(world, random, i, k, logger, config)).run();
 	}
 

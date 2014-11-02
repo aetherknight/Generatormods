@@ -47,18 +47,22 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 
     private final CARuinsConfig config;
 
-	public WorldGenCARuins(World world, Random random, int chunkI, int chunkK, Logger logger, CARuinsConfig config) {
-        super(world, random, chunkI, chunkK, config.triesPerChunk, config.globalFrequency, logger, config.chestConfigs);
+    public WorldGenCARuins(World world, Random random, int chunkI, int chunkK, Logger logger,
+            CARuinsConfig config) {
+        super(world, random, chunkI, chunkK, config.getTriesPerChunk(),
+                config.getGlobalFrequency(), logger, config.getChestConfigs());
         this.config = config;
 	}
 
 	@Override
 	public boolean generate(int i0, int j0, int k0) {
         logger.debug("Attempting to generate CARuins near ("+i0+","+j0+","+k0+")");
-        int ContainerWidth = config.containerWidth;
-        int ContainerLength = config.containerLength;
+        int ContainerWidth = config.getContainerWidth();
+        int ContainerLength = config.getContainerLength();
 
-		int th = config.minHeight + random.nextInt(config.maxHeight - config.minHeight + 1);
+        int th =
+                config.getMinHeight()
+                        + random.nextInt(config.getMaxHeight() - config.getMinHeight() + 1);
         if (caRule == null) //if we haven't picked in an earlier generate call
             caRule = ((WeightedCARule)WeightedRandom.getRandomItem(world.rand, config.caRules)).getRule();
         if (caRule == null)
@@ -75,10 +79,10 @@ public class WorldGenCARuins extends WorldGeneratorThread {
                 new BuildingCellularAutomaton(this, blockRule, Dir.randomDir(random),
                         Handedness.R_HAND, false, ContainerWidth, th, ContainerLength,
                         seed, caRule, null, new int[] {i0, j0, k0});
-		if (bca.plan(true, config.minHeightBeforeOscillation) && bca.queryCanBuild(0, true)) {
+        if (bca.plan(true, config.getMinHeightBeforeOscillation()) && bca.queryCanBuild(0, true)) {
             logger.info("Building CARuin at ("+i0+","+j0+","+k0+")");
-			bca.build(config.smoothWithStairs, config.makeFloors);
-			if (config.globalFrequency < 0.05 && random.nextInt(2) != 0) {
+            bca.build(config.getSmoothWithStairs(), config.getMakeFloors());
+            if (config.getGlobalFrequency() < 0.05 && random.nextInt(2) != 0) {
 				for (int tries = 0; tries < 10; tries++) {
 					int[] pt = new int[] { i0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)), 0,
 							k0 + (2 * random.nextInt(2) - 1) * (ContainerWidth + random.nextInt(ContainerWidth)) };
@@ -97,20 +101,22 @@ public class WorldGenCARuins extends WorldGeneratorThread {
 
     private ISeed pickSeed() {
         SeedType seedCode =
-                ((SeedType.Weighted) WeightedRandom.getRandomItem(world.rand, config.weightedSeeds))
-                        .getSeedType();
+                ((SeedType.Weighted) WeightedRandom.getRandomItem(world.rand,
+                        config.getWeightedSeeds())).getSeedType();
         if (caRule.isFourRule()) // only use symmetric for 4-rules
             seedCode = SeedType.SYMMETRIC_SEED;
         switch (seedCode) {
             case SYMMETRIC_SEED:
-                return new SymmetricSeed(Math.min(config.containerWidth, config.containerLength),
-                        config.symmetricSeedDensity);
+                return new SymmetricSeed(Math.min(config.getContainerWidth(),
+                        config.getContainerLength()), config.getSymmetricSeedDensity());
             case LINEAR_SEED:
-                return new LinearSeed(config.containerWidth);
+                return new LinearSeed(config.getContainerWidth());
             case CIRCULAR_SEED:
-                return new CircularSeed(Math.min(config.containerWidth, config.containerLength));
+                return new CircularSeed(Math.min(config.getContainerWidth(),
+                        config.getContainerLength()));
             default:
-                return new CruciformSeed(Math.min(config.containerWidth, config.containerLength));
+                return new CruciformSeed(Math.min(config.getContainerWidth(),
+                        config.getContainerLength()));
         }
     }
 }

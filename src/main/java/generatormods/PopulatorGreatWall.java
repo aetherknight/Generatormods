@@ -71,27 +71,29 @@ public class PopulatorGreatWall extends BuildingExplorationHandler {
 
             config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
             config.initialize();
-            sharedConfig = config.sharedConfig;
+            allowedDimensions = config.getAllowedDimensions();
 
 			File stylesDirectory = new File(CONFIG_DIRECTORY, templateFolderName);
             wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
             logger.info("Template loading complete.");
 
-            logger.info("Probability of wall generation attempt per chunk explored is " + config.globalFrequency + ", with " + config.triesPerChunk + " tries per chunk.");
+            logger.info("Probability of wall generation attempt per chunk explored is "
+                    + config.getGlobalFrequency() + ", with " + config.getTriesPerChunk()
+                    + " tries per chunk.");
 		} catch (Exception e) {
 			errFlag = true;
             logger.fatal("There was a problem loading the great wall mod", e);
 		}
-		if (config.globalFrequency < 0.000001)
+        if (config.getGlobalFrequency() < 0.000001)
 			errFlag = true;
 	}
 
 	@Override
 	public final void generate(World world, Random random, int i, int k) {
-		if (random.nextFloat() < config.globalFrequency)
-            (new WorldGenGreatWall(world, random, i, k, config.triesPerChunk,
-                    config.globalFrequency, logger, config.chestConfigs, wallStyles,
-                    config.curveBias)).run();
+        if (random.nextFloat() < config.getGlobalFrequency())
+            (new WorldGenGreatWall(world, random, i, k, config.getTriesPerChunk(),
+                    config.getGlobalFrequency(), logger, config.getChestConfigs(), wallStyles,
+                    config.getCurveBias())).run();
 	}
 
 	@Override

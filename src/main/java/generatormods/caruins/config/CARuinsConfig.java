@@ -18,7 +18,6 @@
  */
 package generatormods.caruins.config;
 
-import generatormods.buildings.BuildingCellularAutomaton;
 import generatormods.common.TemplateRule;
 import generatormods.common.config.AbstractConfig;
 import generatormods.common.config.ParseError;
@@ -49,7 +48,6 @@ public class CARuinsConfig extends AbstractConfig{
             Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner, Blocks.mob_spawner,
             Blocks.mob_spawner}, new int[] {0, 0, 0, 0, 0}, new String[] {"UPRIGHT", "UPRIGHT",
             "Silverfish", "LavaSlime", "CaveSpider"}, 100);
-
 
     // Default CARuins template is 1/3 cobblestone, 2/3 mossy cobblestone.
     private final static TemplateRule DEFAULT_TEMPLATE = new TemplateRule(new Block[] {
@@ -102,25 +100,22 @@ public class CARuinsConfig extends AbstractConfig{
         }
     }
 
-    public int minHeight;
-    public int maxHeight;
-    public int minHeightBeforeOscillation;
-    public boolean smoothWithStairs;
-    public boolean makeFloors;
-    public int containerWidth;
-    public int containerLength;
-
-    public float symmetricSeedDensity;
-    public int symmetricSeedWeight;
-    public int linearSeedWeight;
-    public int circularSeedWeight;
-    public int cruciformSeedWeight;
-
-    public List<SeedType.Weighted> weightedSeeds;
-
-    public TemplateRule mediumLightWideFloorSpawnerRule;
-    public TemplateRule mediumLightNarrowFloorSpawnerRule;
-    public TemplateRule lowLightSpawnerRule;
+    private int minHeight;
+    private int maxHeight;
+    private int minHeightBeforeOscillation;
+    private boolean smoothWithStairs;
+    private boolean makeFloors;
+    private int containerWidth;
+    private int containerLength;
+    private float symmetricSeedDensity;
+    private int symmetricSeedWeight;
+    private int linearSeedWeight;
+    private int circularSeedWeight;
+    private int cruciformSeedWeight;
+    private List<SeedType.Weighted> weightedSeeds;
+    private TemplateRule mediumLightWideFloorSpawnerRule;
+    private TemplateRule mediumLightNarrowFloorSpawnerRule;
+    private TemplateRule lowLightSpawnerRule;
 
     /**
      * Contains the template rule for a CA Ruin that is generated in a given biome. The indices of
@@ -316,5 +311,69 @@ public class CARuinsConfig extends AbstractConfig{
                 logger.error("Error parsing CA rule: \"" + caRuleString + "\". Ignoring.", e);
             }
         }
+    }
+
+    public int getMinHeight() {
+        return minHeight;
+    }
+
+    public int getMaxHeight() {
+        return maxHeight;
+    }
+
+    public int getMinHeightBeforeOscillation() {
+        return minHeightBeforeOscillation;
+    }
+
+    public boolean getSmoothWithStairs() {
+        return smoothWithStairs;
+    }
+
+    public boolean getMakeFloors() {
+        return makeFloors;
+    }
+
+    public int getContainerWidth() {
+        return containerWidth;
+    }
+
+    public int getContainerLength() {
+        return containerLength;
+    }
+
+    public float getSymmetricSeedDensity() {
+        return symmetricSeedDensity;
+    }
+
+    public int getSymmetricSeedWeight() {
+        return symmetricSeedWeight;
+    }
+
+    public int getLinearSeedWeight() {
+        return linearSeedWeight;
+    }
+
+    public int getCircularSeedWeight() {
+        return circularSeedWeight;
+    }
+
+    public int getCruciformSeedWeight() {
+        return cruciformSeedWeight;
+    }
+
+    public List<SeedType.Weighted> getWeightedSeeds() {
+        return weightedSeeds;
+    }
+
+    public TemplateRule getMediumLightWideFloorSpawnerRule() {
+        return mediumLightWideFloorSpawnerRule;
+    }
+
+    public TemplateRule getMediumLightNarrowFloorSpawnerRule() {
+        return mediumLightNarrowFloorSpawnerRule;
+    }
+
+    public TemplateRule getLowLightSpawnerRule() {
+        return lowLightSpawnerRule;
     }
 }
