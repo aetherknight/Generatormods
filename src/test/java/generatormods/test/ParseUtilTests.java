@@ -157,7 +157,7 @@ public class ParseUtilTests {
                 ParseUtil.readNamedCheckList(logger, new int[] {0, 0, 0, 1}, "=",
                         "some_rule = nofish, redfish", choices, "all fish");
         assertThat(res, equalTo(new int[] {0, 0, 1, 0}));
-        verify(logger).warn(anyString());
+        verify(logger).warn(anyString(), anyVararg());
 
         // TODO: exception-causing error
     }
