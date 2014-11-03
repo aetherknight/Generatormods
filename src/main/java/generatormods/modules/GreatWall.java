@@ -34,11 +34,8 @@ import net.minecraft.world.World;
  */
 public class GreatWall extends AbstractModule {
 	public static GreatWall instance;
-	//DATA VARIABLES
-    public List<TemplateWall> wallStyles = null;
-	public int[] placedCoords = null;
-	public World placedWorld = null;
 
+    public List<TemplateWall> wallStyles;
     public GreatWallConfig config;
 
     public GreatWall(String parentModName, File configDir) {

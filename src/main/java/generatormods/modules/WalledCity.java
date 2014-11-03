@@ -47,12 +47,10 @@ public class WalledCity extends AbstractModule {
     public final static int MAX_FOG_HEIGHT = 27;
 	public final static int CITY_TYPE_UNDERGROUND = 1;//TheEnd dimension id, since we don't generate there
 
-	//DATA VARIABLES
-	public List<TemplateWall> cityStyles = null;
+    public List<TemplateWall> surfaceCityStyles = new ArrayList<TemplateWall>();
     public List<TemplateWall> undergroundCityStyles = new ArrayList<TemplateWall>();
     public WalledCityChatHandler chatHandler;
     public CityDataManager cityDataManager;
-
     public WalledCityConfig config;
 
     public WalledCity(String parentModName, File configDir) {
@@ -61,11 +59,15 @@ public class WalledCity extends AbstractModule {
 
     @Override
     public final void generate(World world, Random random, int i, int k) {
-        if (cityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, world.provider.dimensionId)
+        if (surfaceCityStyles.size() > 0
+                && cityDataManager.isCitySeparated(world, i, k, world.provider.dimensionId)
                 && random.nextFloat() < config.getGlobalFrequency()) {
-            (new WalledCityBuilder(world, random, i, k, config.getTriesPerChunk(),
-                    config.getGlobalFrequency(), logger, config.getChestConfigs(), chatHandler,
-                    cityDataManager, cityStyles, config.getRejectOnPreexistingArtifacts())).run();
+            WalledCityBuilder wcb =
+                    new WalledCityBuilder(world, random, i, k, config.getTriesPerChunk(),
+                            config.getGlobalFrequency(), logger, config.getChestConfigs(),
+                            chatHandler, cityDataManager, surfaceCityStyles,
+                            config.getRejectOnPreexistingArtifacts());
+            wcb.run();
         }
         if (undergroundCityStyles.size() > 0 && cityDataManager.isCitySeparated(world, i, k, CITY_TYPE_UNDERGROUND)
                 && random.nextFloat() < config.getUndergroundGlobalFrequency()) {
@@ -88,15 +90,19 @@ public class WalledCity extends AbstractModule {
 
     private void loadTemplates() throws Exception {
         File stylesDirectory = new File(configDir, "walledcity");
-        cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
-        TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, "streets"), logger);
-        // TODO: does this work? I worry that the remove() screws up indices.
-        for (int m = 0; m < cityStyles.size(); m++) {
-            if (cityStyles.get(m).underground) {
-                TemplateWall uws = cityStyles.remove(m);
-                uws.streets.add(uws); //underground cities have no outer walls, so this should be a street style
-                undergroundCityStyles.add(uws);
-                m--; // this fixes the index?
+
+        List<TemplateWall> allCityStyles =
+                TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
+        TemplateWall.loadStreets(allCityStyles, new File(stylesDirectory, "streets"), logger);
+        for (TemplateWall cityStyle : allCityStyles) {
+            if (cityStyle.underground) {
+                // underground cities lack outer walls, so its wall style should instead be a street
+                // style
+                cityStyle.streets.add(cityStyle);
+                undergroundCityStyles.add(cityStyle);
+            } else {
+                // surface walled city
+                surfaceCityStyles.add(cityStyle);
             }
         }
         logger.info("Template loading complete.");

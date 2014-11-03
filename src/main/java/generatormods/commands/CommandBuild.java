@@ -59,6 +59,7 @@ public class CommandBuild extends CommandBase {
 	}
 
 	@Override
+    @SuppressWarnings("rawtypes")
 	public List getCommandAliases() {
 		return null;
 	}
@@ -82,10 +83,13 @@ public class CommandBuild extends CommandBase {
 			}
 			else if ("city".equalsIgnoreCase(coordinate[0])) {
                 WalledCity cityMod = WalledCity.instance;
-                (new WalledCityBuilder(world, new Random(), posX, posZ, 1, 1.0, cityMod.logger,
-                        cityMod.config.getChestConfigs(), cityMod.chatHandler,
-                        cityMod.cityDataManager, cityMod.cityStyles,
-                        cityMod.config.getRejectOnPreexistingArtifacts())).run();
+                WalledCityBuilder wcb =
+                        new WalledCityBuilder(world, new Random(), posX, posZ, 1, 1.0,
+                                cityMod.logger, cityMod.config.getChestConfigs(),
+                                cityMod.chatHandler, cityMod.cityDataManager,
+                                cityMod.surfaceCityStyles,
+                                cityMod.config.getRejectOnPreexistingArtifacts());
+                wcb.run();
 			} else if ("undcity".equalsIgnoreCase(coordinate[0])) {
                 WalledCity cityMod = WalledCity.instance;
                 UndergroundCityBuilder wgt =
@@ -109,6 +113,7 @@ public class CommandBuild extends CommandBase {
 	}
 
 	@Override
+    @SuppressWarnings("rawtypes")
 	public List addTabCompletionOptions(ICommandSender var1, String[] var2) {
 		return var2.length == 1 ? getListOfStringsMatchingLastWord(var2, "ruin", "wall", "city", "undcity") : null;
 	}
