@@ -50,7 +50,7 @@ public class GeneratorMods {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        configDir = event.getModConfigurationDirectory();
+        configDir = new File(event.getModConfigurationDirectory(), "generatormods");
 
         caRuins = new CARuins(modId, configDir);
         greatWall = new GreatWall(modId, configDir);
