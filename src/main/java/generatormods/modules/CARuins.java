@@ -21,16 +21,13 @@ package generatormods.modules;
 import generatormods.builders.CARuinsBuilder;
 import generatormods.config.CARuinsConfig;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.io.File;
 import java.util.Random;
 
 import net.minecraft.world.World;
 
 /**
- * Main class that hooks into Forge for CARuins. It loads configuration and
- * sets up the world generation it adds.
+ * Main class for CARuins. It loads configuration and sets up the world generation it adds.
  */
 public class CARuins extends AbstractModule {
 	public static CARuins instance;
@@ -38,8 +35,7 @@ public class CARuins extends AbstractModule {
     public CARuinsConfig config;
 
     public CARuins(String parentModName, File configDir) {
-        super(configDir);
-        this.logger = LogManager.getLogger(parentModName + "." + this.toString());
+        super(parentModName, configDir);
     }
 
     public final void loadConfiguration() {

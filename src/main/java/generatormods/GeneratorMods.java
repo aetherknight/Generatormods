@@ -65,10 +65,6 @@ public class GeneratorMods {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-    }
-
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
         /*
          * Initialize the submods. We want to load templates after all mods have loaded so that we
          * can check whether any modded blockIDs are valid.
@@ -84,6 +80,10 @@ public class GeneratorMods {
             GameRegistry.registerWorldGenerator(greatWall, 1);
         if (!walledCity.isDisabled())
             GameRegistry.registerWorldGenerator(walledCity, 0);
+    }
+
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
     }
 
     @EventHandler

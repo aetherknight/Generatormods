@@ -18,7 +18,6 @@
  */
 package generatormods.modules;
 
-import generatormods.GeneratorMods;
 import generatormods.builders.GreatWallBuilder;
 import generatormods.config.GreatWallConfig;
 import generatormods.config.templates.TemplateWall;
@@ -29,11 +28,9 @@ import java.util.Random;
 
 import net.minecraft.world.World;
 
-import org.apache.logging.log4j.LogManager;
-
-/*
- * PopulatorGreatWall is the main class that hooks into ModLoader for the Great
- * Wall Mod. It reads the globalSettings file and runs WorldGenWalledCities.
+/**
+ * Main class for the Great Wall Mod. It laods configuration and templates, and it starts building
+ * great walls.
  */
 public class GreatWall extends AbstractModule {
 	public static GreatWall instance;
@@ -45,8 +42,7 @@ public class GreatWall extends AbstractModule {
     public GreatWallConfig config;
 
     public GreatWall(String parentModName, File configDir) {
-        super(configDir);
-        this.logger = LogManager.getLogger(parentModName + "." + this.toString());
+        super(parentModName, configDir);
     }
 
     public final void loadConfiguration() {

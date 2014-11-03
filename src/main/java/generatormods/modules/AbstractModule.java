@@ -30,9 +30,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.chunk.IChunkProvider;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/*
+/**
  * BuildingExplorationHandler is an abstract superclass for PopulatorWalledCity
  * and PopulatorGreatWall. It loads settings files and runs
  * WorldGeneratorThreads.
@@ -44,7 +45,8 @@ public abstract class AbstractModule implements IWorldGenerator {
     protected File configDir;
     protected List<Integer> allowedDimensions;
 
-    public AbstractModule(File configDir) {
+    public AbstractModule(String parentModName, File configDir) {
+        this.logger = LogManager.getLogger(parentModName + "." + toString());
         this.configDir = configDir;
     }
 

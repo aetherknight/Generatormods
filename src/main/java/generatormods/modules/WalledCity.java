@@ -33,16 +33,13 @@ import java.util.Random;
 
 import net.minecraft.world.World;
 
-import org.apache.logging.log4j.LogManager;
-
 import static generatormods.util.WorldUtil.IGNORE_WATER;
 import static generatormods.util.WorldUtil.WORLD_MAX_Y;
 import static generatormods.util.WorldUtil.findSurfaceJ;
 
-/*
- * PopulatorWalledCity is the main class that hooks into ModLoader for the
- * Walled City Mod. It reads the globalSettings file, keeps track of city
- * locations, and runs WorldGenWalledCitys and WorldGenUndergroundCities.
+/**
+ * Main for the Walled City Mod. It loads configuration and templates, keeps track of city
+ * locations, and it starts building walled cities and underground cities.
  */
 public class WalledCity extends AbstractModule {
 	public static WalledCity instance;
@@ -59,8 +56,7 @@ public class WalledCity extends AbstractModule {
     public WalledCityConfig config;
 
     public WalledCity(String parentModName, File configDir) {
-        super(configDir);
-        this.logger = LogManager.getLogger(parentModName + "." + this.toString());
+        super(parentModName, configDir);
     }
 
     @Override
