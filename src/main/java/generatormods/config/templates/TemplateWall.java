@@ -28,26 +28,25 @@ import generatormods.util.build.Shape;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
+
 import org.apache.logging.log4j.Logger;
 
 /*
  * TemplateWall reads in additional variables from a .tml file to define a wall template.
- * The class includes static functions used to load template folders and link together hierarchical templates.
  */
 public class TemplateWall extends TemplateTML {
-	public final static String BUILDING_DIRECTORY_NAME = "buildings";
 	public final static int[] ALL_BIOMES = null;
 	public final static int NO_RULE = -1;
 	public final static int MAX_STREET_DENSITY = 20;
+
 	public TemplateTML makeDefaultTower, makeCARuin;
 	//USER MODIFIABLE PARAMETERS, values below are defaults
 	public int[] Biomes = ALL_BIOMES;
@@ -78,8 +77,8 @@ public class TemplateWall extends TemplateTML {
 	public int CARuinMaxHeight = 35;
     public List<CARule> CARuinAutomataRules = null;
 
-	//****************************************  CONSTRUCTOR - WallStyle*************************************************************************************//
-    public TemplateWall(File wallFile, HashMap<String, TemplateTML> buildingTemplateMap, Logger logger) throws Exception {
+    public TemplateWall(File wallFile, Map<String, TemplateTML> buildingTemplateMap, Logger logger)
+            throws Exception {
         super(wallFile, logger);
 		readTowerParameters();
 		buildings = loadChildTemplates("building_templates", buildingTemplateMap);
@@ -100,7 +99,6 @@ public class TemplateWall extends TemplateTML {
 		}
 	}
 
-	//****************************************  FUNCTION - loadTowerParameters *************************************************************************************//
 	public void readTowerParameters() throws Exception {
 		float mobProb = 0.0F, pigZombieProb = 0.0F, endermanProb = 0.0F, caveSpiderProb = 0.0F; //deprecated, for backwards compatibility
 		if (extraOptions.containsKey("biomes"))
@@ -331,8 +329,8 @@ public class TemplateWall extends TemplateTML {
 		}
 	}
 
-	//****************************************  FUNCTION - loadChildTemplates *************************************************************************************//
-	public ArrayList<TemplateTML> loadChildTemplates(String listVarString, HashMap<String, TemplateTML> childTemplateMap) {
+    public ArrayList<TemplateTML> loadChildTemplates(String listVarString,
+            Map<String, TemplateTML> childTemplateMap) {
 		ArrayList<TemplateTML> childTemplates = new ArrayList<TemplateTML>();
 		if (!extraOptions.containsKey(listVarString))
 			return childTemplates;
@@ -354,7 +352,8 @@ public class TemplateWall extends TemplateTML {
 		return childTemplates;
 	}
 
-	public ArrayList<TemplateWall> loadChildStyles(String listVarString, HashMap<String, TemplateWall> childTemplateMap) {
+    public ArrayList<TemplateWall> loadChildStyles(String listVarString,
+            Map<String, TemplateWall> childTemplateMap) {
 		ArrayList<TemplateWall> childTemplates = new ArrayList<TemplateWall>();
 		if (!extraOptions.containsKey(listVarString))
 			return childTemplates;
@@ -409,125 +408,27 @@ public class TemplateWall extends TemplateTML {
 		return circular ? CircMinHeight + random.nextInt(CircMaxHeight - CircMinHeight + 1) : SqrMinHeight + random.nextInt(SqrMaxHeight - SqrMinHeight + 1);
 	}
 
-    public static ArrayList<TemplateTML> loadTemplatesFromDir(File tmlDirectory, Logger logger) {
-		ArrayList<TemplateTML> templates = new ArrayList<TemplateTML>();
-		for (File f : tmlDirectory.listFiles()) {
-			if (getFileType(f.getName()).equals("tml")) {
-				try {
-                    TemplateTML t = new TemplateTML(f, logger).buildLayout();
-					templates.add(t);
-				} catch (Exception e) {
-                    // TODO: make this an actual exception type
-					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-                        logger.warn("Did not load template: {}, weight was zero", f.getName());
-					} else {
-						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
-                            logger.error("There was a problem loading the .tml file " + f.getName(), e);
-						} else
-                            logger.error("There was a problem loading the .tml file " + f.getName() + ": " + e.getMessage());
-					}
-				}
-			}
-		}
-		return templates;
-	}
+    public static TemplateWall pickBiomeWeightedWallStyle(List<TemplateWall> styles, World world,
+            int i, int k, Random random, boolean ignoreBiomes) {
+        int biome = world.getBiomeGenForCoordsBody(i, k).biomeID + 1;
+        if ((biome < 0 || biome > BiomeGenBase.getBiomeGenArray().length) && !ignoreBiomes)
+            return null;
+        int sum = 0;
+        for (TemplateWall ws : styles) {
+            if (ignoreBiomes || ws.Biomes == TemplateWall.ALL_BIOMES || ws.Biomes[biome] > 0)
+                sum += ws.weight;
+        }
+        if (sum <= 0)
+            return null;
+        int s = random.nextInt(sum);
+        sum = 0;
+        for (TemplateWall ws : styles) {
+            if (ignoreBiomes || ws.Biomes == TemplateWall.ALL_BIOMES || ws.Biomes[biome] > 0)
+                sum += ws.weight;
+            if (sum > s)
+                return ws;
+        }
+        return null;
+    }
 
-    public static ArrayList<TemplateWall> loadWallStylesFromDir(File stylesDirectory, Logger logger) throws Exception {
-		if (!stylesDirectory.exists())
-			throw new Exception("Could not find directory /" + stylesDirectory.getName() + " in the config folder " + stylesDirectory.getParent() + "!");
-		//load buildings
-        logger.info("Loading building subfolder in {}/{} ...", stylesDirectory,
-                BUILDING_DIRECTORY_NAME);
-		HashMap<String, TemplateTML> buildingTemplates = new HashMap<String, TemplateTML>();
-		Iterator<TemplateTML> itr = null;
-		try {
-            itr = loadTemplatesFromDir(new File(stylesDirectory, BUILDING_DIRECTORY_NAME), logger).iterator();
-		} catch (NullPointerException e) {
-            logger.error("No buildings folder for " + stylesDirectory.getName(), e);
-		}
-		if (itr != null)
-			while (itr.hasNext()) {
-				TemplateTML t = itr.next();
-				buildingTemplates.put(t.name, t);
-			}
-		//load walls
-        logger.info("Loading wall styles from directory {} ...", stylesDirectory);
-		ArrayList<TemplateWall> styles = new ArrayList<TemplateWall>();
-		for (File f : stylesDirectory.listFiles()) {
-			if (getFileType(f.getName()).equals("tml")) {
-				try {
-					TemplateWall ws = new TemplateWall(f, buildingTemplates, logger);
-					styles.add(ws);
-				} catch (Exception e) {
-					if (e == TemplateTML.ZERO_WEIGHT_EXCEPTION) {
-                        logger.warn("Did not load template {}, weight was zero.",f.getName());
-					} else {
-						if (!e.getMessage().startsWith(TemplateRule.BLOCK_NOT_REGISTERED_ERROR_PREFIX)) {
-                            logger.error("Error loading wall style " + f.getName(), e);
-						} else
-                            logger.error("Error loading wall style " + f.getName() + ": " + e.getMessage());
-					}
-				}
-			}
-		}
-		if (styles.size() == 0)
-			throw new Exception("Did not find any valid wall styles!");
-		return styles;
-	}
-
-	public static TemplateWall pickBiomeWeightedWallStyle(List<TemplateWall> styles, World world, int i, int k, Random random, boolean ignoreBiomes) {
-		int biome = world.getBiomeGenForCoordsBody(i, k).biomeID + 1;
-		if ((biome < 0 || biome > BiomeGenBase.getBiomeGenArray().length) && !ignoreBiomes)
-			return null;
-		int sum = 0;
-		for (TemplateWall ws : styles) {
-			if (ignoreBiomes || ws.Biomes == ALL_BIOMES || ws.Biomes[biome] > 0)
-				sum += ws.weight;
-		}
-		if (sum <= 0)
-			return null;
-		int s = random.nextInt(sum);
-		sum = 0;
-		for (TemplateWall ws : styles) {
-			if (ignoreBiomes || ws.Biomes == ALL_BIOMES || ws.Biomes[biome] > 0)
-				sum += ws.weight;
-			if (sum > s)
-				return ws;
-		}
-		return null;
-	}
-
-    public static void loadStreets(List<TemplateWall> cityStyles, File streetsDirectory, Logger logger) throws Exception {
-		//streets, don't print error if directory DNE
-		HashMap<String, TemplateWall> streetTemplateMap = new HashMap<String, TemplateWall>();
-		Iterator<TemplateWall> itr;
-		try {
-            logger.info("Loading streets subfolder in {} ...", streetsDirectory);
-            itr = loadWallStylesFromDir(streetsDirectory, logger).iterator();
-			while (itr.hasNext()) {
-				TemplateWall cs = itr.next();
-				streetTemplateMap.put(cs.name, cs);
-			}
-		} catch (Exception e) {
-            logger.error("No street folder for " + streetsDirectory.getName(), e);
-		}
-		itr = cityStyles.iterator();
-		while (itr.hasNext()) {
-			TemplateWall cs = itr.next();
-			cs.streets = cs.loadChildStyles("street_templates", streetTemplateMap);
-			if (cs.streets.size() == 0 && !cs.underground) {
-				itr.remove();
-                logger.warn("No valid street styles for {}. Disabling this city style.", cs.name);
-			}
-			//else cs.streetWeights=buildWeightsAndIndex(cs.streets);
-		}
-		if (cityStyles.size() == 0)
-			throw new Exception("Did not find any valid city styles that had street styles!");
-	}
-
-	//****************************************  FUNCTION - getFileType *************************************************************************************//
-	private static String getFileType(String s) {
-		int mid = s.lastIndexOf(".");
-		return s.substring(mid + 1, s.length());
-	}
 }

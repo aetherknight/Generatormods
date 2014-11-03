@@ -20,6 +20,7 @@ package generatormods.modules;
 
 import generatormods.builders.GreatWallBuilder;
 import generatormods.config.GreatWallConfig;
+import generatormods.config.templates.TemplateLoader;
 import generatormods.config.templates.TemplateWall;
 
 import java.io.File;
@@ -38,8 +39,8 @@ public class GreatWall extends AbstractModule {
     public List<TemplateWall> wallStyles;
     public GreatWallConfig config;
 
-    public GreatWall(String parentModName, File configDir) {
-        super(parentModName, configDir);
+    public GreatWall(String parentModName, File configDir, File jarFile) {
+        super(parentModName, configDir, jarFile);
     }
 
     public final void loadConfiguration() {
@@ -50,8 +51,9 @@ public class GreatWall extends AbstractModule {
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 
-            File stylesDirectory = new File(configDir, "greatwall");
-            wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
+            TemplateLoader tl = new TemplateLoader(logger, jarFile, configDir);
+            tl.extractTemplatesFromJar("greatwall");
+            wallStyles = tl.loadWallStyles("greatwall");
             logger.info("Template loading complete.");
 
             logger.info(

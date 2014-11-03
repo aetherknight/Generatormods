@@ -34,8 +34,8 @@ public class CARuins extends AbstractModule {
 
     public CARuinsConfig config;
 
-    public CARuins(String parentModName, File configDir) {
-        super(parentModName, configDir);
+    public CARuins(String parentModName, File configDir, File jarFile) {
+        super(parentModName, configDir, jarFile);
     }
 
     public final void loadConfiguration() {

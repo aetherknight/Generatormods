@@ -44,6 +44,7 @@ public class GeneratorMods {
     public static GeneratorMods instance;
 
     public File configDir;
+    public File modJarFile;
     protected CARuins caRuins;
     protected GreatWall greatWall;
     protected WalledCity walledCity;
@@ -51,10 +52,11 @@ public class GeneratorMods {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         configDir = new File(event.getModConfigurationDirectory(), "generatormods");
+        modJarFile = event.getSourceFile();
 
-        caRuins = new CARuins(modId, configDir);
-        greatWall = new GreatWall(modId, configDir);
-        walledCity = new WalledCity(modId, configDir);
+        caRuins = new CARuins(modId, configDir, modJarFile);
+        greatWall = new GreatWall(modId, configDir, modJarFile);
+        walledCity = new WalledCity(modId, configDir, modJarFile);
 
         CARuins.instance = caRuins;
         GreatWall.instance = greatWall;

@@ -21,6 +21,7 @@ package generatormods.modules;
 import generatormods.builders.UndergroundCityBuilder;
 import generatormods.builders.WalledCityBuilder;
 import generatormods.config.WalledCityConfig;
+import generatormods.config.templates.TemplateLoader;
 import generatormods.config.templates.TemplateWall;
 import generatormods.walledcity.CityDataManager;
 import generatormods.walledcity.WalledCityChatHandler;
@@ -53,8 +54,8 @@ public class WalledCity extends AbstractModule {
     public CityDataManager cityDataManager;
     public WalledCityConfig config;
 
-    public WalledCity(String parentModName, File configDir) {
-        super(parentModName, configDir);
+    public WalledCity(String parentModName, File configDir, File jarFile) {
+        super(parentModName, configDir, jarFile);
     }
 
     @Override
@@ -84,16 +85,14 @@ public class WalledCity extends AbstractModule {
             int minSpawnHeight = MAX_FOG_HEIGHT + UndergroundCityBuilder.MAX_DIAM / 2 - 8;
             if (minSpawnHeight <= maxSpawnHeight)
                 wgt.setSpawnHeight(minSpawnHeight, maxSpawnHeight, false);
-            (wgt).run();
+            wgt.run();
         }
     }
 
     private void loadTemplates() throws Exception {
-        File stylesDirectory = new File(configDir, "walledcity");
-
-        List<TemplateWall> allCityStyles =
-                TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
-        TemplateWall.loadStreets(allCityStyles, new File(stylesDirectory, "streets"), logger);
+        TemplateLoader tl = new TemplateLoader(logger, jarFile, configDir);
+        tl.extractTemplatesFromJar("walledcity");
+        List<TemplateWall> allCityStyles = tl.loadWallStylesAndStreets("walledcity");
         for (TemplateWall cityStyle : allCityStyles) {
             if (cityStyle.underground) {
                 // underground cities lack outer walls, so its wall style should instead be a street

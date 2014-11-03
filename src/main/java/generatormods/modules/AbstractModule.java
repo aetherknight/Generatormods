@@ -43,11 +43,13 @@ public abstract class AbstractModule implements IWorldGenerator {
     private boolean isDisabled = false;
 	private List<World> currentWorld = new ArrayList<World>();
     protected File configDir;
+    protected File jarFile;
     protected List<Integer> allowedDimensions;
 
-    public AbstractModule(String parentModName, File configDir) {
+    public AbstractModule(String parentModName, File configDir, File jarFile) {
         this.logger = LogManager.getLogger(parentModName + "." + toString());
         this.configDir = configDir;
+        this.jarFile = jarFile;
     }
 
 	@Override
