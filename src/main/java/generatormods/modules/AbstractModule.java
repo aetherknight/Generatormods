@@ -20,7 +20,6 @@ package generatormods.modules;
 
 import generatormods.util.WorldUtil;
 import cpw.mods.fml.common.IWorldGenerator;
-import cpw.mods.fml.common.Loader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,15 +38,16 @@ import org.apache.logging.log4j.Logger;
  * WorldGeneratorThreads.
  */
 public abstract class AbstractModule implements IWorldGenerator {
-	public final static File CONFIG_DIRECTORY = new File(Loader.instance().getConfigDir(), "generatormods");
-
 	public Logger logger;
     private boolean isDisabled = false;
 	private List<World> currentWorld = new ArrayList<World>();
-
+    protected File configDir;
     protected List<Integer> allowedDimensions;
 
-	//**************************** FORGE WORLD GENERATING HOOK ****************************************************************************//
+    public AbstractModule(File configDir) {
+        this.configDir = configDir;
+    }
+
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
         if (isDisabled())

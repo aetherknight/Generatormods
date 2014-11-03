@@ -18,6 +18,7 @@
  */
 package generatormods.modules;
 
+import generatormods.GeneratorMods;
 import generatormods.builders.GreatWallBuilder;
 import generatormods.config.GreatWallConfig;
 import generatormods.config.templates.TemplateWall;
@@ -43,7 +44,8 @@ public class GreatWall extends AbstractModule {
 
     public GreatWallConfig config;
 
-    public GreatWall(String parentModName) {
+    public GreatWall(String parentModName, File configDir) {
+        super(configDir);
         this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 
@@ -51,11 +53,11 @@ public class GreatWall extends AbstractModule {
 		try {
             logger.info("Loading config and templates for GreatWall");
 
-            config = new GreatWallConfig(CONFIG_DIRECTORY, logger);
+            config = new GreatWallConfig(configDir, logger);
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 
-            File stylesDirectory = new File(CONFIG_DIRECTORY, "greatwall");
+            File stylesDirectory = new File(configDir, "greatwall");
             wallStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
             logger.info("Template loading complete.");
 

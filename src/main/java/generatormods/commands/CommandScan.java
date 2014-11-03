@@ -19,7 +19,6 @@
 package generatormods.commands;
 
 import cpw.mods.fml.common.registry.GameData;
-import generatormods.modules.AbstractModule;
 import generatormods.util.blocks.BlockAndMeta;
 
 import java.io.BufferedWriter;
@@ -44,6 +43,13 @@ import net.minecraft.init.Blocks;
  */
 public class CommandScan extends CommandBase{
     public final String[] modes = {"wall", "building"};
+
+    private File configDir;
+
+    public CommandScan(File configDir) {
+        this.configDir = configDir;
+    }
+
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender commandSender){
         return commandSender instanceof EntityPlayer;
@@ -74,7 +80,7 @@ public class CommandScan extends CommandBase{
             b = parseInt(var1, command[4].split(",")[1]);
             int maxZ = Math.max(a,b);
             int minZ = Math.min(a,b);
-            File template = new File(AbstractModule.CONFIG_DIRECTORY, command[1]+".tml");
+            File template = new File(configDir, command[1]+".tml");
             try{
             if(template.createNewFile()){
                 List<BlockAndMeta> blocks = new ArrayList<BlockAndMeta>();

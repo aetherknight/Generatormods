@@ -32,6 +32,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import java.io.File;
 
 @Mod(modid = GeneratorMods.modId, name = "Formivore's GeneratorMods", version = "${version}",
         dependencies = "after:ExtraBiomes,BiomesOPlenty", acceptableRemoteVersions = "*")
@@ -42,17 +43,18 @@ public class GeneratorMods {
     @Instance(modId)
     public static GeneratorMods instance;
 
-
+    public File configDir;
     protected CARuins caRuins;
     protected GreatWall greatWall;
     protected WalledCity walledCity;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        configDir = event.getModConfigurationDirectory();
 
-        caRuins = new CARuins(modId);
-        greatWall = new GreatWall(modId);
-        walledCity = new WalledCity(modId);
+        caRuins = new CARuins(modId, configDir);
+        greatWall = new GreatWall(modId, configDir);
+        walledCity = new WalledCity(modId, configDir);
 
         CARuins.instance = caRuins;
         GreatWall.instance = greatWall;
@@ -87,6 +89,6 @@ public class GeneratorMods {
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandBuild());
-        event.registerServerCommand(new CommandScan());
+        event.registerServerCommand(new CommandScan(configDir));
     }
 }

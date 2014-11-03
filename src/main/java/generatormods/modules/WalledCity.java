@@ -58,7 +58,8 @@ public class WalledCity extends AbstractModule {
 
     public WalledCityConfig config;
 
-    public WalledCity(String parentModName) {
+    public WalledCity(String parentModName, File configDir) {
+        super(configDir);
         this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 
@@ -90,7 +91,7 @@ public class WalledCity extends AbstractModule {
     }
 
     private void loadTemplates() throws Exception {
-        File stylesDirectory = new File(CONFIG_DIRECTORY, "walledcity");
+        File stylesDirectory = new File(configDir, "walledcity");
         cityStyles = TemplateWall.loadWallStylesFromDir(stylesDirectory, logger);
         TemplateWall.loadStreets(cityStyles, new File(stylesDirectory, "streets"), logger);
         // TODO: does this work? I worry that the remove() screws up indices.
@@ -109,7 +110,7 @@ public class WalledCity extends AbstractModule {
 		try {
             logger.info("Loading config and templates for WalledCity");
 
-            config = new WalledCityConfig(CONFIG_DIRECTORY, logger);
+            config = new WalledCityConfig(configDir, logger);
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 

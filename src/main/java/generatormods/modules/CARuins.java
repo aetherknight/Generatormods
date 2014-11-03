@@ -23,6 +23,7 @@ import generatormods.config.CARuinsConfig;
 
 import org.apache.logging.log4j.LogManager;
 
+import java.io.File;
 import java.util.Random;
 
 import net.minecraft.world.World;
@@ -36,7 +37,8 @@ public class CARuins extends AbstractModule {
 
     public CARuinsConfig config;
 
-    public CARuins(String parentModName) {
+    public CARuins(String parentModName, File configDir) {
+        super(configDir);
         this.logger = LogManager.getLogger(parentModName + "." + this.toString());
     }
 
@@ -44,7 +46,7 @@ public class CARuins extends AbstractModule {
 		try {
             logger.info("Loading config for CARuins");
 
-            config = new CARuinsConfig(CONFIG_DIRECTORY, logger);
+            config = new CARuinsConfig(configDir, logger);
             config.initialize();
             allowedDimensions = config.getAllowedDimensions();
 
