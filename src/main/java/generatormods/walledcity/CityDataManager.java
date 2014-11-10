@@ -18,8 +18,8 @@
  */
 package generatormods.walledcity;
 
-import generatormods.PopulatorWalledCity;
-import generatormods.common.Util;
+import generatormods.modules.WalledCity;
+import generatormods.util.WorldUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,7 +28,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +71,7 @@ public class CityDataManager {
      *
      * TODO: Make this part of a City object?
      */
+    @SuppressWarnings("unchecked")
     public void addCityToVillages(World world, int id) {
         if (world != null && world.provider.dimensionId != 1) {
             if (world.villageCollectionObj != null) {
@@ -93,7 +93,7 @@ public class CityDataManager {
     public boolean isCitySeparated(World world, int i, int k, int cityType) {
         if (cityLocations.containsKey(world)) {
             for (int[] location : cityLocations.get(world)) {
-                if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == PopulatorWalledCity.CITY_TYPE_UNDERGROUND ? undergroundMinCitySeparation : minCitySeparation)) {
+                if (location[2] == cityType && Math.abs(location[0] - i) + Math.abs(location[1] - k) < (cityType == WalledCity.CITY_TYPE_UNDERGROUND ? undergroundMinCitySeparation : minCitySeparation)) {
                     return false;
                 }
             }
@@ -121,7 +121,9 @@ public class CityDataManager {
     }
 
     public void updateWorldExplored(World world) throws IOException {
-        File cityFile = new File(Util.getWorldSaveDir(world), world.provider.getDimensionName() + CITY_FILE_SAVE);
+        File cityFile =
+                new File(WorldUtil.getWorldSaveDir(world), world.provider.getDimensionName()
+                        + CITY_FILE_SAVE);
         if (cityFiles.isEmpty() || !cityFiles.containsKey(world))
             cityFiles.put(world, cityFile);
         if (!cityFile.createNewFile() && !cityLocations.containsKey(world))

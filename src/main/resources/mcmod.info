@@ -1,40 +1,8 @@
 [
 {
-  "modid": "CARuins",
-  "name": "Cellular Automata Ruins",
-  "description": "Generates strange towers and ruins using cellualar automata.
-This mod comes without ABSOLUTELY NO WARRANTY, and it is licensed under the LGPL. For details see the license within the mod's jar file.",
-  "version": $version,
-  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7, forked by AetherKnight",
-  "logoFile": "",
-  "mcversion": $mcversion,
-  "url": "http://www.minecraftforum.net/topic/171188-",
-  "updateUrl": "",
-  "authorList": ["Formivore","GotoLink","AetherKnight"],
-  "parent":"",
-  "screenshots": [],
-  "dependencies": []
-},
-{
-  "modid": "GreatWallMod",
-  "name": "Great Wall Mod",
-  "description": "Generates Great walls in the world.
-This mod comes without ABSOLUTELY NO WARRANTY, and it is licensed under the LGPL. For details see the license within the mod's jar file.",
-  "version": $version,
-  "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7, forked by AetherKnight",
-  "logoFile": "",
-  "mcversion": $mcversion,
-  "url": "http://www.minecraftforum.net/topic/171188-",
-  "updateUrl": "",
-  "authorList": ["Formivore","GotoLink","AetherKnight"],
-  "parent":"",
-  "screenshots": [],
-  "dependencies": []
-},
-{
-  "modid": "WalledCityMod",
-  "name": "Walled City Generator",
-  "description": "Generates walled and underground cities in the world.
+  "modid": "GeneratorMods",
+  "name": "Formivore's Generator Mods",
+  "description": "Generates cellular automata-derived ruins and towers, great walls, walled cities, and underground cities.
 This mod comes without ABSOLUTELY NO WARRANTY, and it is licensed under the LGPL. For details see the license within the mod's jar file.",
   "version": $version,
   "credits": "Made by Formivore, Updated by GotoLink from MC 1.4.7, forked by AetherKnight",

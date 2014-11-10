@@ -18,7 +18,7 @@
  */
 package generatormods.caruins.seeds;
 
-import generatormods.BuildingCellularAutomaton;
+import generatormods.caruins.CAState;
 
 import java.util.Random;
 
@@ -29,13 +29,13 @@ public class LinearSeed implements ISeed {
         this.maxWidth = maxWidth;
     }
 
-    public byte[][] makeSeed(Random random) {
+    public CAState[][] makeSeed(Random random) {
         if (maxWidth <= 1)
-            return new byte[][] { { BuildingCellularAutomaton.ALIVE } }; //degenerate case
+            return new CAState[][] { { CAState.ALIVE } }; //degenerate case
         int width = random.nextInt(random.nextInt(maxWidth - 1) + 1) + 2; //random number in (2,maxWidth) inclusive, concentrated towards low end
-        byte[][] seed = new byte[width][1];
+        CAState[][] seed = new CAState[width][1];
         for (int x = 0; x < width; x++)
-            seed[x][0] = BuildingCellularAutomaton.ALIVE;
+            seed[x][0] = CAState.ALIVE;
         return seed;
     }
 }

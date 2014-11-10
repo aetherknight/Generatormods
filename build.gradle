@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -16,6 +17,7 @@ buildscript {
 }
 
 apply plugin: 'forge'
+apply plugin: 'jacoco' // code coverage reporting
 
 version = "0.1.6"
 group = "generatormods" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -24,6 +26,7 @@ archivesBaseName = project.projectDir.name
 minecraft {
     version = "1.7.10-10.13.0.1184"
     runDir = "eclipse/assets"
+    replace '${version}', project.version
 }
 
 processResources {
@@ -62,5 +65,18 @@ jar {
 compileJava {
             //options.compilerArgs << "-Werror"
             options.compilerArgs << "-Xlint:deprecation"
-            //options.compilerArgs << "-Xlint:unchecked"
+            options.compilerArgs << "-Xlint:unchecked"
+}
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+    testCompile "org.mockito:mockito-core:1.+"
+}
+
+test {
+    useJUnit()
+    testLogging {
+        // Show that tests are run in the command-line output
+        events 'started', 'passed'
+    }
 }

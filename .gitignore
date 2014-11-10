@@ -1,12 +1,13 @@
 # Gradle/Forge:
-.gradle
-bin
-build
-eclipse
+/.gradle
+/bin
+/bin/**
+/build
+/eclipse
 # Eclipse:
-.classpath
-.project
-.settings
+/.classpath
+/.project
+/.settings
 # IDEA:
 *.iml
 *.ipr

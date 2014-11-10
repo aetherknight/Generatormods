@@ -6,6 +6,20 @@ An updated and unified version of Formivore's 3 mods:
 * GreatWalls --- Generate large walls from descriptive templates, including towers and other structures along their length
 * WalledCities --- Generate walled cities, including ruins, underground cities, sandstone cities, etc. from templates.
 
+## Building
+
+## Testing
+
+Run:
+
+    ./gradlew cleantTest test
+
+To run all the tests.
+
+To then generate the code coverage report:
+
+    ./gradlew jacocoTestReport
+
 ## Fork History
 
 Source code for this mod may be found at:
