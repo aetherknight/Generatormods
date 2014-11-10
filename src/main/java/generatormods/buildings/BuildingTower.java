@@ -250,7 +250,6 @@ public class BuildingTower extends Building {
                 rHeight = minHorizDim / 2;
         }
 		if (isObstructedSolid(new int[] { rBuffer, bHeight, Math.max(rBuffer, ybuffer) }, new int[] { bWidth - 1 - rBuffer, bHeight + rHeight, bLength - 1 - rBuffer })) {
-            logger.warn("Tower: {} is obstructed near its roof!", IDString());
 			return true;
 		}
 		return false;
@@ -314,7 +313,6 @@ public class BuildingTower extends Building {
 		return zLim;
 	}
 
-	//****************************************  FUNCTION - queryCanBuild *************************************************************************************//
 	public boolean queryCanBuild(int ybuffer, boolean overlapTowers) {
         int rooftopJ =
                 j0 + bHeight + (roofStyle == RoofStyle.CONE ? minHorizDim : minHorizDim / 2) + 2;
@@ -325,6 +323,7 @@ public class BuildingTower extends Building {
 		}
 		//check if obstructed at roof
 		if (isObstructedRoof(ybuffer)) {
+            logger.debug("Tower: {} is obstructed near its roof.", IDString());
 			return false;
 		}
 		//check if obstructed on body
@@ -337,11 +336,11 @@ public class BuildingTower extends Building {
 				return false;
 		} else if (!overlapTowers) {
 			if (isObstructedFrame(3, ybuffer)) {
-				//if(BuildingWall.DEBUG) FMLLog.getLogger().info("Tower blocked in frame.");
+                logger.debug("Tower: {} is blocked in-frame.", IDString());
 				return false;
 			}
 		}
-		//if(BuildingWall.DEBUG) FMLLog.getLogger().info("canbuildtower");
+        logger.debug("Tower: {} can be built", IDString());
 		return true;
 	}
 
