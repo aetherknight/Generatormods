@@ -733,7 +733,7 @@ public class Building {
 		}
 	}
 
-	private ItemStack getChestItemstack(String chestType) {
+	private ItemStack getChestItemstack(ChestType chestType) {
 		if (chestType.equals(ChestType.TOWER) && random.nextInt(4) == 0) { // for tower chests, chance of returning the tower block
             return new ItemStack(bRule.primaryBlock.getBlock(), random.nextInt(10),
                     bRule.primaryBlock.getMeta());
@@ -747,6 +747,7 @@ public class Building {
         ChestItemSpec chosenItem =
                 PickWeighted.pickWeightedOption(world.rand, weights,
                         chestContentsSpec.getChestItems());
+        logger.debug("Chose {} from chest type {}", chosenItem.toSpecString(), chestType);
         Object obj = chosenItem.getBlockOrItem();
         if(obj == null){
             return null;
@@ -1170,26 +1171,42 @@ public class Building {
 		return metadata + tempdata;
 	}
 
-	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setLootChest
-	// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
 	private void setLootChest(int[] pt, Block chestBlock, int meta, String chestType) {
-		if (world.setBlock(pt[0], pt[1], pt[2], chestBlock, meta, 2)) {
-			TileEntityChest chest = (TileEntityChest) world.getTileEntity(pt[0], pt[1], pt[2]);
-            if (chestItems != null && chestItems.containsKey(chestType)) {
-                for (int m = 0; m < chestItems.get(chestType).getTries(); m++) {
-					if (random.nextBoolean()) {
-						ItemStack itemstack = getChestItemstack(chestType);
-						if (itemstack != null && chest != null)
-							chest.setInventorySlotContents(random.nextInt(chest.getSizeInventory()), itemstack);
-					}
-				}
-			}
-		}
+        logger.debug("creating chest at ({},{},{}) with type of {}", pt[0], pt[1], pt[2], chestType);
+        if (!world.setBlock(pt[0], pt[1], pt[2], chestBlock, meta, 2)) {
+            return;
+        }
+        TileEntityChest chest = (TileEntityChest) world.getTileEntity(pt[0], pt[1], pt[2]);
+        ChestType chestTypeEnum;
+        try {
+            chestTypeEnum = ChestType.valueOf(chestType);
+        } catch (IllegalArgumentException e) {
+            logger.error("unknown chest type: {}", chestType);
+            return;
+        }
+        if (chestItems == null) {
+            logger.error("chestItems is null!");
+            return;
+        }
+        if (!chestItems.containsKey(chestTypeEnum)) {
+            logger.error("unknown chest type (but known enum): {}", chestType);
+            return;
+        }
+        for (int m = 0; m < chestItems.get(chestTypeEnum).getTries(); m++) {
+            logger.debug("setLootChest(): Try {} ", m);
+            if (random.nextBoolean()) {
+                logger.debug("Success, picking an item");
+                ItemStack itemstack = getChestItemstack(chestTypeEnum);
+                if (itemstack != null && chest != null)
+                    chest.setInventorySlotContents(random.nextInt(chest.getSizeInventory()),
+                            itemstack);
+            }
+        }
 	}
 
-	// &&&&&&&&&&&&&&&&& SPECIAL BLOCK FUNCTION - setMobSpawner
-	// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
 	private void setMobSpawner(int[] pt, Block spawner, int metadata, String info) {
+        logger.debug("Creating mob spawner at ({},{},{}) with info of {}", pt[0], pt[1], pt[2],
+                info);
 		if(world.setBlock(pt[0], pt[1], pt[2], spawner, metadata, 2)){
             TileEntityMobSpawner tileentitymobspawner = (TileEntityMobSpawner) world.getTileEntity(pt[0], pt[1], pt[2]);
             if (tileentitymobspawner != null){
