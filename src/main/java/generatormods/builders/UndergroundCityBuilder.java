@@ -222,7 +222,7 @@ public class UndergroundCityBuilder extends AbstractBuilder {
 				for (int x1 = 0; x1 < top_diam; x1++) {
                     if (Shape.CIRCLE_SHAPE[top_diam][x1][y1] >= 0) {
                         WorldUtil.setBlockAndMetaNoLighting(world, i + offset + x1, j + z1, k
-                                + offset + y1, Blocks.air, 0);
+                                + offset + y1, Blocks.air, 0, 2);
                     }
 				}
 			}
@@ -245,7 +245,7 @@ public class UndergroundCityBuilder extends AbstractBuilder {
 					for (int x1 = 0; x1 < bottom_diam; x1++) {
                         if (Shape.CIRCLE_SHAPE[bottom_diam][x1][y1] >= 0) {
                             WorldUtil.setBlockAndMetaNoLighting(world, i + offset + x1, j - z1, k
-                                    + offset + y1, Blocks.air, 0);
+                                    + offset + y1, Blocks.air, 0, 2);
                         }
 					}
 				}

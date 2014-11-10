@@ -533,7 +533,7 @@ public class Building {
                 world.setBlock(block[0], block[1], block[2], blc, block[3], 3);
             else
                 WorldUtil.setBlockAndMetaNoLighting(world, block[0], block[1], block[2], blc,
-                        block[3]);
+                        block[3], 3);
         }
 	}
 
@@ -580,7 +580,7 @@ public class Building {
             world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 2);
         } else {
             WorldUtil.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
-                    rotateMetadata(blockID, metadata));
+                    rotateMetadata(blockID, metadata), 2);
         }
         if (BlockProperties.get(blockID).isDoor) {
             addDoorToNewListIfAppropriate(pt[0], pt[1], pt[2]);
@@ -634,7 +634,7 @@ public class Building {
 			world.setBlock(pt[0], pt[1], pt[2], blockID, rotateMetadata(blockID, metadata), 3);
 		else
             WorldUtil.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2], blockID,
-                    rotateMetadata(blockID, metadata));
+                    rotateMetadata(blockID, metadata), 3);
 		if (BlockProperties.get(blockID).isDoor) {
 			addDoorToNewListIfAppropriate(pt[0], pt[1], pt[2]);
 		}

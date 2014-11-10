@@ -26,6 +26,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.ISaveHandler;
 
 /**
@@ -116,20 +117,48 @@ public class WorldUtil {
     }
 
     /**
-     * Appears to set a block (and its metadata) at a given coordinate, in a manner that appears to
-     * set the value directly instead of using something like StructureComponent's
-     * placeBlockAtCurrentPosition().
-     * <p>
-     * TODO: We should consider using something similar to StructureComponent's
-     * placeBlockAtCurrentPosition()
+     * Essentially World.setBlock(), but disables updating the lighting.
      */
-    public static void setBlockAndMetaNoLighting(World world, int i, int j, int k, Block blockId,
-            int meta) {
-        if (i < 0xfe363c80 || k < 0xfe363c80 || i >= 0x1c9c380 || k >= 0x1c9c380 || j < 0
-                || j > WORLD_MAX_Y)
-            return;
-        world.getChunkFromChunkCoords(i >> 4, k >> 4).func_150807_a(i & 0xf, j, k & 0xf, blockId,
-                meta);
+    public static boolean setBlockAndMetaNoLighting(World world, int i, int j, int k, Block block,
+            int meta, int flags) {
+        if (i >= -30000000 && k >= -30000000 && i < 30000000 && k < 30000000) {
+            if (j < 0) {
+                return false;
+            } else if (j >= 256) {
+                return false;
+            } else {
+                Chunk chunk = world.getChunkFromChunkCoords(i >> 4, k >> 4);
+                Block block1 = null;
+
+                if ((flags & 1) != 0) {
+                    block1 = chunk.getBlock(i & 15, j, k & 15);
+                }
+
+                boolean flag = chunk.func_150807_a(i & 15, j, k & 15, block, meta);
+                // world.theProfiler.startSection("checkLight");
+                // world.func_147451_t(i, j, k);
+                // world.theProfiler.endSection();
+
+                if (flag) {
+                    if ((flags & 2) != 0 && (!world.isRemote || (flags & 4) == 0)
+                            && chunk.func_150802_k()) {
+                        world.markBlockForUpdate(i, j, k);
+                    }
+
+                    if (!world.isRemote && (flags & 1) != 0) {
+                        world.notifyBlockChange(i, j, k, block1);
+
+                        if (block.hasComparatorInputOverride()) {
+                            world.func_147453_f(i, j, k, block);
+                        }
+                    }
+                }
+
+                return flag;
+            }
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -159,7 +188,7 @@ public class WorldUtil {
         Block fillBlockId = oldSurfaceBlockId == Blocks.grass ? Blocks.dirt : oldSurfaceBlockId;
         for (; lowPt[1] <= jtop; lowPt[1]++)
             setBlockAndMetaNoLighting(world, lowPt[0], lowPt[1], lowPt[2],
-                    lowPt[1] == jtop ? oldSurfaceBlockId : fillBlockId, 0);
+                    lowPt[1] == jtop ? oldSurfaceBlockId : fillBlockId, 0, 2);
     }
 
     public static File getWorldSaveDir(World world) {

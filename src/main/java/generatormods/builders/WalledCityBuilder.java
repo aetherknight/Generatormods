@@ -511,10 +511,10 @@ public class WalledCityBuilder extends AbstractBuilder implements ILayoutGenerat
 						for (; pt[1] > jmax; pt[1]--)
 							if (!world.isAirBlock(pt[0], pt[1], pt[2]))
                                 WorldUtil.setBlockAndMetaNoLighting(world, pt[0], pt[1], pt[2],
-                                        Blocks.air, 0);
+                                        Blocks.air, 0, 2);
 						if (!world.isAirBlock(pt[0], jmax - 1, pt[2]))
                             WorldUtil.setBlockAndMetaNoLighting(world, pt[0], jmax, pt[2],
-                                    oldSurfaceBlockId, 0);
+                                    oldSurfaceBlockId, 0, 2);
 					}
 					if (pt[1] < jmin)
                         WorldUtil.fillDown(pt, jmin, world);
